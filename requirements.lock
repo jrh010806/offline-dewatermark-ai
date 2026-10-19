@@ -1,0 +1,20 @@
+# 本机实测通过的精确版本，换机器时用：pip install -r requirements.lock
+# 生成方式：python -m pip freeze（已剔除历史改写工具 git-filter-repo，运行时不需要）
+# Python 版本：3.14.6；若目标机装不了 3.14，见 MIGRATION.md §降级方案
+ImageIO==2.38.1
+lazy-loader==0.6
+networkx==3.7
+numpy==2.5.4
+opencv-python==5.0.0.93
+packaging==26.3
+pillow==13.0.0
+pymupdf==1.28.2
+PySide6==6.12.0
+PySide6_Addons==6.12.0
+PySide6_Essentials==6.12.0
+PySide6_Pdf==6.12.0.140
+PySide6_WebEngine==6.12.0.140
+scikit-image==0.26.0
+scipy==1.18.1
+shiboken6==6.12.0
+tifffile==2026.10.15

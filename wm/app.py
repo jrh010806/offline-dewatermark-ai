@@ -29,7 +29,10 @@ OPEN_FILTER = "可处理文档 (*.pdf *.png *.jpg *.jpeg *.bmp *.tif *.tiff);;�
 def make_app() -> QApplication:
     """Qt's fallback font has no CJK glyphs, so every label renders as a box."""
     app = QApplication.instance() or QApplication(sys.argv[:1])
-    app.setFont(QFont("Microsoft YaHei", 9))
+    font = QFont()
+    font.setFamilies(["Microsoft YaHei", "Noto Sans CJK SC", "PingFang SC", "WenQuanYi Micro Hei"])
+    font.setPointSize(9)
+    app.setFont(font)
     return app
 
 

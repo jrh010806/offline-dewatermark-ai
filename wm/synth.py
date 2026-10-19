@@ -9,17 +9,53 @@ from __future__ import annotations
 
 import io
 import json
+import os
 import random
 from pathlib import Path
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-FONTS = {
-    "body": "C:/Windows/Fonts/simsun.ttc",
-    "head": "C:/Windows/Fonts/msyhbd.ttc",
-    "hei": "C:/Windows/Fonts/simhei.ttf",
+# The corpus is only as faithful to a real tender document as the fonts it can
+# find on this machine, so these are looked up rather than hard-coded.
+_FONT_ROOTS = [p for p in [
+    os.environ.get("WM_FONTS_DIR"),
+    "C:/Windows/Fonts",
+    "/usr/share/fonts",
+    "/Library/Fonts",
+    str(Path(__file__).with_name("fonts")),
+] if p]
+
+_FONT_FILES = {
+    "body": ["simsun.ttc", "NotoSerifCJKsc-Regular.otf", "SourceHanSerifSC-Regular.otf", "wqy-zenhei.ttc"],
+    "head": ["msyhbd.ttc", "NotoSansCJKsc-Bold.otf", "SourceHanSansSC-Bold.otf", "wqy-microhei.ttc"],
+    "hei": ["simhei.ttf", "NotoSansCJKsc-Regular.otf", "SourceHanSansSC-Regular.otf", "wqy-zenhei.ttc"],
 }
+
+_font_cache: dict[str, str] = {}
+
+
+def _resolve_font(kind: str) -> str:
+    if kind not in _font_cache:
+        for root in _FONT_ROOTS:
+            base = Path(root)
+            for name in _FONT_FILES[kind]:
+                # Linux ships fonts nested by vendor, Windows keeps them flat.
+                found = [base / name] if (base / name).exists() else \
+                    list(base.rglob(name)) if os.name == "posix" else []
+                if found:
+                    _font_cache[kind] = str(found[0])
+                    break
+            if kind in _font_cache:
+                break
+        if kind not in _font_cache:
+            # Falling back to PIL's default bitmap font would draw every Han
+            # glyph as an empty box, and the mask metrics would then measure a
+            # corpus that contains no text. Refuse loudly instead.
+            raise FileNotFoundError(
+                f"未找到中文字体（kind={kind}），已尝试目录：{_FONT_ROOTS}。"
+                f"请安装黑体/宋体，或设置环境变量 WM_FONTS_DIR 指向字体目录。")
+    return _font_cache[kind]
 
 _SENTENCES = [
     "本项目围绕离线智能去水印技术开展研究，重点解决复杂样式水印的定位与还原问题。",
@@ -57,7 +93,7 @@ WATERMARK_STYLES = (
 
 
 def _font(kind: str, px: int) -> ImageFont.FreeTypeFont:
-    return ImageFont.truetype(FONTS[kind], px)
+    return ImageFont.truetype(_resolve_font(kind), px)
 
 
 def _wrap(draw: ImageDraw.ImageDraw, text: str, font, width: int, max_lines: int):

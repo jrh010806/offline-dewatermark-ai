@@ -5,3 +5,5 @@ data/
 out/
 *.log
 .qoder/
+# 投标策略与需求分析，含竞标判断，只留本地
+docs/

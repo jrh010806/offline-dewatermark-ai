@@ -193,8 +193,48 @@ def _empty(paper: np.ndarray) -> MaskLayer:
                      footprint=np.zeros(paper.shape[:2], bool))
 
 
+def blocking_ratio(img: np.ndarray) -> float:
+    """How much of the page's quiet-area gradient sits on 8-pixel boundaries.
+
+    JPEG quantises whole 8x8 blocks, so its error is periodic; lossless pages
+    have no such structure and the ratio sits near 1. Restricted to quiet
+    transitions because glyph strokes would otherwise drown the signal."""
+    g = img.astype(np.float32).mean(2)
+    ratios = []
+    for axis in (1, 0):
+        d = np.abs(np.diff(g, axis=axis))
+        quiet = d < 3.0
+        n = d.shape[1] if axis == 1 else d.shape[0]
+        grid = np.zeros(n, bool)
+        grid[((np.arange(n) + 1) % 8) == 0] = True
+        sel = (np.broadcast_to(grid, d.shape) if axis == 1
+               else np.broadcast_to(grid[:, None], d.shape))
+        b, i = d[sel & quiet], d[~sel & quiet]
+        if b.size and i.size:
+            ratios.append(float(b.mean() / max(i.mean(), 1e-3)))
+    return float(np.mean(ratios)) if ratios else 1.0
+
+
+def deblock(img: np.ndarray) -> np.ndarray:
+    """A copy of the page used for *locating*, median-filtered when it carries
+    JPEG blocking.
+
+    A JPEG round trip moves every pixel by a few levels, which is the same
+    magnitude as a light veil's deviation, so the covered-paper spike smears
+    into a continuum and whole blocks read as watermark: at quality 75 mask
+    precision falls 0.90 -> 0.31, and the large-centred style collapses from
+    0.55 to 0.02. A 3x3 median pulls the poles back (0.02 -> 0.45) but costs
+    precision on clean pages (0.55 -> 0.47), so it is gated on the blocking
+    ratio, which separates the two regimes on the synthetic set (lossless
+    0.97-1.07 against 1.20-2.16 at quality 75). Locating never reaches the
+    output: un-mixing runs on the pixels the client gave us, otherwise the
+    fidelity clause would be measuring our own filtering."""
+    return img if blocking_ratio(img) < 1.35 else cv2.medianBlur(img, 3)
+
+
 def estimate_single_page(img: np.ndarray, thr: Thresholds = Thresholds(),
                          close_px: int = 11) -> MaskLayer:
+    img = deblock(img)
     paper = paper_level(img)
     P = float(np.median(paper))
     gray = img.astype(np.float32).mean(2)
@@ -248,7 +288,7 @@ def estimate_crosspage(images: list[np.ndarray], thr: Thresholds = Thresholds(),
     if band.mean() < _MIN_FRACTION:
         band = dev > 0.45 * m
     shape = _extend_shape(band.astype(np.float32), close_px)
-    page0 = images[0]
+    page0 = deblock(images[0])
     gray0 = page0.astype(np.float32).mean(2)
     s, t, t_level = _fit_poles(page0, gray0, shape, P, m)
     anchor = paper_anchor(gray, P)

@@ -14,15 +14,16 @@ import numpy as np
 from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtGui import QFont, QImage, QPixmap
 from PySide6.QtWidgets import (
-    QApplication, QComboBox, QHBoxLayout, QLabel, QListWidget, QListWidgetItem,
-    QMainWindow, QProgressBar, QPushButton, QSplitter, QTableWidget,
-    QTableWidgetItem, QVBoxLayout, QWidget,
+    QApplication, QComboBox, QFileDialog, QHBoxLayout, QLabel, QListWidget,
+    QListWidgetItem, QMainWindow, QProgressBar, QPushButton, QSplitter,
+    QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget,
 )
 
 from . import documents, pipeline
 from .contract import JobEvent, JobState, PageImage, PageResult, Thresholds
 
 VIEW_MODES = ("结果", "原图", "掩码叠加", "分屏对比")
+OPEN_FILTER = "可处理文档 (*.pdf *.png *.jpg *.jpeg *.bmp *.tif *.tiff);;所有文件 (*)"
 
 
 def make_app() -> QApplication:
@@ -147,8 +148,16 @@ class MainWindow(QMainWindow):
         self.worker: Worker | None = None
 
     def open_file(self, path: str | Path | None = None) -> None:
-        path = Path(path) if path else Path("data/syn/doc00_tiled_text/page00.png")
-        self.pages = documents.load_pages(path, dpi=200)
+        if not path:
+            files, _ = QFileDialog.getOpenFileNames(
+                self, "打开文档（可多选图片，同一水印的图片作为一批处理）",
+                "data", OPEN_FILTER)
+            if not files:
+                return
+            pages = documents.load_many(files)
+        else:
+            pages = documents.load_pages(path, dpi=200)
+        self.pages = pages
         self.results = []
         self.page_list.clear()
         for page in self.pages:

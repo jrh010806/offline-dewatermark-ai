@@ -22,6 +22,17 @@ def load_pages(path: str | Path, dpi: int = 200) -> list[PageImage]:
     raise ValueError(f"unsupported input {path.suffix}")
 
 
+def load_many(paths: list[str | Path], dpi: int = 200) -> list[PageImage]:
+    """A hand-picked set of image files is one batch: same watermark, many
+    pages, so the cross-page prior still applies."""
+    pages: list[PageImage] = []
+    for p in paths:
+        pages.extend(load_pages(p, dpi=dpi))
+    for i, page in enumerate(pages):
+        page.page_index = i
+    return pages
+
+
 def _pdf_pages(path: Path, dpi: int) -> list[PageImage]:
     doc = fitz.open(str(path))
     pages = []

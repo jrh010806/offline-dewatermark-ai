@@ -1,0 +1,131 @@
+<style>
+.mx{font:13px/1.5 "Segoe UI",system-ui,sans-serif;color:#e8eaf0;background:#15171c;padding:18px;border-radius:10px}
+.mx h1{font-size:17px;margin:0 0 4px}
+.mx h2{font-size:14px;margin:22px 0 8px;color:#8ab4ff;border-left:3px solid #8ab4ff;padding-left:8px}
+.mx p.sub{color:#9aa3b2;margin:0 0 14px}
+.mx table{border-collapse:collapse;width:100%;font-size:12px}
+.mx th{background:#22262e;text-align:left;padding:6px 8px;color:#c9d2e0;position:sticky;top:0}
+.mx td{border-bottom:1px solid #262a33;padding:5px 8px;vertical-align:top}
+.mx tr.grp td{background:#1d2129;color:#8ab4ff;font-weight:600}
+.mx code{background:#22262e;padding:1px 4px;border-radius:3px;font-family:Consolas,monospace;font-size:11px}
+.tag{display:inline-block;padding:1px 6px;border-radius:9px;font-size:11px;border:1px solid}
+.done{color:#7ee08a;border-color:#2f5c36}.part{color:#f0c674;border-color:#6b5a2c}
+.todo{color:#9aa3b2;border-color:#333842}.gpu{color:#e08a8a;border-color:#5c2f2f}
+.bar{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0 0;font-size:12px;color:#9aa3b2}
+.chk{display:block;margin:6px 0;padding:8px 10px;background:#1b1f26;border:1px solid #2a2f38;border-radius:6px;cursor:pointer}
+.chk.on{border-color:#7ee08a;background:#182019}
+.chk b{color:#e8eaf0}
+.chk small{display:block;color:#9aa3b2;margin-top:2px}
+.cnt{font-size:12px;color:#7ee08a;margin-top:8px}
+</style>
+<div class="mx">
+<h1>离线智能去水印 · 功能矩阵 × 技术栈确认表</h1>
+<p class="sub">需求 7009111111 ｜ 状态截至 2026-10-19 ｜ 矩阵原文在 <code>离线智能去水印_产品化准备与交付物路线图.md</code> §2（40 个编号），本页按"已实现 / 部分 / 未开始 / 需GPU"重新对齐了代码实际状态</p>
+
+<h2>1. 功能矩阵（按模块）</h2>
+<table>
+<tr><th style="width:78px">编号</th><th style="width:200px">功能</th><th style="width:62px">来源</th><th style="width:40px">优先级</th><th>技术路径 → 开源库</th><th style="width:96px">状态</th></tr>
+
+<tr class="grp"><td colspan="6">M1 输入与解析</td></tr>
+<tr><td>WM-101</td><td>PDF 逐页光栅化</td><td>门限1</td><td>P0</td><td>PyMuPDF <code>get_pixmap(dpi)</code></td><td><span class="tag done">已实现</span></td></tr>
+<tr><td>WM-102</td><td>JPG/PNG/TIFF 单张与多页图</td><td>门限1</td><td>P0</td><td>Pillow + OpenCV 解码</td><td><span class="tag part">部分(未接TIFF多页)</span></td></tr>
+<tr><td>WM-103</td><td>PDF 结构解析：对象/图层/smask</td><td>自加</td><td>P0</td><td>PyMuPDF XObject 遍历</td><td><span class="tag done">已实现</span></td></tr>
+<tr><td>WM-104</td><td>PDF 文本层与坐标读取</td><td>自加</td><td>P1</td><td>PyMuPDF <code>get_text("dict")</code></td><td><span class="tag todo">未开始</span></td></tr>
+<tr><td>WM-105</td><td>DPI/色彩空间/EXIF 归一</td><td>自加</td><td>P1</td><td>Pillow + lcms(OpenCV)</td><td><span class="tag todo">未开始</span></td></tr>
+
+<tr class="grp"><td colspan="6">M2 水印定位（成败在此）</td></tr>
+<tr><td>WM-201</td><td>跨页统计先验：按页中位数戳出无内容水印</td><td>自加</td><td>P0</td><td>numpy 逐像素中位数 + 直方图尖峰</td><td><span class="tag done">已实现并验证</span></td></tr>
+<tr><td>WM-202</td><td>单页色调通道：叠印极点反解</td><td>门限3</td><td>P0</td><td><code>I=s·B+t</code>，OpenCV 形态学</td><td><span class="tag done">已实现</span></td></tr>
+<tr><td>WM-203</td><td>纸面锚点门 / 墨晕保护</td><td>自加</td><td>P0</td><td>形态学膨胀 + 双极点一致性</td><td><span class="tag done">今日新增</span></td></tr>
+<tr><td>WM-204</td><td>点阵/晶格周期检测</td><td>门限3</td><td>P1</td><td>FFT(<code>numpy.fft</code>) / 自相关</td><td><span class="tag todo">未开始</span></td></tr>
+<tr><td>WM-205</td><td>样式模板匹配（指定样式）</td><td>期望7</td><td>P1</td><td>OpenCV 模板匹配 / ORB</td><td><span class="tag todo">未开始</span></td></tr>
+<tr><td>WM-206</td><td>开放词表定位（提示词→区域）</td><td>期望5</td><td>P1</td><td>Grounding DINO + SAM 2（需GPU）</td><td><span class="tag gpu">需GPU</span></td></tr>
+<tr><td>WM-207</td><td>单层水印提取（独立 alpha 图层）</td><td>期望6</td><td>P0</td><td><code>pipeline.extract_watermark</code> RGBA</td><td><span class="tag done">已实现</span></td></tr>
+<tr><td>WM-208</td><td>实例化：逐条水印带 bbox/置信度</td><td>自加</td><td>P0</td><td>connectedComponents</td><td><span class="tag done">已实现</span></td></tr>
+<tr><td>WM-209</td><td>白名单保护（印章/签名/二维码）</td><td>自加</td><td>P0</td><td>HSV 红色分割 + 区域锁定</td><td><span class="tag part">合成集有印章,规则未实现</span></td></tr>
+
+<tr class="grp"><td colspan="6">M3 区域语义判别</td></tr>
+<tr><td>WM-301</td><td>区域图：背景/照片/文字/表格线/印章</td><td>自加</td><td>P1</td><td>contract <code>RegionKind</code> 已定义</td><td><span class="tag part">仅契约,未实现</span></td></tr>
+<tr><td>WM-302</td><td>文字区判定（OCR 置信度场）</td><td>自加</td><td>P1</td><td>PaddleOCR（需GPU/CPU可跑）</td><td><span class="tag todo">未开始</span></td></tr>
+
+<tr class="grp"><td colspan="6">M4 修复与重建</td></tr>
+<tr><td>WM-401</td><td>代数反混合 <code>B=(I-βt)/(1-β(1-s))</code></td><td>门限3</td><td>P0</td><td>numpy</td><td><span class="tag done">已实现(优于inpaint)</span></td></tr>
+<tr><td>WM-402</td><td>遮挡区学习重建（水印压在文字/图案上）</td><td>门限3</td><td>P0</td><td>LaMa / SDXL+ControlNet（需GPU）</td><td><span class="tag gpu">未开始·当前唯一硬缺口</span></td></tr>
+<tr><td>WM-403</td><td>低置信不重绘（宁欠不幻）</td><td>自加</td><td>P0</td><td>置信度阈值 + 墨晕保护</td><td><span class="tag done">已实现</span></td></tr>
+<tr><td>WM-404</td><td>传统修补占位</td><td>自加</td><td>P2</td><td>OpenCV TELEA</td><td><span class="tag done">已实现(实测更差)</span></td></tr>
+
+<tr class="grp"><td colspan="6">M5 校验与回退</td></tr>
+<tr><td>WM-501</td><td>四条件协议：保真/残膜/识别/时限</td><td>自加</td><td>P0</td><td>verdict.py + scikit-image PSNR/SSIM</td><td><span class="tag done">已实现</span></td></tr>
+<tr><td>WM-502</td><td>非水印区一致性 Δ 度量</td><td>指标3</td><td>P0</td><td>掩码外像素差均值/p99</td><td><span class="tag done">已实现</span></td></tr>
+<tr><td>WM-503</td><td>判定失败自动回退原图</td><td>自加</td><td>P0</td><td>管线内 fail→保留源页</td><td><span class="tag todo">未开始</span></td></tr>
+<tr><td>WM-504</td><td>逐页审计记录（可导出）</td><td>自加</td><td>P1</td><td><code>JobEvent</code> JSON</td><td><span class="tag part">结构已定,未落盘</span></td></tr>
+
+<tr class="grp"><td colspan="6">M6 重组与输出</td></tr>
+<tr><td>WM-601</td><td>引擎A：删除水印对象（无损）</td><td>自加</td><td>P0</td><td><code>structure.strip_pdf</code> delete_image</td><td><span class="tag part">已实现,路由有崩溃</span></td></tr>
+<tr><td>WM-602</td><td>光栅页重组成 PDF（保页数/元数据）</td><td>门限1</td><td>P0</td><td>PyMuPDF insert_image</td><td><span class="tag todo">未开始(现只出PNG)</span></td></tr>
+<tr><td>WM-603</td><td>批量输出目录/命名/原格式回写</td><td>门限2</td><td>P0</td><td>pipeline.write_results</td><td><span class="tag done">已实现(PNG)</span></td></tr>
+
+<tr class="grp"><td colspan="6">M7 批处理与工程</td></tr>
+<tr><td>WM-701</td><td>流式批处理，不限张数</td><td>指标</td><td>P0</td><td>逐页生成器 + 有界内存</td><td><span class="tag part">整文档载入,未流式</span></td></tr>
+<tr><td>WM-702</td><td>批任务界面（进度/成功率/失败原因）</td><td>门限2</td><td>P0</td><td>PySide6 QThread + JobEvent</td><td><span class="tag done">最小可用</span></td></tr>
+<tr><td>WM-703</td><td>断点续跑 / 失败重试</td><td>自加</td><td>P1</td><td>任务状态表</td><td><span class="tag todo">未开始</span></td></tr>
+<tr><td>WM-704</td><td>&lt;2 分钟/张（A6000）</td><td>指标</td><td>P0</td><td>GPU 流水线 / TensorRT 或 ONNXRuntime</td><td><span class="tag gpu">未测(开发机GTX1050)</span></td></tr>
+<tr><td>WM-705</td><td>完全离线（无网络调用、权重本地）</td><td>门限4</td><td>P0</td><td>PyInstaller 打包 + 权重 sha256 校验</td><td><span class="tag todo">未开始</span></td></tr>
+
+<tr class="grp"><td colspan="6">M8 合规</td></tr>
+<tr><td>WM-801</td><td>授权声明与用途限制</td><td>自加</td><td>P0</td><td>首次运行确认 + 日志</td><td><span class="tag todo">未开始</span></td></tr>
+<tr><td>WM-802</td><td>处理痕迹（防伪造追溯）</td><td>自加</td><td>P1</td><td>输出嵌入处理指纹</td><td><span class="tag todo">未开始</span></td></tr>
+<tr><td>WM-803</td><td>中英文提示词互译</td><td>期望5</td><td>P2</td><td>离线词典/小模型（禁在线API）</td><td><span class="tag todo">未开始</span></td></tr>
+</table>
+
+<h2>2. 技术栈 / 开源库确认</h2>
+<table>
+<tr><th style="width:150px">层</th><th style="width:270px">选型</th><th style="width:60px">许可</th><th>作用与状态</th></tr>
+<tr><td>运行时</td><td>Python 3.14.6 + venv</td><td>PSF</td><td>本机 <code>.venv</code> 已就绪</td></tr>
+<tr><td>数值</td><td>numpy 2.5.4</td><td>BSD</td><td>叠印反解、逐页中位数（已用）</td></tr>
+<tr><td>视觉</td><td>OpenCV 5.0.0</td><td>Apache-2.0</td><td>形态学、尖峰、inpaint、自适应二值化（已用）</td></tr>
+<tr><td>指标</td><td>scikit-image 0.26.0</td><td>BSD</td><td>PSNR / SSIM 保真判定（已用）</td></tr>
+<tr><td>文档</td><td>PyMuPDF 1.28.2</td><td>AGPL ⚠</td><td>光栅化＋对象级删除（已用）。<b>AGPL 对交付是许可风险</b>，需评估替换 pdfium/pypdfium2</td></tr>
+<tr><td>图像</td><td>Pillow</td><td>MIT-CMU</td><td>合成集绘制与编解码（已用）</td></tr>
+<tr><td>界面</td><td>PySide6 6.12.0</td><td>LGPL ⚠</td><td>桌面壳（已用，LGPL 需动态链接＋允许重打包）</td></tr>
+<tr><td>重建模型</td><td>LaMa（big-lama）</td><td>Apache-2.0</td><td><b>待引入</b>：只处理水印压在文字/图案上的像素，需 torch+CUDA</td></tr>
+<tr><td>识别模型</td><td>PaddleOCR (PP-OCRv5)</td><td>Apache-2.0</td><td><b>待引入</b>：WM-302 文字区置信度场、"不影响识别"的 CER 度量</td></tr>
+<tr><td>开放词表</td><td>Grounding DINO + SAM 2</td><td>Apache-2.0</td><td>可选：WM-206 提示词定位，显存占用大，投标阶段可降级为样式库</td></tr>
+<tr><td>推理加速</td><td>ONNXRuntime / TensorRT</td><td>MIT/Apache</td><td>待引入：满足 A6000 的 2 分钟/张</td></tr>
+<tr><td>打包</td><td>PyInstaller ＋ 权重离线校验</td><td>GPL ⚠(仅构建)</td><td>待引入：门限4 离线部署；PyInstaller 许可证需确认（可用 Nuitka 备选）</td></tr>
+</table>
+
+<h2>3. 需要你确认的 5 个决策</h2>
+<label class="chk" data-i="0"><b>① 是否现在就引入 torch + LaMa</b><small>影响：包体 ~2.5GB、离线安装脚本、必须有 NVIDIA 环境。不引入则"水印压文字"无法过 0.90 识别线（今日实测上限 0.72）</small></label>
+<label class="chk" data-i="1"><b>② 引擎A（结构删除）优先于 AI 通道</b><small>影响：能解析出 smask 图层的水印走无损删除，秒级、零误删；代价是要先修 <code>structure.strip_pdf</code> 路由崩溃</small></label>
+<label class="chk" data-i="2"><b>③ "识别"用 OCR CER 还是自适应二值化 IoU</b><small>影响：现在用后者（0.90 线）。改成 CER 需要 PaddleOCR，但更贴近"不影响内容识别"的原始表述</small></label>
+<label class="chk" data-i="3"><b>④ 深色重水印/极小角标走样式库，不走单页色调通道</b><small>影响：接受今日结论——heavy_dark 与 corner_id 在色调通道不可辨识，改为"先注册样式再批量处理"</small></label>
+<label class="chk" data-i="4"><b>⑤ 把代码目录初始化成 git 仓库</b><small>现状：<code>C:\Users\LEGION\Documents\Qoder\2026-10-19\afa55361</code> 不是 git 仓库（无版本、无回滚）。建议 <code>git init</code> ＋ <code>.gitignore</code>（排除 .venv/ data/ out/）</small></label>
+<div class="cnt" id="cnt">已确认 0 / 5</div>
+
+<h2>4. 代码地图（1715 行，12 个文件）</h2>
+<table>
+<tr><th style="width:130px">文件</th><th style="width:52px">行数</th><th>职责</th></tr>
+<tr><td>contract.py</td><td>232</td><td>接口契约（算法轨与UI轨唯一的协调成本）</td></tr>
+<tr><td>masks.py</td><td>330</td><td>水印定位：尖峰极点、纸面锚点、墨晕保护、跨页先验</td></tr>
+<tr><td>synth.py</td><td>280</td><td>带真值合成集（含印章/点线/渐变陷阱）</td></tr>
+<tr><td>app.py</td><td>251</td><td><b>前端</b>：PySide6 工作台（页列表＋四视图＋指标＋进度）</td></tr>
+<tr><td>cli.py</td><td>141</td><td>synth / eval / fixtures / run 四个命令</td></tr>
+<tr><td>verdict.py</td><td>136</td><td>四条件协议（含误伤/残留分解）</td></tr>
+<tr><td>pipeline.py</td><td>111</td><td>双引擎路由与逐页处理</td></tr>
+<tr><td>structure.py</td><td>73</td><td>引擎A：PDF 水印对象探测与删除</td></tr>
+<tr><td>repair.py</td><td>49</td><td>反混合与修补</td></tr>
+<tr><td>documents.py / fixtures.py / __init__.py</td><td>112</td><td>载入保存、PDF 测试夹具、包导出</td></tr>
+</table>
+
+<div class="bar">
+<span>评测：<code>./.venv/Scripts/python.exe -m wm.cli eval --data data/syn</code></span>
+<span>前端：<code>./.venv/Scripts/python.exe -m wm.app data/pdf/doc00_tiled_text/raster_flattened.pdf</code></span>
+</div>
+</div>
+<script>
+(function(){var n=0,total=document.querySelectorAll('.chk').length;
+document.querySelectorAll('.chk').forEach(function(el){el.addEventListener('click',function(){
+el.classList.toggle('on');n=document.querySelectorAll('.chk.on').length;
+document.getElementById('cnt').textContent='已确认 '+n+' / '+total;});});})();
+</script>

@@ -12,7 +12,7 @@ from pathlib import Path
 
 import numpy as np
 from PySide6.QtCore import Qt, QThread, Signal
-from PySide6.QtGui import QImage, QPixmap
+from PySide6.QtGui import QFont, QImage, QPixmap
 from PySide6.QtWidgets import (
     QApplication, QComboBox, QHBoxLayout, QLabel, QListWidget, QListWidgetItem,
     QMainWindow, QProgressBar, QPushButton, QSplitter, QTableWidget,
@@ -23,6 +23,13 @@ from . import documents, pipeline
 from .contract import JobEvent, JobState, PageImage, PageResult, Thresholds
 
 VIEW_MODES = ("结果", "原图", "掩码叠加", "分屏对比")
+
+
+def make_app() -> QApplication:
+    """Qt's fallback font has no CJK glyphs, so every label renders as a box."""
+    app = QApplication.instance() or QApplication(sys.argv[:1])
+    app.setFont(QFont("Microsoft YaHei", 9))
+    return app
 
 
 def to_qimage(arr: np.ndarray) -> QImage:
@@ -61,15 +68,18 @@ class Worker(QThread):
         total = len(self.pages)
         self.event.emit(JobEvent("local", "batch", JobState.RUNNING, 0, total).to_dict())
         passed = 0
+        review = 0
         for i, result in enumerate(pipeline.process_pages(self.pages, thr)):
             self.results.append(result)
-            passed += int(result.verdict.passed)
+            state = (JobState.FAILED if not result.verdict.passed else
+                     JobState.NEEDS_REVIEW if result.verdict.review_needed else JobState.PASSED)
+            passed += state is JobState.PASSED
+            review += state is JobState.NEEDS_REVIEW
             self.result_ready.emit(result)
             self.event.emit(JobEvent(
-                "local", result.source.key,
-                JobState.PASSED if result.verdict.passed else JobState.FAILED,
+                "local", result.source.key, state,
                 i + 1, total, elapsed_ms=result.verdict.elapsed_ms,
-                passed_count=passed,
+                passed_count=passed, review_count=review,
                 failure_codes=[str(f) for f in result.verdict.failures],
             ).to_dict())
         self.finished_all.emit()
@@ -161,14 +171,17 @@ class MainWindow(QMainWindow):
     def on_event(self, payload: dict) -> None:
         self.progress.setValue(payload["index"])
         rate = payload.get("running_success_rate", 0.0)
+        state = payload["state"]
         self.status.setText(
-            f"{payload['page_key']} {payload['state']} · {payload['elapsed_ms']}ms · "
-            f"累计成功率 {rate * 100:.1f}%")
+            f"{payload['page_key']} {state} · {payload['elapsed_ms']}ms · "
+            f"四项全过 {rate * 100:.1f}% · 待复核 {payload.get('review_count', 0)}")
         row = payload["index"] - 1
-        if row >= 0 and payload["state"] in (str(JobState.PASSED), str(JobState.FAILED)):
+        colour = {str(JobState.PASSED): Qt.darkGreen,
+                  str(JobState.NEEDS_REVIEW): Qt.darkYellow,
+                  str(JobState.FAILED): Qt.darkRed}.get(state)
+        if row >= 0 and colour is not None:
             item = self.page_list.item(row)
-            item.setBackground(Qt.darkGreen if payload["state"] == str(JobState.PASSED)
-                               else Qt.darkRed)
+            item.setBackground(colour)
             if row == self._current:
                 self.show_page(row)
 
@@ -217,7 +230,7 @@ class MainWindow(QMainWindow):
 
 
 def smoke(path: str | None) -> int:
-    app = QApplication(sys.argv[:1])
+    app = make_app()
     win = MainWindow()
     win.show()
     win.open_file(path or "data/syn/doc00_tiled_text/page00.png")
@@ -232,14 +245,38 @@ def smoke(path: str | None) -> int:
     return 0
 
 
+def shot(path: str | None, out_dir: str) -> int:
+    """Headless render of the workbench, one PNG per view mode, for demos and reports."""
+    app = make_app()
+    win = MainWindow()
+    win.show()
+    win.open_file(path or "data/pdf/doc00_tiled_text/raster_flattened.pdf")
+    win.start_run()
+    win.worker.wait(240_000)
+    app.processEvents()
+    win.page_list.setCurrentRow(0)
+    app.processEvents()
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    for i, mode in enumerate(VIEW_MODES):
+        win.mode_box.setCurrentText(mode)
+        app.processEvents()
+        win.grab().save(str(out / f"workbench{i}_{mode.split('(')[0]}.png"))
+    print(f"shot -> {out} modes={len(VIEW_MODES)} results={len(win.results)}")
+    return 0
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="wm.app")
     parser.add_argument("file", nargs="?", default=None)
     parser.add_argument("--smoke", action="store_true")
+    parser.add_argument("--shot", default=None, help="无头渲染工作台并输出每个视图的 PNG")
     args = parser.parse_args()
     if args.smoke:
         sys.exit(smoke(args.file))
-    app = QApplication(sys.argv[:1])
+    if args.shot:
+        sys.exit(shot(args.file, args.shot))
+    app = make_app()
     win = MainWindow()
     win.show()
     if args.file:

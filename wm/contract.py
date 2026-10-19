@@ -161,6 +161,13 @@ class VerdictReport:
     def passed(self) -> bool:
         return not self.failures
 
+    @property
+    def review_needed(self) -> bool:
+        """A page whose recognition condition was never measured must not be
+        counted as a success: without ground truth the 60% figure would be made
+        of the three conditions we can check locally."""
+        return "recognition" not in self.conditions
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "page_key": self.page_key,
@@ -170,6 +177,7 @@ class VerdictReport:
             "metrics": {k: round(v, 5) for k, v in self.metrics.items()},
             "failures": [str(f) for f in self.failures],
             "passed": self.passed,
+            "review_needed": self.review_needed,
             "elapsed_ms": self.elapsed_ms,
             "stage_ms": self.stage_ms,
             "has_ground_truth": self.has_ground_truth,
@@ -214,6 +222,7 @@ class JobEvent:
     elapsed_ms: int = 0
     message: str = ""
     passed_count: int = 0
+    review_count: int = 0
     failure_codes: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
@@ -225,8 +234,10 @@ class JobEvent:
             "total": self.total,
             "elapsed_ms": self.elapsed_ms,
             "message": self.message,
+            "passed_count": self.passed_count,
             "running_success_rate": round(
                 self.passed_count / max(self.index, 1), 4
             ),
+            "review_count": self.review_count,
             "failure_codes": self.failure_codes,
         }

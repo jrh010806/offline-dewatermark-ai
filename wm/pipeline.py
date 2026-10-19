@@ -108,4 +108,5 @@ def write_results(results: list[PageResult], out_dir: str | Path) -> None:
     for r in results:
         name = f"{r.source.doc_id}_p{r.source.page_index:02d}"
         documents.save_png(out / f"{name}_clean.png", r.output.image)
-        documents.save_png(out / f"{name}_watermark.png", r.extracted_watermark)
+        if r.extracted_watermark is not None:
+            documents.save_png(out / f"{name}_watermark.png", r.extracted_watermark)

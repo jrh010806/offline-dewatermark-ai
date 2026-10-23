@@ -7,6 +7,9 @@ check this before spending any compute.
 from __future__ import annotations
 
 from pathlib import Path
+from functools import lru_cache
+import logging
+from time import perf_counter
 
 import numpy as np
 import pymupdf as fitz
@@ -71,3 +74,61 @@ def strip_pdf(path: str | Path, out_path: str | Path) -> int:
     finally:
         doc.close()
     return removed
+
+
+@lru_cache(maxsize=2)
+def _text_copy(path: str, revision: tuple[int, int]):
+    from .pdf_text import strip_translucent_text
+    source = Path(path)
+    data = source.read_bytes()
+    stat = source.stat()
+    if (stat.st_mtime_ns, stat.st_size) != revision:
+        raise ValueError("PDF changed since upload")
+    return strip_translucent_text(data)
+
+
+def process_text_page(page, thr):
+    """Optional structure preflight shared by the UI, batch, and CLI.
+
+    Source revision and original page number must match the loaded raster.
+    The edited PDF is kept in memory; user input directories are never written.
+    """
+    from .contract import EngineKind, MaskLayer, MaskSource, PageImage, PageResult
+    from . import verdict
+    if page.source_path is None or page.source_page_index is None or page.source_revision is None:
+        return None
+    t0 = perf_counter()
+    try:
+        source = Path(page.source_path)
+        stat = source.stat()
+        if (stat.st_mtime_ns, stat.st_size) != page.source_revision:
+            return None
+        data, counts = _text_copy(page.source_path, page.source_revision)
+        index = page.source_page_index
+        if index >= len(counts) or not counts[index]:
+            return None
+        # Do not apply the structural result to a caller-modified input image.
+        with fitz.open(page.source_path) as original:
+            pix = original[index].get_pixmap(dpi=page.dpi, colorspace=fitz.csRGB)
+            original_pixels = np.frombuffer(pix.samples, np.uint8).reshape(pix.height, pix.width, pix.n)[..., :3]
+            if not np.array_equal(original_pixels, page.image):
+                return None
+        with fitz.open(stream=data, filetype="pdf") as cleaned:
+            pix = cleaned[index].get_pixmap(dpi=page.dpi, colorspace=fitz.csRGB)
+            output = np.frombuffer(pix.samples, np.uint8).reshape(pix.height, pix.width, pix.n)[..., :3].copy()
+        region = np.any(page.image != output, axis=2)
+        mask = MaskLayer(region.astype(np.float32), source=MaskSource.STRUCTURE,
+                         confidence=.95, footprint=region, method="transparent_pdf_text",
+                         repair_mode="structure",
+                         veil_strength=np.zeros(3, np.float32), veil_offset=np.zeros(3, np.float32))
+        ms = round((perf_counter()-t0)*1000)
+        report = verdict.build_verdict(source=page.image, output=output, mask=mask,
+                    engine=EngineKind.STRUCTURE, repairs=[], elapsed_ms=ms,
+                    stage_ms={"structure_ms": ms}, thr=thr)
+        report.metrics["text_blocks_removed"] = float(counts[index])
+        report.page_key = page.key
+        dst = PageImage(output, page.dpi, page.doc_id, page.page_index, page.source_kind)
+        return PageResult(page, dst, mask, report)
+    except Exception as exc:
+        logging.getLogger(__name__).warning("PDF text preflight unavailable; using raster: %s", exc)
+        return None

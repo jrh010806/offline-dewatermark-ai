@@ -1,6 +1,6 @@
 """Restoration backends. The veil inverse is the primary path because it is
-deterministic and cannot hallucinate glyphs; inpainting only handles the
-residual opaque core.
+deterministic and cannot hallucinate glyphs; deep-learning inpainting (LaMa)
+handles the residual opaque core where the watermark occludes text.
 """
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ import cv2
 import numpy as np
 
 from .contract import MaskLayer, RepairName, Thresholds
-from .masks import ink_halo
+from .lama import repair_with_lama
 
 OPAQUE = 0.97
 
@@ -33,17 +33,10 @@ def repair(img: np.ndarray, mask: MaskLayer,
     shared cross-page coverage field, which is measured on a content-free median
     and therefore knows nothing about this page's glyph ramps, is still protected
     per page. Leaving a little watermark where it crosses text is the deliberate
-    bias: erasing a stroke breaches the tender's third clause outright."""
-    used: list[RepairName] = []
-    if mask.coverage(thr.mask_alpha_min) <= 0:
-        return img.copy(), used
-    P = float(np.median(mask.paper)) if mask.paper is not None else 255.0
-    coverage = mask.alpha.copy()
-    coverage[ink_halo(img.astype(np.float32).mean(2), P)] = 0.0
-    out = alpha_unmix(img, mask, coverage)
-    used.append(RepairName.ALPHA_UNMIX)
-    opaque = coverage >= OPAQUE
-    if opaque.mean() > 1e-5:
-        out = inpaint(out, opaque)
-        used.append(RepairName.INPAINT)
-    return out, used
+    bias: erasing a stroke breaches the tender's third clause outright.
+
+    The opaque core (coverage >= 0.97) is handed to LaMa for deep-learning
+    reconstruction — this is where the watermark sits on top of text and
+    algebraic un-mixing alone cannot recover the original glyphs.
+    """
+    return repair_with_lama(img, mask, thr)

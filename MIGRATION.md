@@ -1,7 +1,7 @@
 # 换机运行说明（MIGRATION）
 
 目标：在任何一台新机器上，四条命令把这套代码跑到"能出评测数字"的状态。
-当前全部功能**纯 CPU**，不需要显卡、不需要网络。
+经典通道纯 CPU 可跑；LaMa 深度学习修复可选（未装时自动回退传统算法）。
 
 ---
 
@@ -15,7 +15,7 @@
 | `data/`（合成语料、PDF 夹具） | ❌ 不在 | **不用拷**，一条命令重新生成，且逐像素一致（随机种子固定为 20261019） |
 | `docs/`（需求分析、路线图、进度小结） | ❌ 故意不在 | 含投标策略，**手工拷贝**这个文件夹 |
 | `out/`（处理结果） | ❌ 不在 | 重跑即得，不用拷 |
-| `models/`（AI 权重，将来才有） | ❌ 不会进 git | 体积大＋许可要单独签，用带外拷贝＋SHA256 校验 |
+| `models/`（LaMa ONNX 权重） | ❌ 不会进 git | 首次运行自动从 Hugging Face 下载（~93 MB），或手工放 `models/inpainting_lama_2025jan.onnx`。OCR 的三个模型（~8 MB）随 `rapidocr-onnxruntime` 的 wheel 一起装，**不需要下载**，见 §7 |
 
 ## 2. 新机器四条命令
 
@@ -31,6 +31,8 @@ pip install -r requirements.lock
 
 ```bash
 python -c "import numpy, cv2, skimage, fitz, PySide6, PIL; print('依赖 OK')"
+python -c "from wm.lama import is_available; print('LaMa:', '可用' if is_available() else '缺失，修复将报错（放入 models/ 目录）')"
+python -c "from wm import ocr; print('OCR:', '可用' if ocr.available() else '未装，检测走保守阈值')"
 python -m wm.cli synth --out data/syn     # 生成带真值语料，约 30 页 / 1 分钟
 python -m wm.cli fixtures                 # 打成测试用 PDF（光栅页 + 结构水印页）
 python -m wm.cli eval                     # 跑四条件评测，出成功率表
@@ -66,18 +68,50 @@ pip install -r requirements.txt   # 只钉主版本，允许装到该 Python 上
 
 **注意**：换 numpy/opencv 小版本可能改变像素级结果（medianBlur 的实现细节、float32 求和顺序都会影响掩码）。降级后必须先跑 `eval` 对表，再决定是否接受这台机器出的数字。
 
-## 6. 有 NVIDIA 显卡的机器
+## 6. LaMa 深度学习修复（WM-402）
 
-现在这些都不需要。将来引入 AI 通道（路线图 WM-203/204/401/402/403）时才装：
+LaMa 已接入，走 ONNX 推理（OpenCV DNN 模块），**不需要 torch**，纯 CPU 即可跑。
+模型文件（~93 MB）来源：`opencv/inpainting_lama`（Hugging Face），Apache-2.0 许可。
 
-```bash
-# CUDA 版 torch，按目标机驱动选 CUDA 版本，别装 CPU wheel
-pip install torch --index-url https://download.pytorch.org/whl/cu124
-```
+**首次运行自动下载**：程序第一次调用 LaMa 时会从 Hugging Face 下载 ONNX 文件，
+缓存到 `~/.cache/huggingface/`。之后走本地缓存，不需要网络。
+
+**离线部署**：在有网机器上先跑一次，然后把 ONNX 文件拷到目标机的以下任一位置：
+- `~/.cache/huggingface/`（默认缓存目录）
+- 项目根目录下 `models/inpainting_lama_2025jan.onnx`
+- 通过环境变量 `WM_LAMA_ONNX=/path/to/model.onnx` 指定
+
+**缺失策略**：ONNX 文件找不到或加载失败时，修复阶段直接抛 `LamaModelMissing`
+错误并在界面显示——**绝不静默回退**到 `cv2.inpaint`。组委会工作站断网，静默回退
+会让效果倒退且无从发现，所以离线部署必须把模型文件放进项目 `models/` 目录。
+
+**NVIDIA GPU 加速**（RTX A6000 实测机）：推理后端已是 onnxruntime，CPU 为默认。
+在装有 `onnxruntime-gpu` 的机器上设环境变量 `WM_LAMA_CUDA=1` 即启用 CUDA 推理，
+启动日志会打印 `providers=[...]` 供确认。
 
 选型与许可结论（哪些模型能商用、哪些必须避开）见 `docs/AI选型与许可_2026-10-19.md`。
 
-## 7. 已知遗留
+## 7. OCR 划禁区（检测的文字保护）
+
+检测器分不清"淡水印"和"字的抗锯齿边"——两者都是中间灰度，所以阈值一放宽就会连字一起擦。
+`wm/ocr.py` 用 OCR（光学字符识别）把"这里确实是正文文字"划成禁区，检测器在禁区外才允许放开阈值。
+**注意它是反向用的**：不是识字，是划保护圈；水印本身也是字，所以只有"和正文同字号、水平、读得清"的框才算禁区，
+印章那种又大又斜又淡的字不会被保护。
+
+- 依赖：`rapidocr-onnxruntime`（RapidOCR 的 ONNX 版，复用 LaMa 已在用的 onnxruntime，不需要 paddle）。
+- **模型随 wheel 打包**（检测＋方向分类＋识别三个文件共 ~8 MB），装完即离线可用，**没有首次联网下载这一步**。
+- 缓存位置在 `.venv/lib/pythonX/site-packages/rapidocr_onnxruntime/models/`，随虚拟环境一起，不用手工拷。
+- 成本：本机实测每页 1–6 秒（纯 CPU）。
+- **可选**：没装这个包时 `text_zones()` 返回 None，检测走原来的保守阈值，管线不受影响。
+
+自检：
+
+```bash
+python -c "from wm import ocr; print('OCR:', '可用' if ocr.available() else '未装，检测走保守阈值')"
+```
+
+## 8. 已知遗留
 
 - `pymupdf==1.28.2` 是 **AGPL-3.0**（一种会传染的强开源许可），闭源交付需替换成 `pypdfium2`（BSD，谷歌 PDFium 的绑定）。替换后必须重跑 `eval` 与 `fixtures`，因为 PDF 渲染器换了 → 底图像素会变。
+- LaMa ONNX 模型（~93 MB）首次运行需联网从 Hugging Face 下载，缓存到 `~/.cache/huggingface/`。离线部署环境需提前在有网机器上跑一次再拷缓存目录，或把文件放到 `models/` 下。
 - 交付机打包（PyInstaller／Nuitka）需要在目标机上验证，本机验证不了。

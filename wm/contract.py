@@ -28,6 +28,7 @@ class EngineKind(StrEnum):
 class RepairName(StrEnum):
     ALPHA_UNMIX = "alpha_unmix"
     INPAINT = "inpaint"
+    PAPER_CLEANUP = "paper_cleanup"
     LAMA = "lama"
     DIFFUSION = "diffusion"
     NONE = "none"
@@ -79,6 +80,11 @@ class Thresholds:
     residual_coverage_max: float = 0.15
     ink_iou_min: float = 0.90
     time_budget_ms: int = 120_000
+    # LaMa inference knobs. The ONNX weights are fixed; these control how the
+    # model is fed, which is what actually changes the result on real samples.
+    lama_context_margin: int = 256   # px of clean page the model gets as context
+    lama_tile_overlap: int = 64      # px of feathered blend between 512 tiles
+    lama_mask_dilate: int = 0        # px to widen the repaint region before inpaint
 
 
 @dataclass
@@ -88,6 +94,10 @@ class PageImage:
     doc_id: str = ""
     page_index: int = 0
     source_kind: str = "pdf_page"
+    # Original PDF identity survives load_many() renumbering; never infer a path from doc_id.
+    source_path: str | None = None
+    source_page_index: int | None = None
+    source_revision: tuple[int, int] | None = None
 
     @property
     def height(self) -> int:
@@ -125,6 +135,11 @@ class MaskLayer:
     instances: list[WatermarkInstance] = field(default_factory=list)
     lattice: tuple[int, int] | None = None
     footprint: np.ndarray | None = None
+    # OCR/repetition supplies geometry, not a measured alpha-compositing model.
+    # Such masks must not run the algebraic inverse with invented veil poles.
+    repair_mode: str = "hybrid"
+    method: str = "tonal"
+    text_keepout: np.ndarray | None = None
 
     def binary(self, threshold: float = Thresholds.mask_alpha_min) -> np.ndarray:
         return (self.alpha >= threshold).astype(np.uint8) * 255
@@ -174,7 +189,7 @@ class VerdictReport:
             "engine": str(self.engine),
             "repairs": [str(r) for r in self.repairs],
             "conditions": self.conditions,
-            "metrics": {k: round(v, 5) for k, v in self.metrics.items()},
+            "metrics": {k: round(v, 5) if np.isfinite(v) else None for k, v in self.metrics.items()},
             "failures": [str(f) for f in self.failures],
             "passed": self.passed,
             "review_needed": self.review_needed,
@@ -193,15 +208,18 @@ class PageResult:
     extracted_watermark: np.ndarray | None = None
     clean_reference: np.ndarray | None = None
     regions: RegionMap | None = None
+    processing: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "page": self.source.key,
             "mask_source": str(self.mask.source),
             "mask_confidence": round(self.mask.confidence, 4),
+            "mask_method": self.mask.method,
             "coverage": round(self.mask.coverage(), 5),
             "instances": len(self.mask.instances),
             "verdict": self.verdict.to_dict(),
+            "processing": self.processing,
         }
 
 

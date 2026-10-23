@@ -4,5 +4,5 @@ from .contract import (EngineKind, FailureCode, JobEvent, JobState, MaskLayer,
                        RepairName, StructureProbe, Thresholds, VerdictReport,
                        WatermarkInstance)
 
-__all__ = ["contract", "documents", "fixtures", "masks", "pipeline", "repair",
+__all__ = ["contract", "documents", "fixtures", "lama", "masks", "pipeline", "repair",
            "structure", "synth", "verdict"]

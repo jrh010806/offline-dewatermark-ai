@@ -23,13 +23,18 @@ _FONT_ROOTS = [p for p in [
     "C:/Windows/Fonts",
     "/usr/share/fonts",
     "/Library/Fonts",
+    "/System/Library/Fonts",
+    "/System/Library/Fonts/Supplemental",
     str(Path(__file__).with_name("fonts")),
 ] if p]
 
 _FONT_FILES = {
-    "body": ["simsun.ttc", "NotoSerifCJKsc-Regular.otf", "SourceHanSerifSC-Regular.otf", "wqy-zenhei.ttc"],
-    "head": ["msyhbd.ttc", "NotoSansCJKsc-Bold.otf", "SourceHanSansSC-Bold.otf", "wqy-microhei.ttc"],
-    "hei": ["simhei.ttf", "NotoSansCJKsc-Regular.otf", "SourceHanSansSC-Regular.otf", "wqy-zenhei.ttc"],
+    "body": ["simsun.ttc", "NotoSerifCJKsc-Regular.otf", "SourceHanSerifSC-Regular.otf",
+             "wqy-zenhei.ttc", "Songti.ttc"],
+    "head": ["msyhbd.ttc", "NotoSansCJKsc-Bold.otf", "SourceHanSansSC-Bold.otf",
+             "wqy-microhei.ttc", "PingFang.ttc"],
+    "hei": ["simhei.ttf", "NotoSansCJKsc-Regular.otf", "SourceHanSansSC-Regular.otf",
+            "wqy-zenhei.ttc", "Hiragino Sans GB.ttc"],
 }
 
 _font_cache: dict[str, str] = {}

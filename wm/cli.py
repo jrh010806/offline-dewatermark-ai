@@ -98,9 +98,10 @@ def cmd_fixtures(args: argparse.Namespace) -> None:
 
 def cmd_run(args: argparse.Namespace) -> None:
     results = pipeline.process_file(args.input, dpi=args.dpi, skip_structure=args.force_raster)
-    pipeline.write_results(results, args.out)
+    out = pipeline.write_results(results, args.out, source_path=args.input)
     for r in results:
         print(json.dumps(r.to_dict(), ensure_ascii=False))
+    print(f"\n结果已保存到: {out}")
 
 
 def main(argv: list[str] | None = None) -> None:

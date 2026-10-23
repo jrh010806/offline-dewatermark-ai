@@ -1,14 +1,21 @@
-# 经典通道（当前全部功能只依赖这些，纯 CPU 可跑）
+# 经典通道（纯 CPU 可跑）
 numpy==2.5.4
 opencv-python==5.0.0.93
 scikit-image==0.26.0
 scipy==1.18.1
 pymupdf==1.28.2
+pypdf==6.21.2
 pillow==13.0.0
 PySide6==6.12.0
 
-# 待引入（水印压在文字/图案上的像素重建，需 NVIDIA GPU；见路线图 WM-402）
-# torch
+# LaMa 深度学习修复（水印压文字区域重建）
+# 走 ONNX 推理，不需要 torch；模型权重解析顺序见 wm/lama.py（WM_LAMA_ONNX / models/ / HF 缓存）
+onnxruntime==1.31.0
+huggingface_hub
+
+# OCR 划禁区（检测器禁止声称水印的文字区域）
+# rapidocr 的 ONNX 版，复用上面的 onnxruntime，三个模型（~8 MB）随 wheel 打包，离线可用
+rapidocr-onnxruntime
+
+# GPU 加速（RTX A6000 实测机专用；装后设 WM_LAMA_CUDA=1 即启用 CUDA 推理）
 # onnxruntime-gpu
-# paddlepaddle-gpu
-# paddleocr

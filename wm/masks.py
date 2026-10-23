@@ -232,34 +232,232 @@ def deblock(img: np.ndarray) -> np.ndarray:
     return img if blocking_ratio(img) < 1.35 else cv2.medianBlur(img, 3)
 
 
+def _stamp_footprint(candidate: np.ndarray, min_area: int, hfrac: tuple[float, float],
+                     wfrac: tuple[float, float], dilate_px: int) -> np.ndarray:
+    """Large low-contrast blobs only: stamp glyphs are far bigger than body text,
+    so a connected-component area cut plus a centre-of-page window separates them
+    without any tonal assumption."""
+    binary = candidate.astype(np.uint8)
+    num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(binary, 8)
+    big = np.zeros(num_labels, np.uint8)
+    big[1:][stats[1:, cv2.CC_STAT_AREA] > min_area] = 1
+    large = big[labels]
+    h, w = large.shape
+    window = np.zeros_like(large)
+    window[int(h * hfrac[0]):int(h * hfrac[1]), int(w * wfrac[0]):int(w * wfrac[1])] = 1
+    large = large & window
+    if large.mean() < 5e-4:
+        return large.astype(bool)
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (dilate_px, dilate_px))
+    return cv2.dilate(large, kernel, iterations=2).astype(bool)
+
+
+def _veil_mask(img: np.ndarray, gray: np.ndarray, dev: np.ndarray, P: float,
+               paper: np.ndarray, footprint: np.ndarray, thr: Thresholds,
+               seed: np.ndarray) -> MaskLayer | None:
+    """Turn a located footprint into measured coverage.
+
+    A constant coverage over the footprint - what this did before - under-removes
+    the dense core of a stamp and over-removes its faint antialiased skirt, which
+    is why a stamp could pass the verdict and still be readable.
+
+    A stamp is a fixed-colour overlay, so covered paper is a single value and the
+    veil is that colour at s = 0; coverage is then just how far a pixel sits
+    between paper and it. ``_fit_poles``' scored search is what the *graded*
+    light-veil channel needs, and here it is what goes wrong: on a measured
+    sample the covered-paper pole sits at 202 and the search settled on a veil
+    predicting 247, which un-mixes almost nothing and leaves the stamp readable.
+    """
+    inside = footprint & (dev > 0.04 * P)
+    if inside.mean() < _MIN_FRACTION:
+        return None
+    m = _spike(dev[inside], 0.06 * P, 0.9 * P)
+    if m <= 0:
+        return None
+    sel = inside & (np.abs(dev - m) <= max(0.12 * m, 4.0))
+    if sel.mean() < _MIN_FRACTION:
+        return None
+    t = np.median(img[sel], axis=0).astype(np.float32)
+    t_level = float(t.mean())
+    s = np.zeros(3, np.float32)
+    anchor = paper_anchor(gray, P)
+    shape = footprint.astype(np.float32)
+    beta = _beta_field(dev, m, shape, gray, t_level, anchor, P)
+    mask = MaskLayer(alpha=beta, source=MaskSource.PRIOR,
+                     confidence=float(np.clip(seed.mean() / 0.002, 0.0, 1.0)),
+                     veil_strength=s, veil_offset=t, paper=paper)
+    mask.footprint = footprint & anchor
+    mask.alpha = _complete_occluded_coverage(beta, mask.footprint, gray, t_level)
+    mask.instances = _instances(mask.alpha, thr)
+    return mask
+
+
 def estimate_single_page(img: np.ndarray, thr: Thresholds = Thresholds(),
-                         close_px: int = 11) -> MaskLayer:
+                         close_px: int = 11,
+                         keepout: np.ndarray | None = None,
+                         use_ocr: bool = True) -> MaskLayer:
+    """Hybrid detection: tonal spike for light veils + scale filter for stamp watermarks.
+
+    ``keepout`` is the OCR body-text zone (see wm.ocr). Where it exists the scale
+    filter may widen its deviation band - the band was narrow precisely because
+    glyph antialiasing lives in it, and the keep-out removes that collision by
+    evidence rather than by guesswork. It also bounds the footprint, which the
+    repair stage repaints wholesale after bridging it across the watermark's own
+    strokes: an unbounded footprint hands the inpainter the glyphs next door.
+    """
+    from . import periodic, paper_grid
+    located = paper_grid.estimate(img)
+    if located is not None:
+        located.instances = _instances(located.alpha, thr)
+        return located
+    located = periodic.estimate(img)
+    if located is not None:
+        located.instances = _instances(located.alpha, thr)
+        return located
+    if use_ocr:
+        from . import repeated, ocr, paper_repeat
+        located = repeated.estimate(img)
+        if located is not None and located.repair_mode == 'document_overlay':
+            located.instances = _instances(located.alpha, thr)
+            return located
+        paper = paper_repeat.estimate(img)
+        if paper is not None:
+            paper.instances = _instances(paper.alpha, thr)
+            return paper
+        if located is not None:
+            located.instances = _instances(located.alpha, thr)
+            return located
+        from . import document_overlay
+        located = document_overlay.estimate(img, keepout=keepout)
+        if located is not None:
+            located.instances = _instances(located.alpha, thr)
+            return located
+        from . import chromatic
+        located = chromatic.estimate(img)
+        if located is not None:
+            located.instances = _instances(located.alpha, thr)
+            return located
+        if keepout is None:
+            keepout = ocr.text_zones(img)
     img = deblock(img)
     paper = paper_level(img)
     P = float(np.median(paper))
     gray = img.astype(np.float32).mean(2)
     dev = P - gray
-    # Candidate tones are restricted to the bright half of the range on purpose.
-    # Widening it to find *dark* heavy veils (covered-paper pole at gray 83 of 255)
-    # was measured and lost: the antialias mass beside the body-ink cluster then
-    # out-votes the watermark spike, the fit collapses to s=1,t=0 and the page is
-    # returned untouched. A veil that dark is tonally indistinguishable from ink,
-    # so it belongs to the structural/semantic channel, not this one.
+    not_text = np.ones(gray.shape, bool) if keepout is None else ~keepout
+
+    # Method 1: Tonal spike (original, for light veils)
     side = gray > 0.55 * P
     seed, m = _veil_magnitude(dev, side, P)
-    if m <= 0:
+
+    if m > 0:
+        # Check if tonal spike detection is reasonable (not detecting all text as watermark)
+        shape = _extend_shape(seed, close_px)
+        shape_ratio = (shape > 0.5).mean()
+
+        # If shape covers > 10% of image, it's probably detecting text, not watermark
+        # Use scale filter instead for table documents with stamp watermarks
+        if shape_ratio < 0.10:
+            # Tonal detection succeeded with reasonable coverage
+            s, t, t_level = _fit_poles(img, gray, shape, P, m)
+            anchor = paper_anchor(gray, P)
+            beta = _beta_field(dev, m, shape, gray, t_level, anchor, P)
+            mask = MaskLayer(alpha=beta, source=MaskSource.PRIOR,
+                             confidence=float(np.clip(seed.mean() / 0.002, 0.0, 1.0)),
+                             veil_strength=s, veil_offset=t, paper=paper)
+            mask.footprint = (shape > 0.5) & anchor & not_text
+            mask.alpha = _complete_occluded_coverage(beta, mask.footprint, gray, t_level)
+            mask.alpha[~not_text] = 0
+            mask.instances = _instances(mask.alpha, thr)
+            return mask
+
+    # Method 1.5: Saturation contrast (for gray watermark on colored background)
+    # Key insight: background is HIGH saturation (colored), watermark is LOW saturation (gray)
+    b, g, r = img[:,:,0].astype(np.float32), img[:,:,1].astype(np.float32), img[:,:,2].astype(np.float32)
+    max_c = np.maximum(np.maximum(r, g), b)
+    min_c = np.minimum(np.minimum(r, g), b)
+    saturation = np.where(max_c > 0, (max_c - min_c) / np.maximum(max_c, 1), 0)
+
+    # Check if image has significant colored background (mean saturation > 0.15)
+    bg_saturation = saturation.mean()
+    if bg_saturation > 0.15:
+        # Colored background detected - use saturation contrast
+        # Watermark is low saturation (gray), background is high saturation (colored)
+        wm_candidate = saturation < 0.10  # Low saturation = gray/white = watermark
+
+        # Also require watermark to be lighter than background (higher gray value)
+        # This helps separate gray watermark from dark text/shadows
+        wm_candidate = wm_candidate & (gray > np.median(gray) * 0.95) & not_text
+
+        footprint = _stamp_footprint(wm_candidate, min_area=1000, hfrac=(0.1, 0.9),
+                                     wfrac=(0.1, 0.9), dilate_px=15) & not_text
+        if footprint.any():
+            mask = _veil_mask(img, gray, dev, P, paper, footprint, thr, wm_candidate)
+            if mask is not None:
+                return mask
+            alpha = np.zeros(gray.shape, dtype=np.float32)
+            alpha[footprint] = 0.6
+            mask = MaskLayer(alpha=alpha, source=MaskSource.PRIOR,
+                             confidence=float(footprint.mean()),
+                             veil_strength=np.array([0.4, 0.4, 0.4], dtype=np.float32),
+                             veil_offset=np.array([180.0, 180.0, 180.0], dtype=np.float32),
+                             paper=paper)
+            mask.footprint = footprint
+            mask.instances = _instances(alpha, thr)
+            return mask
+
+    # Method 2: Scale filter (for large stamp watermarks like "青岛红创" on white background)
+    # Key insight: watermark has MODERATE deviation from paper, text has HIGH
+    # deviation, background has LOW. Use deviation range + saturation filter to
+    # separate; the band is only this narrow because glyph antialiasing sits in
+    # it too, which is what the OCR keep-out removes.
+    if keepout is None:
+        wm_candidate = (dev > 30) & (dev < 70) & (saturation < 0.15)
+        band = dict(min_area=500, dilate_px=21)
+    else:
+        wm_candidate = (dev > 12) & (dev < 120) & (saturation < 0.15) & not_text
+        band = dict(min_area=400, dilate_px=13)
+
+    footprint = _stamp_footprint(wm_candidate, hfrac=(0.15, 0.85), wfrac=(0.15, 0.85),
+                                **band) & not_text
+    if not footprint.any():
         return _empty(paper)
-    shape = _extend_shape(seed, close_px)
-    s, t, t_level = _fit_poles(img, gray, shape, P, m)
-    anchor = paper_anchor(gray, P)
-    beta = _beta_field(dev, m, shape, gray, t_level, anchor, P)
-    mask = MaskLayer(alpha=beta, source=MaskSource.PRIOR,
-                     confidence=float(np.clip(seed.mean() / 0.002, 0.0, 1.0)),
-                     veil_strength=s, veil_offset=t, paper=paper)
-    mask.footprint = (shape > 0.5) & anchor
-    mask.alpha = _complete_occluded_coverage(beta, mask.footprint, gray, t_level)
-    mask.instances = _instances(mask.alpha, thr)
+
+    mask = _veil_mask(img, gray, dev, P, paper, footprint, thr, wm_candidate)
+    if mask is not None:
+        return mask
+
+    # Fit failed (no covered-paper pole): fall back to a constant medium-confidence
+    # coverage rather than nothing, so the page still gets a mask and is flagged for
+    # review instead of silently reporting no watermark.
+    alpha = np.zeros(gray.shape, dtype=np.float32)
+    alpha[footprint] = 0.5
+    mask = MaskLayer(alpha=alpha, source=MaskSource.PRIOR,
+                     confidence=float(footprint.mean()),
+                     veil_strength=np.array([0.5, 0.5, 0.5], dtype=np.float32),
+                     veil_offset=np.array([100.0, 100.0, 100.0], dtype=np.float32),
+                     paper=paper)
+    mask.footprint = footprint
+    mask.instances = _instances(alpha, thr)
     return mask
+
+
+def with_prior(single: MaskLayer, prior: MaskLayer | None,
+               thr: Thresholds = Thresholds()) -> MaskLayer:
+    """Use cross-page statistics only when supported by the single-image mask.
+
+    In particular, repeated table text or unrelated photo backgrounds must not
+    overrule a more specific per-image localization.
+    """
+    if prior is None or single.method.startswith(('repeated_', 'single_')):
+        return single
+    a, b = single.binary(thr.mask_alpha_min)>0, prior.binary(thr.mask_alpha_min)>0
+    if a.shape != b.shape or prior.confidence < .12:
+        return single
+    if not a.any():
+        return prior if 0 < b.mean() < .1 else single
+    overlap = (a & b).sum()/max((a | b).sum(),1)
+    return prior if overlap >= .45 and b.sum() <= a.sum()*1.5 else single
 
 
 def estimate_crosspage(images: list[np.ndarray], thr: Thresholds = Thresholds(),
@@ -283,7 +481,7 @@ def estimate_crosspage(images: list[np.ndarray], thr: Thresholds = Thresholds(),
     dev = P - gray
     seed, m = _veil_magnitude(dev, dev > 0.04 * P, P)
     if m <= 0:
-        return estimate_single_page(images[0], thr)
+        return estimate_single_page(images[0], thr, close_px=close_px, use_ocr=False)
     band = (dev > 0.45 * m) & (dev < 1.6 * m)
     if band.mean() < _MIN_FRACTION:
         band = dev > 0.45 * m
@@ -297,6 +495,7 @@ def estimate_crosspage(images: list[np.ndarray], thr: Thresholds = Thresholds(),
         alpha=beta, source=MaskSource.CROSSPAGE,
         confidence=float(np.clip((beta > 0.5).mean() / 0.002, 0.0, 1.0)),
         veil_strength=s, veil_offset=t, paper=paper,
+        method='crosspage',
     )
     mask.footprint = (shape > 0.5) & anchor
     mask.alpha = _complete_occluded_coverage(beta, mask.footprint, gray, t_level)

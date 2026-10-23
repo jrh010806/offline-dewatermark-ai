@@ -6,22 +6,27 @@
 
 ```bash
 python -m venv .venv
-./.venv/Scripts/pip install -r requirements.txt
+# Linux/macOS: source .venv/bin/activate    Windows: .venv\Scripts\activate
+./.venv/bin/pip install -r requirements.lock   # Windows: .venv\Scripts\pip
 
 # 生成带真值的合成样本集（手上没有真实样本，这是唯一可自证的基准）
-./.venv/Scripts/python.exe -m wm.cli synth --out data/syn --docs 5 --pages 6
+# 需中文字体：找不到时直接报错，不设 WM_FONTS_DIR 时本机 macOS 会失败，见 MIGRATION.md §3
+python -m wm.cli synth --out data/syn --docs 5 --pages 6
 
 # 把合成集打成两种 PDF 形态：压平光栅页（引擎B）与独立透明水印图层（引擎A）
-./.venv/Scripts/python.exe -m wm.cli fixtures --data data/syn --out data/pdf
+python -m wm.cli fixtures --data data/syn --out data/pdf
 
 # 四条件协议评测（掩码质量 / 保真 / 残膜 / OCR 一致性 / 时限）
-./.venv/Scripts/python.exe -m wm.cli eval --data data/syn
+python -m wm.cli eval --data data/syn
+
+# 不依赖中文字体的端到端自测（5 种样式，纯 OpenCV 渲染，随时可跑）
+python -m wm.e2e_test --out out/e2e_ort
 
 # 处理一个文件或图片
-./.venv/Scripts/python.exe -m wm.cli run data/pdf/doc00_tiled_text/raster_flattened.pdf --out out/run
+python -m wm.cli run data/pdf/doc00_tiled_text/raster_flattened.pdf --out out/run
 
 # 打开桌面前端
-./.venv/Scripts/python.exe -m wm.app data/pdf/doc00_tiled_text/raster_flattened.pdf
+python -m wm.app data/pdf/doc00_tiled_text/raster_flattened.pdf
 ```
 
 ## 代码地图
@@ -30,13 +35,19 @@ python -m venv .venv
 |---|---|
 | `wm/contract.py` | 接口契约：算法轨与 UI 轨唯一的协调成本 |
 | `wm/synth.py` | 带真值合成集（含印章、点线表格、照片渐变等**不可删除内容**陷阱） |
-| `wm/masks.py` | 水印定位：直方图尖峰极点、纸面锚点门、墨晕保护、跨页统计先验 |
-| `wm/repair.py` | 修复：代数反混合 `B=(I-βt)/(1-β(1-s))`，可选修补 |
+| `wm/masks.py` | 水印定位：直方图尖峰极点、纸面锚点门、墨晕保护、跨页统计先验、JPEG 块效应门控去块、平色印章通道（`s=0` 拟合）、彩底饱和度通道 |
+| `wm/repair.py` | 修复调度：整体委托 `lama.repair_with_lama`（反混合 → 墨晕保护 → LaMa） |
+| `wm/lama.py` | LaMa ONNX 推理（onnxruntime，无需 torch）：模型三级查找、瓦片羽化拼接、不透明核心退化界限、缺模型显式报错 |
+| `wm/ocr.py` | OCR 正文禁区：RapidOCR 检测框按字号/倾角/置信度筛选后膨胀成保护区 |
+| `wm/directional.py` | Gabor 方向滤波（斜向印章），**实验代码，尚未接入管线** |
 | `wm/verdict.py` | 判定：保真 / 残膜 / 识别 / 时限四条件，并分解"误伤文字"与"残留水印" |
 | `wm/structure.py` | 引擎A：探测并删除 PDF 中的独立水印对象（无损） |
-| `wm/pipeline.py` | 双引擎路由与逐页处理、结果落盘、单层水印提取 |
+| `wm/pipeline.py` | 双引擎路由、批量与流式逐页处理、结果与 manifest 落盘、单层水印提取 |
+| `wm/documents.py` | PDF / 图片载入（含流式 `iter_pages`、多图成批 `load_many`）与保存 |
+| `wm/e2e_test.py` | 不依赖中文字体的端到端自测，5 种样式，落盘 `results.json` |
 | `wm/app.py` | PySide6 前端：页列表、结果/原图/掩码叠加/分屏四视图、指标与进度 |
 | `wm/cli.py` | `synth` / `eval` / `fixtures` / `run` |
+| `tools/` | `blocking_probe`（块效应探测）、`jpeg_floor`（编解码损伤基线）、`ocr_ab`（OCR 禁区 A/B） |
 
 ## 技术要点
 
@@ -44,12 +55,105 @@ python -m venv .venv
 
 两条保护性规则来自实测：半透明叠加只有当同一窗口内还存在未覆盖纸面时才"可验证"（照片渐变色块与水印一样逐页不变，但没有纸面锚点）；真实墨旁的像素优先归给文字而不是水印（83–91% 的假阳性落在墨笔画 3–5 px 内）。
 
-## 当前状态
+## 当前状态（2026-10-21）
 
-- 经典通道（纯 CPU）已打通端到端；掩码精确率 dot_grid 0.97 / tiled_text 0.90，整页 PSNR 33–41。
-- 唯一硬缺口：水印**压在文字或图案上**的那部分像素无法用代数反混合还原，需要学习式重建（路线图 WM-402）。
-- 深色重字母水印与极小角标在单页色调通道不可辨识，需走结构解析或样式库通道。
+- 经典通道（纯 CPU）端到端打通；合成集掩码精确率 dot_grid 0.97 / tiled_text 0.90，整页 PSNR 33–41（Windows 机实测）。
+- 学习式重建（原"唯一硬缺口"WM-402）**已接入**：LaMa ONNX 走 onnxruntime，不需要 torch，CPU 即可跑，`WM_LAMA_CUDA=1` 预留 GPU 开关；5 样式端到端单页 13.3–29.4 秒（`out/e2e_ort/results.json`）。
+- **但该轮自测没把真值传进判定协议，识别条件（ink_iou）未被测量**，这 5 页按 `review_needed` 口径属"待复核"，不等于"四项全过"。
+- OCR 正文禁区已接入（`wm/ocr.py`，RapidOCR），用于解决"淡水印与字的抗锯齿边同为中间灰度"这一方向性盲区；印章字形按字号/倾角/置信度排除在保护之外。
+- JPEG 有损输入已处理：定位前按块效应门控去块（quality=75 下掩码精确率曾从 0.90 掉到 0.31），去块只用于定位、不进输出。
+- 深色重字母水印与极小角标在单页色调通道仍不可辨识，需走结构解析或样式库通道。
+- 时限（标书 <2 分钟/张）：合成集 CPU 达标；真实印章页按旧 `cv2.dnn` 计时 225 秒，换引擎外推 140–155 秒**仍超线**，A6000 未实测（租卡验证为必做项）。
 - 指标口径是本项目自定义（需求原文未给成功率公式），需与需求方书面确认。
-- 输入侧已知风险：JPEG 有损压缩会抹平色调双峰，掩码精确率从 0.90 掉到 0.31（quality=75 实测），需先去块再定位。
+- 本机（macOS）暂跑不了合成集：`data/syn/` 为空且缺候选目录里的中文字体，需设 `WM_FONTS_DIR`，见 `MIGRATION.md §3` 与功能矩阵 §4。
 
-详细功能矩阵（40 条编号，M1–M8）、非功能需求、UI 页面清单与风险登记在本地 `docs/交付物路线图.md`（含竞标分析，故意不纳入版本库）。
+详细功能矩阵（**48 条编号，M1–M8**，含逐条代码证据与状态口径）、实测数字与环境缺口在本地 `docs/功能矩阵.md`；可视化快照 `visualizations/wm-matrix-stack.html`。竞标分析、非功能需求与 UI 页面清单原载 `docs/交付物路线图.md`，该文件已不在磁盘上（`docs/` 故意不入库）。
+
+### 桌面多批次处理
+
+运行 `python -m wm.app`，点击「新增批次」多选同水印样式的图片或文档；可连续新增任意批次，支持重命名、删除、向当前批次追加图片。左侧分别显示批次和当前批次的图片。
+
+- 每批独立保存处理参数；同批内部按图片尺寸分组统计跨页先验，水印位置应基本对齐。单张尺寸组使用单图识别。
+- 可处理当前图片、当前批次，或依次处理所有批次。单张处理也使用所属整批同尺寸组的先验。每次启动均重新处理选中范围，已有结果逐张更新。
+- 先验缓存在当前会话中；追加图片、改变检测阈值、笔画跨接或 OCR 选项会使本批缓存失效，只改变修复参数则复用先验。
+- 每张结束后更新结果和进度；程序异常或质量判定不通过均继续后续图片。暂停、继续、停止在图片边界生效；先验计算期间收到请求则在先验结束后生效。
+- 运行或暂停时锁定批次内容与参数，可切换查看图片。停止后重新启动会重跑所选范围；继续则从下一张开始。
+- 导出可选择当前图片、当前批次或所有批次，按批次分目录保存，包含结果、manifest 和记录状态/异常的 queue.json。会话不自动恢复，关闭前提示未导出的结果。
+
+队列与界面回归测试：`QT_QPA_PLATFORM=offscreen python -m unittest discover -s tests -v`。
+
+### 单图斜向文字水印改进
+
+默认开启「OCR 水印定位与正文保护」。单张图内也能利用重复文字：OCR 提供方向和候选行，视觉重复匹配确认水印形状；不依赖批次、固定水印文案、文件名或预存标注。不满足条件时继续使用原有灰度/颜色定位。此路径目前针对重复斜向文字，不能代表任意 Logo、任意位置水印的效果。
+
+白底文档在纸面和正文交叠处都能测得可信色调时，估计透明叠加关系，直接还原并保护暗色笔画；照片使用限定范围的 LaMa 修复。小于模型尺寸的图块补边而不拉伸，模型结果只写回请求修复的像素。跨页先验作为可选增强：与单图定位不一致或计算异常时，不覆盖或阻塞单图处理。页面耗时和时间预算包括检测阶段。
+
+可运行 `HF_HUB_OFFLINE=1 python tools/verify_single.py` 复测 `heavy_dark_02.jpg` 与 `heavy_dark_04.jpg`，输出原尺寸结果、前后对照和 `verification.json` 到 `out/single_improvement/`。推理不读取参考图和标注；脚本只在推理结束后读取它们评分。脚本中的“区域误差”是固定水印区域相对无水印底图的像素误差，不是去除成功率。该脚本需要保留此前 `tools/diagnose_single.py` 产生的基线数据。
+
+这两张图有改善，但细小裁切水印、与正文重叠的抗锯齿边缘、照片补图痕迹仍需人工复核，尚未达到商业网站的通用效果。关闭 OCR 会停用文字定位；单图点阵检测不依赖 OCR。
+
+边界残片定位还会在已验证的重复方向和行距上匹配可见残笔，忽略画面外缺失部分；OCR 正文/页码区域可否决匹配。只补入实际匹配到的笔画，不整条擦除边框。`python tools/regress_edges.py` 会验证现有平铺文字、居中水印、点阵样本的掩码/修复参数是否因边界改动发生变化，并输出当前质量到 `out/edge_cleanup/other_styles.json`。掩码未变化仅代表边界改动没有引入变化，不代表该类水印已经处理达标。
+
+### 照片点阵与大字定位
+
+单图点阵通过图内多次重复估计间距、相位、覆盖与颜色，要求不同区域的衰减规律一致且单个形状紧凑。透明度反解保留照片亮度纹理，仅在已确认的小点内插值色度，避免 JPEG 彩色残点；不调用 LaMa，也不需要同批多图。当前支持整数像素间距为 7–64 的正方形点阵；不满足证据时继续其他定位路径。
+
+大字照片新增色彩残差定位：从输入自身拟合背景颜色关系，测量斜向排列方向，再由 OCR 确认大字候选，仅将其中的实际笔画交给 LaMa。它适用于背景颜色关系集中的彩色照片；单色、复杂多彩背景、普通正文或缺少 OCR 证据不会进入该路径。现在还会从原图邻域尝试拟合透明度：仅在笔画内部、反解结果与模型重建相近时回填原图细节，边缘与不一致的反解保留模型结果，避免把水印轮廓或白边当成纹理。用户显式设置的掩码外扩仍然生效。跨页先验不能覆盖这些单图定位结果。
+
+运行 `HF_HUB_OFFLINE=1 python tools/verify_photo_styles.py`，输出原图／旧版／新版对照、原尺寸 PNG 与指标到 `out/photo_styles/`。基线首次运行后保存在该目录的 `baseline/`，参考图仅在推理后用于评分。596×335 点阵样例区域误差由传统定位的 12.95 降到 3.01；居中大字照片从最初的 24.70 降到 13.38，本轮为 14.36→13.38。照片仍有修补痕迹，不能当成完整恢复。
+
+### 居中文档与全量回归
+
+白底、正文主要为中性色的彩色斜向大字文档，新增单图色差与透明度估计。覆盖纸面的色调提供大字笔画，正文交叠处的色差及覆盖黑字的色调帮助恢复正文；只有笔画几何、纸面和墨色观测都成立时才使用该路径。灰色正文通过 OCR 范围额外保护，不交给生成模型重画。中性灰水印或没有足够色差/墨色证据时继续原路径。
+
+`big_center_04` 文档区域误差本轮 40.34→4.36，全流程约 1.9 秒（修复约 41 毫秒）；`big_center_02` 照片本轮 14.36→13.38，首次加载模型的该次全流程约 13 秒。它们是当前样例的像素误差与本机耗时，不是成功率或通用速度承诺。
+
+完整原尺寸回归运行：`HF_HUB_OFFLINE=1 python tools/regress_suite.py --stage after`。可用 `--cases big_center_02 big_center_04` 复测目标样例，`python tools/report_regression.py` 从保存的前后结果生成对照图及 HTML 报告。修改前的基线可用 `--stage before` 保存，已有基线默认不会覆盖。输出在 `out/center_refinement/`，参考图仅在推理完成后评分。
+
+本轮 16 张样例全部完成原尺寸前后回归，两张目标图片改善，其他 14 张输出逐像素一致，包括原有斜向文字及边缘修复；默认参数下全部样例的请求修复范围外像素未改变。全量回归仍发现 `big_center_01`、`big_center_03`、`dot_grid_01`、`dot_grid_03`、`dot_grid_04` 尚无有效改善，且部分高清图片处理超过 120 秒。这些既有问题仍需后续处理，不能将当前整套样例标为达标。
+
+### 新样本回归：点阵文档与 PDF 透明文字
+
+本轮新增两个默认路径，都只分析输入自身；跨页先验仍是可选增强。
+
+- 白底点阵文档：同一张纸内估计点阵周期、相位、纸面/墨色的透明叠加关系，反解交叠处；仅在远离正文与彩色印章的已确认小点内清理残影。不是整块擦白，也不依赖同批多页。当前针对整数周期 7–64 像素的紧凑正方形点阵。
+- 可编辑 PDF：先检查透明、大字号的独立文字叠加，符合旋转或重复证据时，只省略对应文字显示指令，保留下面的正文、表格及图片。混有普通正文的同一文字块不删除；Form XObject 中的文字暂不处理。此检测依据几何与透明度，不能证明文字语义一定是水印，结果仍标待复核。
+- PDF 路径已接入单张、当前批次、全部批次和流式处理；仍每页更新一次进度。保留上传时的原文件页号和修订标识，避免多个 PDF 合批重编号后处理错页。输入文件变更或像素被调用方修改时拒绝沿用结构结果。处理不在输入目录写中间文件。
+
+三个既有点阵文档 `dot_grid_01/03/04` 的固定水印区域误差由 13.07/17.69/17.68 降至 2.42/1.49/1.73（0–255 灰度单位，越低越好）。这是样例误差，不是去除成功率。更新后的原尺寸结果与回归数据在 `out/new_samples/native_regression/after/`。
+
+外部 `watermark_samples` 的 300 对图片、10 对 PDF 全部校验配对与 SHA256；按无水印文件哈希固定划分开发/留出数据。可编辑的 5 份 PDF 共 32 页，移除后在相同渲染器、100 DPI 下与干净参考逐像素一致；10 份干净 PDF 均未被改动。另 5 份扫描式 PDF 共 24 页无法走文字对象删除，且参考原件存在渲染/JPEG 差异，不能按原件像素误差直接计为去水印成败。
+
+300 张新照片仍暴露出旧定位流程的明显短板。专用 SLBR 模型在项目留出集上改善了水印区域，但会修改部分干净图片中的合法文字/Logo；两轮小规模校准未解决这个问题，因此**没有接入默认处理**。研究输出保存在 `out/new_samples/slbr_validation/`，Torch 仅供该研究脚本使用，桌面程序不新增此依赖。第三方预训练集与样本包的重叠尚未审计，项目留出集不能当作完全独立的公开基准。
+
+复测命令（从项目根目录运行，保留现有基线，不覆盖原始素材）：
+
+```bash
+python tools/evaluate_samples.py inventory --root /path/to/watermark_samples --out out/new_samples/inventory.json
+HF_HUB_OFFLINE=1 python tools/evaluate_samples.py baseline --split all --out out/new_samples/baseline_fresh
+python tools/evaluate_pdf_overlays.py --out out/new_samples/pdf_outputs
+HF_HUB_OFFLINE=1 python tools/regress_suite.py --stage after --output-root out/new_samples/native_regression
+python tools/report_samples.py
+QT_QPA_PLATFORM=offscreen python -m unittest discover -s tests -v
+```
+
+逐项指标、前后对照及保留的问题见 `out/new_samples/report.html`；该报告以本地已保存的推理结果为依据，不把“运行完毕”当作“水印去除成功”。
+
+### 针对 2026 年 10 月 23 日批次实测结果的修复
+
+针对 `out/test/batches_20261023_171636_608671` 的 4 批、16 张导出结果复测，确认输入和结果与已保存样例一致，问题在定位及修复算法。新增 `wm/paper_repeat.py`：在白底文档中用完整文字的视觉重复确认 OCR 候选，每个模板最多保留 256 个匹配，而不是只取前 12 个；在正文密集处抑制暗色内容对匹配的干扰，少量完整水印时补充识别文字片段。只在已经确认的笔画内清理纸面，保护暗色正文、灰字和彩色链接/印章，不让 LaMa 重画该类区域。已有可信透明度反解优先保留；照片及点阵路径保持原样。
+
+连续表格线增加独立保护。只有细而长的水平或竖直线条可以进入该保护，厚水印块不能当作表格线复制回结果。新增测试覆盖超过 12 处的重复水印、分成前后两段的文字、正文与彩色内容保护、表格线以及未复核导出的统计口径。
+
+本次对 `heavy_dark_01` 与 `tiled_text_01/02/03/04` 的清理有改善；其中高清文档本机记录约 17–22 秒，仍有页边及正文交叠处残留。`tiled_text_04` 仍有明显文字残留；居中照片 `big_center_01/03` 仍未解决，照片补图痕迹也仍存在，不能把整批标为达标。原尺寸输出、原图／用户导出／本次结果的对照和按批次保存的图片在 `out/user_optimization/`。参考图只在推理结束后用于评估，不进入算法。
+
+导出修正：未复核的页面不计入已验证通过数量；只要仍有未复核页面，`success_rate` 为 `null`，自动规则通过数另外记录为 `checks_passed`。未知的识别指标导出为标准 JSON 的 `null`，不再写 `NaN`。每页保存本次修复参数，桌面界面也提示自动检查可能漏掉水印。
+
+复测和生成对照：
+
+```bash
+HF_HUB_OFFLINE=1 python tools/optimize_export.py --exports out/test/batches_20261023_171636_608671 --out out/user_optimization/after
+python tools/report_export_fix.py
+```
+
+`--cases` 可只重跑指定文件并更新已有记录。工具只接受本地已知样例名，原素材和用户提供的导出目录均不写入。

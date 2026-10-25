@@ -171,18 +171,24 @@ def _document_overlay(img, region, profile, confidence, allow_broad_ink: bool = 
         return None
     gray=img.mean(2)
     paper=float(np.percentile(gray,97))
+    estimated = np.clip(coverage_hint, 0, 1) if coverage_hint is not None else None
     edges=np.arange(0,258,2)
     histogram,_=np.histogram(gray[region & ~keepout],bins=edges)
-    # Find the covered-paper pole relative to the clean-paper peak, not with
-    # a fixed ceiling: truncating at any fixed bound just moves the clean
-    # paper mode onto that bound. The covered pole must sit clearly below it.
     clean_peak = float(edges[int(np.argmax(histogram))])
+    # Estimate the covered-paper pole on template-covered pixels only: the
+    # whole region is mostly clean paper, so its near-white antialiasing can
+    # otherwise outvote the actual veil pole (measured on layered samples).
+    pool = gray[region & ~keepout & (estimated > .5)] if estimated is not None \
+        else gray[region & ~keepout]
+    if pool.size < 200:
+        pool = gray[region & ~keepout]
+    histogram,_=np.histogram(pool,bins=edges)
     histogram[(edges[:-1]<.16*paper)|(edges[:-1]>clean_peak-12)]=0
     if histogram.max()<20:
         return None
     covered=float(edges[np.argmax(histogram)]+1)
-    estimated = np.clip(coverage_hint, 0, 1) if coverage_hint is not None else \
-        np.clip((paper-profile)/max(paper-covered,1),0,1)
+    if estimated is None:
+        estimated = np.clip((paper-profile)/max(paper-covered,1),0,1)
     # Joint two-pole fit with a histogram peak for the covered-ink level.
     # The covered-ink pole sits between the uncovered body-ink level and the
     # covered-paper level; taking the strongest histogram peak in that open

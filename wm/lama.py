@@ -286,6 +286,11 @@ def repair_with_lama(img: np.ndarray, mask, thr) -> tuple[np.ndarray, list[Repai
     if mask.coverage(thr.mask_alpha_min) <= 0:
         return img.copy(), used
 
+    if mask.repair_mode == 'corner_cleanup':
+        out = img.copy()
+        out[mask.footprint] = np.clip(mask.paper[mask.footprint], 0, 255).astype(np.uint8)
+        return out, [RepairName.PAPER_CLEANUP]
+
     if mask.repair_mode == 'paper_repeat_cleanup':
         from .paper_repeat import restore
         return restore(img, mask), [RepairName.PAPER_CLEANUP]
@@ -349,10 +354,21 @@ def repair_with_lama(img: np.ndarray, mask, thr) -> tuple[np.ndarray, list[Repai
         # without generating new letter shapes.
         core = out.mean(2) < .4*paper
         if mask.text_keepout is not None:
-            # Light body strokes and their antialiasing rims must not be
-            # whitened by the paper fill either; only confident paper inside
-            # the OCR zones may be flattened after the inverse.
-            core |= mask.text_keepout & (out.mean(2) < (.85 if mask.repair_mode == "coloured_document_overlay" else .92)*paper)
+            if mask.repair_mode == "document_overlay_full" and float(np.min(mask.veil_strength)) >= 0.4:
+                # Light veils: the inverse should leave a bimodal page (paper
+                # vs body ink). Estimate the body-ink level on uncovered text
+                # and only protect strokes near it; faint leftover veil above
+                # that level is flattened instead of being protected as text.
+                body_pool = img.mean(2)[mask.text_keepout & ~mask.footprint
+                                        & (img.mean(2) < .5*paper)]
+                body_ink = float(np.percentile(body_pool, 20)) if body_pool.size >= 50 else 0.0
+                cut = min(.85*paper, body_ink*1.5 + 25)
+                core |= mask.text_keepout & (out.mean(2) < cut)
+            else:
+                # Light body strokes and their antialiasing rims must not be
+                # whitened by the paper fill either; only confident paper inside
+                # the OCR zones may be flattened after the inverse.
+                core |= mask.text_keepout & (out.mean(2) < (.85 if mask.repair_mode == "coloured_document_overlay" else .92)*paper)
         cores = core.astype(np.uint8)
         protected = cv2.dilate(cores, np.ones((3,3),np.uint8)) > 0
         from .paper_repeat import table_rules

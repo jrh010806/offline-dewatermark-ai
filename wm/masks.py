@@ -327,6 +327,12 @@ def estimate_single_page(img: np.ndarray, thr: Thresholds = Thresholds(),
         if located is not None:
             located.instances = _instances(located.alpha, thr)
             return located
+    if wanted("corner_id"):
+        from . import corner_id
+        located = corner_id.estimate(img)
+        if located is not None:
+            located.instances = _instances(located.alpha, thr)
+            return located
     if wanted("dark_text"):
         try:
             from . import dark_text

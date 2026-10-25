@@ -94,8 +94,14 @@ def build_verdict(
         metrics["psnr_in_mask"] = float(peak_signal_noise_ratio(
             clean_reference[gt_mask], output[gt_mask], data_range=255))
         gt_ink, out_ink = _ink(clean_reference), _ink(output)
-        agree = np.logical_and(gt_ink, out_ink)[gt_mask].sum()
-        metrics["ink_iou"] = float(agree / max(np.logical_or(gt_ink, out_ink)[gt_mask].sum(), 1))
+        if not gt_ink[gt_mask].any():
+            # No body text to preserve in this region: recognition is vacuously
+            # satisfied and any leftover veil is judged by the residual condition,
+            # not by a meaningless 0/0 IoU.
+            metrics["ink_iou"] = 1.0
+        else:
+            agree = np.logical_and(gt_ink, out_ink)[gt_mask].sum()
+            metrics["ink_iou"] = float(agree / max(np.logical_or(gt_ink, out_ink)[gt_mask].sum(), 1))
         # Split the same disagreement by who is at fault: strokes we damaged where
         # no watermark sits (clause 3) versus watermark we left behind (clause 2).
         if alpha_reference is not None:

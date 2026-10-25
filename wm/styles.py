@@ -11,7 +11,7 @@ STYLE_CHANNELS: dict[str, tuple[str, ...]] = {
     "tiled_text": ("repeated", "paper_repeat"),
     "big_center": ("document_overlay", "chromatic"),
     "heavy_dark": ("dark_text", "repeated", "paper_repeat"),
-    "corner_id": (),  # 角标走通用尺度/色调通道
+    "corner_id": ("corner_id",),
 }
 
 # 中英文提示词 → 样式代码。键全部小写；按子串匹配，先长后短避免歧义。

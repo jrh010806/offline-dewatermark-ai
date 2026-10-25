@@ -77,6 +77,8 @@ def stage_real(real_root: Path, out: Path, only: set[str] | None = None) -> dict
         roi_mae_in = float(np.abs(src.astype(float) - clean.astype(float)).mean(2)[roi].mean())
         roi_mae_out = float(np.abs(pred.astype(float) - clean.astype(float)).mean(2)[roi].mean())
         row = dict(id=sid, style=style, base=s["base"], base_kind=s["base_kind"],
+                   strength_layer=s.get("strength_layer"), repeated=s.get("repeated"),
+                   solvability=s.get("solvability"),
                    method=mask.method, coverage=round(mask.coverage(), 5),
                    ms=ms, repairs=[str(r) for r in used],
                    stage_ms=dict(report.stage_ms),

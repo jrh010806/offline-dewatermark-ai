@@ -322,22 +322,37 @@ def repair_with_lama(img: np.ndarray, mask, thr) -> tuple[np.ndarray, list[Repai
         out[region] = restored[region]
         return out, [RepairName.ALPHA_UNMIX, RepairName.INPAINT]
 
-    if mask.repair_mode in ("document_overlay", "coloured_document_overlay"):
+    if mask.repair_mode in ("document_overlay", "coloured_document_overlay", "document_overlay_full"):
         out = _alpha_unmix(img, mask)
+        if (mask.repair_mode == "document_overlay_full" and mask.text_keepout is not None
+                and float(np.min(mask.veil_strength)) < 0.4):
+            # Heavy veils only: a pixel that brightens implausibly under a weak
+            # alpha is a misfit on clean antialiasing, not a veil.
+            over = (out.astype(np.int16) - img.astype(np.int16)).mean(2) > 40
+            revert = mask.text_keepout & over & (mask.alpha > 0) & (mask.alpha < 0.9)
+            out[revert] = img[revert]
         paper = float(np.median(mask.paper))
         covered = float(np.mean(mask.veil_strength)*paper + np.mean(mask.veil_offset))
-        dark = (img.mean(2) < covered*.8) & (mask.alpha > 0)
-        out[dark] = np.minimum(out[dark], img[dark])
+        # Full un-mixing at text intersections is only safe for light veils:
+        # below s≈0.4 the inverse amplifies fit noise into real glyph damage
+        # (measured: heavy_dark text damage jumps from ~10% to ~40%). Heavy
+        # veils keep the conservative dark guard instead of trusting the fit.
+        apply_dark_guard = (mask.repair_mode != "document_overlay_full"
+                            or float(np.min(mask.veil_strength)) < 0.4)
+        if apply_dark_guard:
+            dark = (img.mean(2) < covered*.8) & (mask.alpha > 0)
+            out[dark] = np.minimum(out[dark], img[dark])
         # A fitted white-paper overlay is invertible. Do not ask an inpainter
         # to redraw text or table rules we can preserve algebraically.
         # Keep dark stroke cores and their one-pixel antialiasing rim even where
         # the watermark crosses an OCR line; the remaining paper can be cleaned
         # without generating new letter shapes.
         core = out.mean(2) < .4*paper
-        if mask.repair_mode == "coloured_document_overlay" and mask.text_keepout is not None:
-            # Gray body text can be considerably lighter than black ink. OCR
-            # evidence keeps these strokes from being mistaken for white paper.
-            core |= mask.text_keepout & (out.mean(2) < .85*paper)
+        if mask.text_keepout is not None:
+            # Light body strokes and their antialiasing rims must not be
+            # whitened by the paper fill either; only confident paper inside
+            # the OCR zones may be flattened after the inverse.
+            core |= mask.text_keepout & (out.mean(2) < (.85 if mask.repair_mode == "coloured_document_overlay" else .92)*paper)
         cores = core.astype(np.uint8)
         protected = cv2.dilate(cores, np.ones((3,3),np.uint8)) > 0
         from .paper_repeat import table_rules
@@ -385,6 +400,11 @@ def repair_with_lama(img: np.ndarray, mask, thr) -> tuple[np.ndarray, list[Repai
     # read as clean paper. Safety comes from the footprint itself being bounded by
     # the OCR keep-out, not from shrinking it here.
     region = mask.footprint if mask.footprint is not None else opaque
+    if region.mean() > 0.25:
+        # Never gamble more than a quarter of a page on generative repainting:
+        # keep the algebraic inverse and flag the page for manual review.
+        mask.confidence = min(mask.confidence, 0.05)
+        return out, used
     if region.mean() > 1e-5:
         out = inpaint(out, region, thr)
         used.append(RepairName.LAMA)

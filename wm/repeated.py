@@ -159,7 +159,8 @@ def _edge_fragments(feature, valid, template, peaks, protected=None):
     return found
 
 
-def _document_overlay(img, region, profile, confidence):
+def _document_overlay(img, region, profile, confidence, allow_broad_ink: bool = False,
+                      coverage_hint: np.ndarray | None = None):
     """Fit covered-paper and covered-ink poles from THIS document only.
 
     The repeated shape supplies alpha at text intersections. Elsewhere white
@@ -172,31 +173,75 @@ def _document_overlay(img, region, profile, confidence):
     paper=float(np.percentile(gray,97))
     edges=np.arange(0,258,2)
     histogram,_=np.histogram(gray[region & ~keepout],bins=edges)
-    histogram[(edges[:-1]<.16*paper)|(edges[:-1]>.78*paper)]=0
+    # Find the covered-paper pole relative to the clean-paper peak, not with
+    # a fixed ceiling: truncating at any fixed bound just moves the clean
+    # paper mode onto that bound. The covered pole must sit clearly below it.
+    clean_peak = float(edges[int(np.argmax(histogram))])
+    histogram[(edges[:-1]<.16*paper)|(edges[:-1]>clean_peak-12)]=0
     if histogram.max()<20:
         return None
     covered=float(edges[np.argmax(histogram)]+1)
-    estimated=np.clip((paper-profile)/max(paper-covered,1),0,1)
-    ink_pixels=gray[region & keepout & (estimated>.7) &
-                    (gray>.05*paper) & (gray<.65*covered)]
-    if ink_pixels.size<20:
-        return None
-    # The lower tail estimates black glyph cores, rather than the numerous
-    # antialiased edges which would incorrectly raise the covered-ink pole.
-    ink=float(np.percentile(ink_pixels,10))
-    transmittance=(covered-ink)/paper
-    if not .08<transmittance<.85:
-        return None
+    estimated = np.clip(coverage_hint, 0, 1) if coverage_hint is not None else \
+        np.clip((paper-profile)/max(paper-covered,1),0,1)
+    # Joint two-pole fit with a histogram peak for the covered-ink level.
+    # The covered-ink pole sits between the uncovered body-ink level and the
+    # covered-paper level; taking the strongest histogram peak in that open
+    # interval avoids both pure-black contamination and antialiasing bias.
+    body_pool = gray[keepout & ~region & (gray < .5 * paper)]
+    pool = gray[region & keepout & (estimated > .5)]
+    transmittance = ink = None
+    covered_ink_level = None
+    if body_pool.size >= 50 and pool.size >= 50:
+        body_ink = float(np.percentile(body_pool, 20))
+        hist, _ = np.histogram(pool, bins=np.arange(0, 258, 2))
+        lo = int((body_ink + 4) // 2)
+        hi = int(covered // 2)
+        if hi > lo and hist[lo:hi].max() >= 10:
+            covered_ink = float((int(np.argmax(hist[lo:hi])) + lo) * 2 + 1)
+            if paper - body_ink > 30:
+                s_fit = (covered - covered_ink) / (paper - body_ink)
+                t_fit = covered - s_fit * paper
+                if .08 < s_fit < .85 and 0 <= t_fit < covered:
+                    transmittance, ink = float(s_fit), float(t_fit)
+                    covered_ink_level = s_fit * body_ink + t_fit
+    if transmittance is None:
+        ink_pixels=gray[region & keepout & (estimated>.7) &
+                        (gray>.05*paper) & (gray<.65*covered)]
+        # The lower tail estimates black glyph cores, rather than the numerous
+        # antialiased edges which would incorrectly raise the covered-ink pole.
+        percentile = 10
+        if ink_pixels.size < 20 and allow_broad_ink:
+            broad = gray[region & keepout & (estimated > .5)]
+            if broad.size < 50:
+                return None
+            ink_pixels = broad
+            percentile = 5
+        if ink_pixels.size < 20:
+            return None
+        ink = float(np.percentile(ink_pixels, percentile))
+        transmittance = (covered - ink) / paper
+        if not .08 < transmittance < .85:
+            return None
     measured=np.clip((paper-gray)/max(paper-covered,1),0,1)
     # Undo the mild interpolation attenuation of the registered template; never
-    # infer underlying glyph edges from their darkness alone.
-    alpha=np.where(keepout,np.minimum(measured,estimated*1.3),measured)
+    # infer underlying glyph edges from their darkness alone. Inside the OCR
+    # zones only the eroded high-confidence template core may drive the inverse:
+    # antialiasing rims (clean or watermarked) are left untouched so a slightly
+    # misregistered template cannot whiten or darken real body strokes.
+    alpha=np.where(keepout,
+                   np.where(estimated >= .15, measured, 0),
+                   measured)
+    if covered_ink_level is not None and transmittance < 0.4:
+        # Heavy veils only: pixels darker than any veil-covered text can be
+        # are clean body ink and must not enter the noisy inverse.
+        alpha = np.where(keepout & (gray < covered_ink_level - 5), 0, alpha)
     alpha=np.where(region,alpha,0).astype(np.float32)
     return MaskLayer(alpha=alpha,source=MaskSource.PRIOR,confidence=confidence,
                      veil_strength=np.full(3,transmittance,np.float32),
                      veil_offset=np.full(3,ink,np.float32),
                      paper=np.full(img.shape,paper,np.float32),footprint=region,
-                     repair_mode='document_overlay',method='repeated_document_overlay',
+                     repair_mode='document_overlay_full' if coverage_hint is not None else 'document_overlay',
+                     method='repeated_document_overlay',
                      text_keepout=keepout)
 
 
@@ -302,7 +347,7 @@ def estimate(img: np.ndarray) -> MaskLayer | None:
     if document:
         profile=cv2.warpAffine(light_field,cv2.invertAffineTransform(matrix),(w,h),
                                borderValue=255)
-        fitted=_document_overlay(img,region,profile,confidence)
+        fitted=_document_overlay(img,region,profile,confidence,coverage_hint=coverage)
         if fitted is not None:
             return fitted
     # On white documents retain existing dark ink instead of asking a generic

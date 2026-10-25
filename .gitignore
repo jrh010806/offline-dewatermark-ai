@@ -11,3 +11,6 @@ docs/
 /*.png
 /*.jpg
 .DS_Store
+
+# LaMa ONNX 模型权重（~88MB，首次运行自动下载或手工放置，不入库）
+models/

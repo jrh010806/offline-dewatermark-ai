@@ -63,7 +63,8 @@ def build_verdict(
         failures.append(FailureCode.FIDELITY_BREACH)
 
     if alpha_reference is not None and clean_reference is not None:
-        residual_cov = mask_mod.residual_visible_fraction(source, output, clean_reference)
+        residual_cov = mask_mod.residual_visible_fraction(source, output, clean_reference,
+                                                          alpha_reference=alpha_reference)
         metrics["residual_basis"] = 1.0
     else:
         residual_cov = mask_mod.residual_background_fraction(output, mask)

@@ -20,6 +20,7 @@ class Batch:
     uid: str = field(default_factory=lambda: uuid4().hex)
     params: dict[str, int] = field(default_factory=dict)
     use_ocr: bool = True
+    style: str | None = None
     results: dict[int, PageResult] = field(default_factory=dict)
     errors: dict[int, str] = field(default_factory=dict)
     states: dict[int, str] = field(default_factory=dict)
@@ -35,7 +36,7 @@ class BatchWorker(QThread):
 
     def __init__(self, jobs, parent=None):
         super().__init__(parent)
-        self.jobs = jobs  # (batch, selected indices, frozen thresholds, close_px, OCR)
+        self.jobs = jobs  # (batch, selected indices, frozen thresholds, close_px, OCR, style)
         self.total = sum(len(indices) for _, indices, *_ in jobs)
         self.done = 0
         self.outcomes = []
@@ -61,7 +62,9 @@ class BatchWorker(QThread):
             return not self.stopped
 
     def run(self) -> None:
-        for batch, indices, thr, close_px, use_ocr in self.jobs:
+        for job in self.jobs:
+            batch, indices, thr, close_px, use_ocr = job[:5]
+            style = job[5] if len(job) > 5 else None
             groups = {}
             unavailable_priors = set()
             for page in batch.pages:
@@ -71,7 +74,7 @@ class BatchWorker(QThread):
                     return
                 page = batch.pages[index]
                 group = groups[page.image.shape]
-                key = (page.image.shape, thr.mask_alpha_min, close_px, use_ocr)
+                key = (page.image.shape, thr.mask_alpha_min, close_px, use_ocr, style)
                 try:
                     started = perf_counter()
                     self.update.emit(dict(kind="stage", batch=batch.uid, index=index,
@@ -93,11 +96,11 @@ class BatchWorker(QThread):
                                     unavailable_priors.add(key)
                             single = masks.estimate_single_page(
                                 page.image, thr, close_px=close_px,
-                                use_ocr=use_ocr)
+                                use_ocr=use_ocr, style=style)
                             mask = masks.with_prior(single, mask, thr)
                         else:
                             mask = masks.estimate_single_page(page.image, thr, close_px=close_px,
-                                                              use_ocr=use_ocr)
+                                                              use_ocr=use_ocr, style=style)
                         mask_ms = int((perf_counter() - started) * 1000)
                         # Pause/stop requests made during prior estimation take effect before repair.
                         if not self._checkpoint():

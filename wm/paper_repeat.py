@@ -193,12 +193,32 @@ def estimate(img):
         np.maximum(field[y:y+ph,x:x+pw], patch, out=field[y:y+ph,x:x+pw])
     field *= valid
     coverage = cv2.warpAffine(field, cv2.invertAffineTransform(matrix), (w,h))
-    region = cv2.dilate((coverage>.12).astype(np.uint8), np.ones((3,3),np.uint8))>0
+    # Soft coverage keeps antialiased stroke edges inside the invertible fit:
+    # a hard binary template zeroes alpha exactly where the veil feathers out,
+    # which shows up as residual watermark at the glyph rims.
+    coverage = cv2.GaussianBlur(coverage, (0, 0), 1.2)
+    region = cv2.dilate((coverage>.03).astype(np.uint8), np.ones((5,5),np.uint8))>0
     if not .0001 < region.mean() < .15:
         return None
     samples = img[region & (gray>50)]
     if len(samples) < 50:
         return None
+    # Prefer an invertible alpha-compositing fit over paper-only cleanup:
+    # cleaning just the paper leaves watermark strokes where they cross body
+    # text, which is exactly what the recognition condition charges against.
+    # The repeated instances supply the covered-paper profile the fit needs.
+    light_field = np.full(valid.shape, 255, np.float32)
+    for x, y, _ in peaks:
+        light_field[y:y+th, x:x+tw] = np.minimum(
+            light_field[y:y+th, x:x+tw], np.where(template > 0, light, 255))
+    profile = cv2.warpAffine(light_field, cv2.invertAffineTransform(matrix), (w, h),
+                             borderValue=255)
+    fitted = repeated._document_overlay(img, region, profile,
+                                        float(np.median([p[2] for p in peaks])),
+                                        allow_broad_ink=True, coverage_hint=coverage)
+    if fitted is not None:
+        fitted.method = 'paper_repeat_document_overlay'
+        return fitted
     # This path handles neutral lettering only. Coloured stamps have their own
     # measured matting path and must retain it.
     eligible = region & (gray>50) & (gray<245)

@@ -69,7 +69,7 @@ def _process_one(page: PageImage, mask: MaskLayer, thr: Thresholds,
 
 def _run_raster(pages: list[PageImage], thr: Thresholds, gt: GroundTruth | None,
                 force_single: bool = False, use_ocr: bool = True,
-                use_structure: bool = True) -> list[PageResult]:
+                use_structure: bool = True, style: str | None = None) -> list[PageResult]:
     structural = {id(p): structure.process_text_page(p, thr) if use_structure else None for p in pages}
     raster_pages = [p for p in pages if structural[id(p)] is None]
     images = [p.image for p in raster_pages]
@@ -91,7 +91,7 @@ def _run_raster(pages: list[PageImage], thr: Thresholds, gt: GroundTruth | None,
             continue
         t0 = time.perf_counter()
         single = masks.estimate_single_page(page.image, thr,
-                                           use_ocr=use_ocr)
+                                           use_ocr=use_ocr, style=style)
         mask = masks.with_prior(single, shared, thr)
         mask_ms = _ms(t0) + shared_ms // max(len(pages), 1)
         result = _process_one(page, mask, thr, gt, mask_ms=mask_ms)
@@ -145,8 +145,8 @@ def _run_structure(path: Path, thr: Thresholds) -> list[PageResult] | None:
 
 def process_pages(pages: list[PageImage], thr: Thresholds = Thresholds(),
                  gt: GroundTruth | None = None, force_single: bool = False,
-                 use_ocr: bool = True) -> list[PageResult]:
-    return _run_raster(pages, thr, gt, force_single, use_ocr)
+                 use_ocr: bool = True, style: str | None = None) -> list[PageResult]:
+    return _run_raster(pages, thr, gt, force_single, use_ocr, style=style)
 
 
 def remask_page(page: PageImage, thr: Thresholds = Thresholds(),
@@ -158,7 +158,8 @@ def remask_page(page: PageImage, thr: Thresholds = Thresholds(),
 
 
 def process_file(path: str | Path, thr: Thresholds = Thresholds(), dpi: int = 200,
-                 skip_structure: bool = False, use_ocr: bool = True) -> list[PageResult]:
+                 skip_structure: bool = False, use_ocr: bool = True,
+                 style: str | None = None) -> list[PageResult]:
     p = Path(path)
     if p.suffix.lower() == ".pdf" and not skip_structure:
         structural = _run_structure(p, thr)
@@ -166,7 +167,7 @@ def process_file(path: str | Path, thr: Thresholds = Thresholds(), dpi: int = 20
             return structural
     pages = documents.load_pages(p, dpi=dpi)
     return _run_raster(pages, thr, gt=None, force_single=len(pages) < 2, use_ocr=use_ocr,
-                       use_structure=not skip_structure)
+                       use_structure=not skip_structure, style=style)
 
 
 def process_file_streaming(path: str | Path, thr: Thresholds = Thresholds(),

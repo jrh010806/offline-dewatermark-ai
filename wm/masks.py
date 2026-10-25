@@ -295,7 +295,8 @@ def _veil_mask(img: np.ndarray, gray: np.ndarray, dev: np.ndarray, P: float,
 def estimate_single_page(img: np.ndarray, thr: Thresholds = Thresholds(),
                          close_px: int = 11,
                          keepout: np.ndarray | None = None,
-                         use_ocr: bool = True) -> MaskLayer:
+                         use_ocr: bool = True,
+                         style: str | None = None) -> MaskLayer:
     """Hybrid detection: tonal spike for light veils + scale filter for stamp watermarks.
 
     ``keepout`` is the OCR body-text zone (see wm.ocr). Where it exists the scale
@@ -304,41 +305,73 @@ def estimate_single_page(img: np.ndarray, thr: Thresholds = Thresholds(),
     evidence rather than by guesswork. It also bounds the footprint, which the
     repair stage repaints wholesale after bridging it across the watermark's own
     strokes: an unbounded footprint hands the inpainter the glyphs next door.
+
+    ``style`` optionally locks the routing to one watermark style (see
+    wm.styles.STYLE_CHANNELS); unmatched channels are then skipped instead of
+    falling through to the generic detectors.
     """
     from . import periodic, paper_grid
-    located = paper_grid.estimate(img)
-    if located is not None:
-        located.instances = _instances(located.alpha, thr)
-        return located
-    located = periodic.estimate(img)
-    if located is not None:
-        located.instances = _instances(located.alpha, thr)
-        return located
-    if use_ocr:
+    from .styles import STYLE_CHANNELS
+    channels = STYLE_CHANNELS.get(style, ()) if style else None
+
+    def wanted(name: str) -> bool:
+        return channels is None or name in channels
+
+    if wanted("paper_grid"):
+        located = paper_grid.estimate(img)
+        if located is not None:
+            located.instances = _instances(located.alpha, thr)
+            return located
+    if wanted("periodic"):
+        located = periodic.estimate(img)
+        if located is not None:
+            located.instances = _instances(located.alpha, thr)
+            return located
+    if wanted("dark_text"):
+        try:
+            from . import dark_text
+            located = dark_text.estimate(img)
+        except ImportError:
+            located = None
+        if located is not None:
+            located.instances = _instances(located.alpha, thr)
+            return located
+    if use_ocr and (channels is None or any(c in channels for c in
+                                            ("repeated", "paper_repeat", "document_overlay", "chromatic"))):
         from . import repeated, ocr, paper_repeat
-        located = repeated.estimate(img)
-        if located is not None and located.repair_mode == 'document_overlay':
-            located.instances = _instances(located.alpha, thr)
-            return located
-        paper = paper_repeat.estimate(img)
-        if paper is not None:
-            paper.instances = _instances(paper.alpha, thr)
-            return paper
+        located = None
+        if wanted("repeated"):
+            located = repeated.estimate(img)
+            if located is not None and located.repair_mode == 'document_overlay':
+                located.instances = _instances(located.alpha, thr)
+                return located
+        if wanted("paper_repeat"):
+            paper = paper_repeat.estimate(img)
+            if paper is not None:
+                paper.instances = _instances(paper.alpha, thr)
+                return paper
         if located is not None:
             located.instances = _instances(located.alpha, thr)
             return located
-        from . import document_overlay
-        located = document_overlay.estimate(img, keepout=keepout)
-        if located is not None:
-            located.instances = _instances(located.alpha, thr)
-            return located
-        from . import chromatic
-        located = chromatic.estimate(img)
-        if located is not None:
-            located.instances = _instances(located.alpha, thr)
-            return located
+        if wanted("document_overlay"):
+            from . import document_overlay
+            located = document_overlay.estimate(img, keepout=keepout)
+            if located is not None:
+                located.instances = _instances(located.alpha, thr)
+                return located
+        if wanted("chromatic"):
+            from . import chromatic
+            located = chromatic.estimate(img)
+            if located is not None:
+                located.instances = _instances(located.alpha, thr)
+                return located
         if keepout is None:
             keepout = ocr.text_zones(img)
+    if channels:
+        # A locked style that produced no evidence must not silently fall back
+        # to generic repainting; report no detection for this style instead.
+        # corner_id intentionally keeps channels=() and uses the generic path.
+        return _empty(paper_level(img))
     img = deblock(img)
     paper = paper_level(img)
     P = float(np.median(paper))
@@ -449,7 +482,7 @@ def with_prior(single: MaskLayer, prior: MaskLayer | None,
     In particular, repeated table text or unrelated photo backgrounds must not
     overrule a more specific per-image localization.
     """
-    if prior is None or single.method.startswith(('repeated_', 'single_')):
+    if prior is None or single.method.startswith(('repeated_', 'single_', 'paper_repeat_')):
         return single
     a, b = single.binary(thr.mask_alpha_min)>0, prior.binary(thr.mask_alpha_min)>0
     if a.shape != b.shape or prior.confidence < .12:
@@ -505,13 +538,21 @@ def estimate_crosspage(images: list[np.ndarray], thr: Thresholds = Thresholds(),
 
 def residual_visible_fraction(source: np.ndarray, output: np.ndarray,
                               clean: np.ndarray, min_signal: float = 8.0,
-                              keep_ratio: float = 0.5) -> float:
+                              keep_ratio: float = 0.5,
+                              alpha_reference: np.ndarray | None = None) -> float:
     """Fraction of the pixels that *did* carry a watermark and still carry at
     least ``keep_ratio`` of it. Anchored on the original-vs-clean difference, so
     a clean page scores exactly zero and the threshold needs no null-floor
-    calibration. Ground-truth only."""
+    calibration. Ground-truth only.
+
+    When the ground-truth alpha is available the population is restricted to
+    actual watermark pixels: on JPEG inputs the source-vs-clean difference is
+    mostly compression ringing around text, and counting those pixels would
+    make even a perfect removal fail the residual condition."""
     signal = np.abs(source.astype(np.int16) - clean.astype(np.int16)).mean(2)
     carried = signal >= min_signal
+    if alpha_reference is not None:
+        carried &= alpha_reference > 0
     if not carried.any():
         return 0.0
     leftover = np.abs(output.astype(np.int16) - clean.astype(np.int16)).mean(2)

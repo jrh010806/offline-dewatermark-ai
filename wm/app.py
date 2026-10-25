@@ -235,6 +235,7 @@ class MainWindow(QMainWindow):
         for slider in self._sliders.values():
             slider.valueChanged.connect(self.save_params)
         self.ocr_box.toggled.connect(self.save_params)
+        self.style_box.currentTextChanged.connect(self.save_params)
         self.set_busy(False)
 
     # ---- 参数面板 -------------------------------------------------------
@@ -270,6 +271,14 @@ class MainWindow(QMainWindow):
         self.ocr_box.setChecked(True)
         grid.addWidget(self.ocr_box, row, 0, 1, 3)
         row += 1
+        grid.addWidget(QLabel("指定水印样式（可输中英文提示词）"), row, 0)
+        self.style_box = QComboBox()
+        self.style_box.setEditable(True)
+        self.style_box.addItems(["自动识别", "点阵 dot grid", "平铺文字 tiled text",
+                                 "居中大字 big center", "深色重字母 heavy dark", "角标 corner id"])
+        self.style_box.setToolTip("自动=级联路由；指定后只走该样式通道，支持中英文提示词")
+        grid.addWidget(self.style_box, row, 1, 1, 2)
+        row += 1
         self.reprocess_btn = QPushButton("处理／重处理当前图片")
         self.reprocess_btn.clicked.connect(lambda: self.start_run(only_page=self._current))
         self.reprocess_btn.setEnabled(False)
@@ -291,6 +300,10 @@ class MainWindow(QMainWindow):
     def current_close_px(self) -> int:
         return self._sliders["close_px"].value()
 
+    def current_style(self) -> str | None:
+        from .styles import parse_style_prompt
+        return parse_style_prompt(self.style_box.currentText())
+
     def reset_params(self) -> None:
         for attr, s in self._sliders.items():
             s.setValue(_knob_default(attr))
@@ -300,11 +313,14 @@ class MainWindow(QMainWindow):
         if self._loading_params or self.batch is None:
             return
         params = {attr: slider.value() for attr, slider in self._sliders.items()}
+        style = self.current_style()
         if (any(self.batch.params.get(k) != params[k] for k in ("mask_alpha_min", "close_px"))
-                or self.batch.use_ocr != self.ocr_box.isChecked()):
+                or self.batch.use_ocr != self.ocr_box.isChecked()
+                or self.batch.style != style):
             self.batch.invalidate()
         self.batch.params = params
         self.batch.use_ocr = self.ocr_box.isChecked()
+        self.batch.style = style
 
     def select_batch(self, row: int) -> None:
         self.batch = self.batches[row] if 0 <= row < len(self.batches) else None
@@ -315,6 +331,7 @@ class MainWindow(QMainWindow):
             slider.setValue(self.batch.params.get(attr, _knob_default(attr))
                             if self.batch else _knob_default(attr))
         self.ocr_box.setChecked(self.batch.use_ocr if self.batch else True)
+        self.style_box.setCurrentText((self.batch.style or "自动识别") if self.batch else "自动识别")
         self._loading_params = False
         self.page_list.clear()
         if self.batch:
@@ -443,6 +460,7 @@ class MainWindow(QMainWindow):
         for slider in self._sliders.values():
             slider.setEnabled(not busy)
         self.ocr_box.setEnabled(not busy)
+        self.style_box.setEnabled(not busy)
         self.pause_btn.setEnabled(busy)
         self.stop_btn.setEnabled(busy)
         self.export_btn.setEnabled(not busy and any(b.results for b in self.batches))
@@ -465,7 +483,7 @@ class MainWindow(QMainWindow):
                              lama_context_margin=vals["lama_context_margin"],
                              lama_tile_overlap=vals["lama_tile_overlap"],
                              lama_mask_dilate=vals["lama_mask_dilate"])
-            jobs.append((batch, indices, thr, vals["close_px"], batch.use_ocr))
+            jobs.append((batch, indices, thr, vals["close_px"], batch.use_ocr, batch.style))
         if not jobs:
             return
         self.worker = BatchWorker(jobs, self)

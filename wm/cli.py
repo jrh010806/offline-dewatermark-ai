@@ -97,7 +97,16 @@ def cmd_fixtures(args: argparse.Namespace) -> None:
 
 
 def cmd_run(args: argparse.Namespace) -> None:
-    results = pipeline.process_file(args.input, dpi=args.dpi, skip_structure=args.force_raster)
+    from .styles import parse_style_prompt, translate_prompt
+    style = None
+    if args.style:
+        style = parse_style_prompt(args.style)
+        if style is None:
+            raise SystemExit(f"无法识别的水印样式提示词：{args.style!r}；"
+                             "可用：dot_grid/tiled_text/big_center/heavy_dark/corner_id 或中英文描述")
+        print("样式提示词解析:", translate_prompt(args.style))
+    results = pipeline.process_file(args.input, dpi=args.dpi, skip_structure=args.force_raster,
+                                    style=style)
     out = pipeline.write_results(results, args.out, source_path=args.input)
     for r in results:
         print(json.dumps(r.to_dict(), ensure_ascii=False))
@@ -132,6 +141,8 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--out", default="out")
     p.add_argument("--dpi", type=int, default=200)
     p.add_argument("--force-raster", action="store_true")
+    p.add_argument("--style", default=None,
+                   help="指定水印样式（代码或中英文提示词），如 tiled_text / 平铺文字 / dot grid")
     p.set_defaults(fn=cmd_run)
 
     args = parser.parse_args(argv)

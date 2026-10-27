@@ -36,6 +36,52 @@ def paper_level(img: np.ndarray, block: int = 48) -> np.ndarray:
     return np.broadcast_to(hi, (img.shape[0], img.shape[1], 3)).copy()
 
 
+def paper_background_fraction(img: np.ndarray, paper: np.ndarray | None = None) -> float:
+    """Fraction of pixels that look like neutral, bright page stock.
+
+    The tonal and scale fallbacks below assume a document-like paper pole. On a
+    photograph, a global upper percentile is only a scene colour statistic and
+    its histogram spikes can turn unrelated texture into a broad repair mask.
+    Photo-specific detectors run before this guard; if none has evidence, do
+    not let document heuristics invent a mask.
+    """
+    if paper is None:
+        paper = paper_level(img)
+    fimg = img.astype(np.float32)
+    gray = fimg.mean(2)
+    level = float(np.median(paper))
+    chroma = fimg.max(2) - fimg.min(2)
+    return float(np.mean((gray >= 0.90 * level) & (chroma <= 38.0)))
+
+
+def document_rules(img: np.ndarray) -> np.ndarray:
+    """Protect thin continuous document rules, including light footer lines."""
+    gray = img.astype(np.float32).mean(2)
+    ink = (gray < float(np.percentile(gray, 97)) - 12).astype(np.uint8)
+    length = max(40, min(gray.shape)//8)
+    horizontal = cv2.morphologyEx(ink, cv2.MORPH_OPEN, np.ones((1, length), np.uint8))
+    vertical = cv2.morphologyEx(ink, cv2.MORPH_OPEN, np.ones((length, 1), np.uint8))
+    horizontal &= 1-cv2.morphologyEx(horizontal, cv2.MORPH_OPEN, np.ones((5, 1), np.uint8))
+    vertical &= 1-cv2.morphologyEx(vertical, cv2.MORPH_OPEN, np.ones((1, 5), np.uint8))
+    return cv2.dilate(horizontal | vertical, np.ones((7, 7), np.uint8)) > 0
+
+
+def document_content_protection(img: np.ndarray) -> np.ndarray:
+    protected = document_rules(img)
+    gray = img.astype(np.float32).mean(2)
+    core = (gray < .75*float(np.percentile(gray, 97))).astype(np.uint8)
+    count, _, stats, _ = cv2.connectedComponentsWithStats(core, 8)
+    rectangles = np.zeros(gray.shape, np.uint8)
+    for x, y, w, h, area in stats[1:]:
+        # Solid chart bars and header blocks are not transparent veils. Their
+        # antialiasing rims can share the veil histogram spike, so protect the
+        # full rectangle before fitting that histogram. Specialist detectors
+        # still handle confirmed watermark shapes before this fallback.
+        if area >= .001*gray.size and min(w, h) >= 10 and area/(w*h) > .90:
+            rectangles[y:y+h, x:x+w] = 1
+    return protected | (cv2.dilate(rectangles, np.ones((7, 7), np.uint8)) > 0)
+
+
 def paper_anchor(gray: np.ndarray, P: float, radius: int = 9) -> np.ndarray:
     """Neighbourhoods that contain uncovered paper.
 
@@ -342,6 +388,16 @@ def estimate_single_page(img: np.ndarray, thr: Thresholds = Thresholds(),
         if located is not None:
             located.instances = _instances(located.alpha, thr)
             return located
+    if use_ocr and (channels is None or any(c in channels for c in ("corner_id", "repeated", "chromatic"))):
+        if paper_background_fraction(img) < .65:
+            from . import photo_text
+            located = photo_text.estimate(img,
+                allow_corner=channels is None or "corner_id" in channels,
+                allow_oblique=channels is None or any(c in channels for c in ("repeated", "chromatic")),
+                require_repeat=channels is not None and "repeated" in channels and "chromatic" not in channels)
+            if located is not None:
+                located.instances = _instances(located.alpha, thr)
+                return located
     if use_ocr and (channels is None or any(c in channels for c in
                                             ("repeated", "paper_repeat", "document_overlay", "chromatic"))):
         from . import repeated, ocr, paper_repeat
@@ -380,13 +436,21 @@ def estimate_single_page(img: np.ndarray, thr: Thresholds = Thresholds(),
         return _empty(paper_level(img))
     img = deblock(img)
     paper = paper_level(img)
+    if paper_background_fraction(img, paper) < 0.25:
+        # Leave unsupported photographs untouched. The old document fallback
+        # produced a 17.7%-of-image false mask on both a watermarked photo and
+        # its clean counterpart in the held-out set.
+        mask = _empty(paper)
+        mask.method = "nonpaper_background"
+        return mask
     P = float(np.median(paper))
     gray = img.astype(np.float32).mean(2)
     dev = P - gray
-    not_text = np.ones(gray.shape, bool) if keepout is None else ~keepout
+    not_text = ((np.ones(gray.shape, bool) if keepout is None else ~keepout)
+                & ~document_content_protection(img))
 
     # Method 1: Tonal spike (original, for light veils)
-    side = gray > 0.55 * P
+    side = (gray > 0.55 * P) & not_text
     seed, m = _veil_magnitude(dev, side, P)
 
     if m > 0:
@@ -488,13 +552,16 @@ def with_prior(single: MaskLayer, prior: MaskLayer | None,
     In particular, repeated table text or unrelated photo backgrounds must not
     overrule a more specific per-image localization.
     """
-    if prior is None or single.method.startswith(('repeated_', 'single_', 'paper_repeat_')):
+    if prior is None or single.method.startswith(('repeated_', 'single_', 'paper_repeat_', 'photo_')):
         return single
     a, b = single.binary(thr.mask_alpha_min)>0, prior.binary(thr.mask_alpha_min)>0
     if a.shape != b.shape or prior.confidence < .12:
         return single
     if not a.any():
-        return prior if 0 < b.mean() < .1 else single
+        # Repeated page furniture (footers, rules, chart layouts) can survive a
+        # cross-page median. Repetition alone must not authorise erasing it when
+        # this page has no independent watermark evidence.
+        return single
     overlap = (a & b).sum()/max((a | b).sum(),1)
     return prior if overlap >= .45 and b.sum() <= a.sum()*1.5 else single
 

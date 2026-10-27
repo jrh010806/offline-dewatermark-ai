@@ -1,5 +1,9 @@
 """Single-image before/after evaluation. References are used only AFTER inference."""
 from __future__ import annotations
+
+# Historical data was retired on 2026-10-26; shared imported helpers remain usable.
+if __name__ == "__main__":
+    raise SystemExit('该脚本依赖的历史样本已退役。当前测试请使用 .venv/bin/python tools/run_min_regression.py --suite all；历史结果仍在 out/，不再覆盖或重跑。')
 import sys,json,time,hashlib
 from pathlib import Path
 import numpy as np

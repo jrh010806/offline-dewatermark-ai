@@ -1,0 +1,4422 @@
+[
+  {
+    "id": "photo_008__local_text",
+    "kind": "image",
+    "scenario": "C01",
+    "subtype": "local_text",
+    "label": "局部文字",
+    "split": "train",
+    "source_group": "commons:163347923",
+    "split_group": "commons-creator:97032590bee52ff4",
+    "base_id": "photo_008",
+    "background": "photo_landscape",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1536,
+      1152
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_008.png",
+      "watermarked": "images/train/photo_008__local_text/watermarked.png",
+      "overlay_rgba": "images/train/photo_008__local_text/overlay_rgba.png",
+      "alpha": "images/train/photo_008__local_text/alpha.png",
+      "mask": "images/train/photo_008__local_text/mask.png"
+    },
+    "sha256": {
+      "clean": "9e0a6d23e22dd1788422366d45a68368b576ca28e4a9183b098e214d2b543301",
+      "watermarked": "56cf2cb109947e781692dcd31e2a47468b9d631b566a6015b0f526ff177c0b52",
+      "overlay_rgba": "6a5c365844f5f47f159da27fd62559edabbcffece5a507afe801dbc7c915df4d",
+      "alpha": "e3e9b8401b6c1273cd784bb7a5d9357f29e201e123ade38d4eb377966466e6b7",
+      "mask": "e18316bc40d357c0b6e6aa65da5bf64a85a5bf4345b30f8c63a68fec8930ef22"
+    },
+    "parameters": {
+      "style": "local_text",
+      "seed": 126912203747043,
+      "opacity": 0.7,
+      "color": [
+        100,
+        24,
+        42
+      ],
+      "text": "训练素材 7043",
+      "asset_partition": "train",
+      "asset_id": "train:photo_008__local_text",
+      "watermark_origin": "project_synthetic",
+      "placement": "bottom_right",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 178,
+      "support_fraction": 0.002071239330150463,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "photo_008__center_text",
+    "kind": "image",
+    "scenario": "C03",
+    "subtype": "center_text",
+    "label": "居中大字",
+    "split": "train",
+    "source_group": "commons:163347923",
+    "split_group": "commons-creator:97032590bee52ff4",
+    "base_id": "photo_008",
+    "background": "photo_landscape",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1536,
+      1152
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_008.png",
+      "watermarked": "images/train/photo_008__center_text/watermarked.png",
+      "overlay_rgba": "images/train/photo_008__center_text/overlay_rgba.png",
+      "alpha": "images/train/photo_008__center_text/alpha.png",
+      "mask": "images/train/photo_008__center_text/mask.png"
+    },
+    "sha256": {
+      "clean": "9e0a6d23e22dd1788422366d45a68368b576ca28e4a9183b098e214d2b543301",
+      "watermarked": "dcf9cb6d87f6b84648444adeaf2bfce586a46f87bbdb1ded9afb919e6c15a855",
+      "overlay_rgba": "f100e275ba7c0fa8558e3b86591997ca1dbe85a6e8ea140124a12b9d5b097ff0",
+      "alpha": "8884bbe5d59a543fd79643e5d068b15f8ccca961992574d68c79c93de967b363",
+      "mask": "9f443a6a0c4947ac39e194ade641237aa93612ba7acdb7e0084c94974d37c5e8"
+    },
+    "parameters": {
+      "style": "center_text",
+      "seed": 8471919019973,
+      "opacity": 0.3,
+      "color": [
+        151,
+        89,
+        35
+      ],
+      "text": "训练素材 9973",
+      "asset_partition": "train",
+      "asset_id": "train:photo_008__center_text",
+      "watermark_origin": "project_synthetic",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 96,
+      "support_fraction": 0.017695674189814815,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "photo_008__center_white",
+    "kind": "image",
+    "scenario": "C03",
+    "subtype": "center_white",
+    "label": "白色半透明大字",
+    "split": "train",
+    "source_group": "commons:163347923",
+    "split_group": "commons-creator:97032590bee52ff4",
+    "base_id": "photo_008",
+    "background": "photo_landscape",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1536,
+      1152
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_008.png",
+      "watermarked": "images/train/photo_008__center_white/watermarked.png",
+      "overlay_rgba": "images/train/photo_008__center_white/overlay_rgba.png",
+      "alpha": "images/train/photo_008__center_white/alpha.png",
+      "mask": "images/train/photo_008__center_white/mask.png"
+    },
+    "sha256": {
+      "clean": "9e0a6d23e22dd1788422366d45a68368b576ca28e4a9183b098e214d2b543301",
+      "watermarked": "12d2e8c5dc5dfd726f8655944e297f3245fdc94ecc8a0022886bd237316eebb7",
+      "overlay_rgba": "a9e7f881fe886e1760ab3929cc680914069bbbfeb12a4cc5b3e3d8a20a39bad3",
+      "alpha": "3db52ce954c30cc89df13f51d769a2be76368b319eb69db2f7e9e26557e89b55",
+      "mask": "b29473d38d80f022eff1d629c75b1668bbc7354094224b123a4aeee5a827ed3f"
+    },
+    "parameters": {
+      "style": "center_white",
+      "seed": 153196208430496,
+      "opacity": 0.15,
+      "color": [
+        255,
+        255,
+        255
+      ],
+      "text": "训练素材 0496",
+      "asset_partition": "train",
+      "asset_id": "train:photo_008__center_white",
+      "watermark_origin": "project_synthetic",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 47,
+      "support_fraction": 0.01808788158275463,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "photo_008__tiled_diagonal",
+    "kind": "image",
+    "scenario": "C04",
+    "subtype": "tiled_diagonal",
+    "label": "斜向平铺文字",
+    "split": "train",
+    "source_group": "commons:163347923",
+    "split_group": "commons-creator:97032590bee52ff4",
+    "base_id": "photo_008",
+    "background": "photo_landscape",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1536,
+      1152
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_008.png",
+      "watermarked": "images/train/photo_008__tiled_diagonal/watermarked.png",
+      "overlay_rgba": "images/train/photo_008__tiled_diagonal/overlay_rgba.png",
+      "alpha": "images/train/photo_008__tiled_diagonal/alpha.png",
+      "mask": "images/train/photo_008__tiled_diagonal/mask.png"
+    },
+    "sha256": {
+      "clean": "9e0a6d23e22dd1788422366d45a68368b576ca28e4a9183b098e214d2b543301",
+      "watermarked": "d107ddef53397f3b589169fec28deb0d57a7290ee704429905edfcd7f21c3b93",
+      "overlay_rgba": "fd63214931bac01fe6736ad76faea043125262c0b94279bbee21b893f9d84fb2",
+      "alpha": "808130b6b50fc40006e224892223fe5e844c3d821d2743ccd608b3c0115a4c9e",
+      "mask": "bec676cef35187f9d321c982e70eacb37946bbc5b2ff6114293a0a27130e0dca"
+    },
+    "parameters": {
+      "style": "tiled_diagonal",
+      "seed": 140653945846899,
+      "opacity": 0.15,
+      "color": [
+        111,
+        130,
+        138
+      ],
+      "text": "训练素材 6899",
+      "asset_partition": "train",
+      "asset_id": "train:photo_008__tiled_diagonal",
+      "watermark_origin": "project_synthetic",
+      "rotation_degrees": 32,
+      "irregular": false,
+      "alpha_min_nonzero": 1,
+      "alpha_max": 48,
+      "support_fraction": 0.03753492567274305,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "photo_008__negative",
+    "kind": "image",
+    "scenario": "N00",
+    "subtype": "no_watermark",
+    "label": "无水印负例",
+    "split": "train",
+    "source_group": "commons:163347923",
+    "split_group": "commons-creator:97032590bee52ff4",
+    "base_id": "photo_008",
+    "background": "photo_landscape",
+    "provenance": "downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1536,
+      1152
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_008.png",
+      "watermarked": "bases/photos/photo_008.png",
+      "mask": "images/train/photo_008__negative/mask.png",
+      "alpha": "images/train/photo_008__negative/alpha.png"
+    },
+    "sha256": {
+      "clean": "9e0a6d23e22dd1788422366d45a68368b576ca28e4a9183b098e214d2b543301",
+      "watermarked": "9e0a6d23e22dd1788422366d45a68368b576ca28e4a9183b098e214d2b543301",
+      "mask": "d868f8714a76099d11b7cd0b19172f24f85220578d66398fb3637190e2c97808",
+      "alpha": "d868f8714a76099d11b7cd0b19172f24f85220578d66398fb3637190e2c97808"
+    },
+    "parameters": {},
+    "watermark_origin": "none",
+    "is_negative": true,
+    "mask_definition": "all_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "photo_016__local_text",
+    "kind": "image",
+    "scenario": "C01",
+    "subtype": "local_text",
+    "label": "局部文字",
+    "split": "train",
+    "source_group": "commons:15117448",
+    "split_group": "commons-creator:4c10a1b0d701d83a",
+    "base_id": "photo_016",
+    "background": "photo_vegetation",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1152,
+      1536
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_016.png",
+      "watermarked": "images/train/photo_016__local_text/watermarked.png",
+      "overlay_rgba": "images/train/photo_016__local_text/overlay_rgba.png",
+      "alpha": "images/train/photo_016__local_text/alpha.png",
+      "mask": "images/train/photo_016__local_text/mask.png"
+    },
+    "sha256": {
+      "clean": "1b57a608e7742b24d6e46ef9262af7428d62ecc9719e0f95a09bb5239e6a52ad",
+      "watermarked": "fb434013e1684c4f08782a378c03020786a2fe846ba9c26ecdc0118eb9924fa0",
+      "overlay_rgba": "32e1ad95d89ef6d79f1de571036f3f8e2526d6aafa8f8ea74531a5d11ebb4213",
+      "alpha": "65a3dec7902375000ba522c072196215b3229a23606d69d0d01b03725b3c5d72",
+      "mask": "8868a2b6f03e494301d4b8c9561a1edb6e500802ac321e7a296975a6f636d492"
+    },
+    "parameters": {
+      "style": "local_text",
+      "seed": 49556843650956,
+      "opacity": 0.15,
+      "color": [
+        141,
+        45,
+        105
+      ],
+      "text": "训练素材 0956",
+      "asset_partition": "train",
+      "asset_id": "train:photo_016__local_text",
+      "watermark_origin": "project_synthetic",
+      "placement": "bottom_right",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 38,
+      "support_fraction": 0.00213001392505787,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "photo_016__center_text",
+    "kind": "image",
+    "scenario": "C03",
+    "subtype": "center_text",
+    "label": "居中大字",
+    "split": "train",
+    "source_group": "commons:15117448",
+    "split_group": "commons-creator:4c10a1b0d701d83a",
+    "base_id": "photo_016",
+    "background": "photo_vegetation",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1152,
+      1536
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_016.png",
+      "watermarked": "images/train/photo_016__center_text/watermarked.png",
+      "overlay_rgba": "images/train/photo_016__center_text/overlay_rgba.png",
+      "alpha": "images/train/photo_016__center_text/alpha.png",
+      "mask": "images/train/photo_016__center_text/mask.png"
+    },
+    "sha256": {
+      "clean": "1b57a608e7742b24d6e46ef9262af7428d62ecc9719e0f95a09bb5239e6a52ad",
+      "watermarked": "ea5a3c2fa6579bb3fcf499efa14cca50213ba2d69206bc8fbbd5138f2a88feaf",
+      "overlay_rgba": "9abccee7150ac3915ba304ac950ec0386e2f1f0a1284d281acce7ebad7b7a47b",
+      "alpha": "d39f6624ce1c34a7408860814429659e402786d9976f274d3cc44e4b8a2049c1",
+      "mask": "bbff17e334ec90f6dbcc4366cbbe0e22bfe3e44906eb397407a1b66f771ede12"
+    },
+    "parameters": {
+      "style": "center_text",
+      "seed": 248027682822509,
+      "opacity": 0.7,
+      "color": [
+        142,
+        105,
+        136
+      ],
+      "text": "训练素材 2509",
+      "asset_partition": "train",
+      "asset_id": "train:photo_016__center_text",
+      "watermark_origin": "project_synthetic",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 219,
+      "support_fraction": 0.018163610387731483,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "photo_016__center_white",
+    "kind": "image",
+    "scenario": "C03",
+    "subtype": "center_white",
+    "label": "白色半透明大字",
+    "split": "train",
+    "source_group": "commons:15117448",
+    "split_group": "commons-creator:4c10a1b0d701d83a",
+    "base_id": "photo_016",
+    "background": "photo_vegetation",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1152,
+      1536
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_016.png",
+      "watermarked": "images/train/photo_016__center_white/watermarked.png",
+      "overlay_rgba": "images/train/photo_016__center_white/overlay_rgba.png",
+      "alpha": "images/train/photo_016__center_white/alpha.png",
+      "mask": "images/train/photo_016__center_white/mask.png"
+    },
+    "sha256": {
+      "clean": "1b57a608e7742b24d6e46ef9262af7428d62ecc9719e0f95a09bb5239e6a52ad",
+      "watermarked": "8b8407462ab0275333c2e1d9fba47519110f634a7b55348134cf9f50bae3e855",
+      "overlay_rgba": "9e5ef69c75f1339f5fa392f70efa88df4e022dea59c5cfb94cda7d42e84fb7b2",
+      "alpha": "4a63367ecf0f049d70411ac39f8e00f0543ff5b799430a2c7876458cb9dd31f9",
+      "mask": "05f383a2e6414563da12e542c60ba6b70f8f498163aee05a61e6da7c78773a08"
+    },
+    "parameters": {
+      "style": "center_white",
+      "seed": 7863092913448,
+      "opacity": 0.3,
+      "color": [
+        255,
+        255,
+        255
+      ],
+      "text": "训练素材 3448",
+      "asset_partition": "train",
+      "asset_id": "train:photo_016__center_white",
+      "watermark_origin": "project_synthetic",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 96,
+      "support_fraction": 0.017969202112268517,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "photo_016__tiled_diagonal",
+    "kind": "image",
+    "scenario": "C04",
+    "subtype": "tiled_diagonal",
+    "label": "斜向平铺文字",
+    "split": "train",
+    "source_group": "commons:15117448",
+    "split_group": "commons-creator:4c10a1b0d701d83a",
+    "base_id": "photo_016",
+    "background": "photo_vegetation",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1152,
+      1536
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_016.png",
+      "watermarked": "images/train/photo_016__tiled_diagonal/watermarked.png",
+      "overlay_rgba": "images/train/photo_016__tiled_diagonal/overlay_rgba.png",
+      "alpha": "images/train/photo_016__tiled_diagonal/alpha.png",
+      "mask": "images/train/photo_016__tiled_diagonal/mask.png"
+    },
+    "sha256": {
+      "clean": "1b57a608e7742b24d6e46ef9262af7428d62ecc9719e0f95a09bb5239e6a52ad",
+      "watermarked": "0deae03a83af0fc9e945b91f0e03930a11d493b8b37ca820511069eeba5b6f2d",
+      "overlay_rgba": "6e12fc0ea9b3e1b7da85e584a2582331331283428d0107b0fe1a7d4887aab9ea",
+      "alpha": "91274156101247512ac3d8e525e654427d40b92101f3213d5c0986cc99ea9339",
+      "mask": "de6932d72008d3274917fcbbca9cbdd4c604383c80179bfd7ecc9801671a7533"
+    },
+    "parameters": {
+      "style": "tiled_diagonal",
+      "seed": 210159347134837,
+      "opacity": 0.3,
+      "color": [
+        76,
+        151,
+        116
+      ],
+      "text": "训练素材 4837",
+      "asset_partition": "train",
+      "asset_id": "train:photo_016__tiled_diagonal",
+      "watermark_origin": "project_synthetic",
+      "rotation_degrees": 32,
+      "irregular": false,
+      "alpha_min_nonzero": 1,
+      "alpha_max": 97,
+      "support_fraction": 0.032909252025462965,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "photo_016__negative",
+    "kind": "image",
+    "scenario": "N00",
+    "subtype": "no_watermark",
+    "label": "无水印负例",
+    "split": "train",
+    "source_group": "commons:15117448",
+    "split_group": "commons-creator:4c10a1b0d701d83a",
+    "base_id": "photo_016",
+    "background": "photo_vegetation",
+    "provenance": "downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1152,
+      1536
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_016.png",
+      "watermarked": "bases/photos/photo_016.png",
+      "mask": "images/train/photo_016__negative/mask.png",
+      "alpha": "images/train/photo_016__negative/alpha.png"
+    },
+    "sha256": {
+      "clean": "1b57a608e7742b24d6e46ef9262af7428d62ecc9719e0f95a09bb5239e6a52ad",
+      "watermarked": "1b57a608e7742b24d6e46ef9262af7428d62ecc9719e0f95a09bb5239e6a52ad",
+      "mask": "7ffa325a947822e335b8bc8a2cdaa3e82ce0f8c3efdbc05ce52422b0f38c490c",
+      "alpha": "7ffa325a947822e335b8bc8a2cdaa3e82ce0f8c3efdbc05ce52422b0f38c490c"
+    },
+    "parameters": {},
+    "watermark_origin": "none",
+    "is_negative": true,
+    "mask_definition": "all_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "photo_024__local_text",
+    "kind": "image",
+    "scenario": "C01",
+    "subtype": "local_text",
+    "label": "局部文字",
+    "split": "train",
+    "source_group": "commons:71349842",
+    "split_group": "commons-creator:998a64159fea2d65",
+    "base_id": "photo_024",
+    "background": "photo_objects",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      872
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_024.png",
+      "watermarked": "images/train/photo_024__local_text/watermarked.png",
+      "overlay_rgba": "images/train/photo_024__local_text/overlay_rgba.png",
+      "alpha": "images/train/photo_024__local_text/alpha.png",
+      "mask": "images/train/photo_024__local_text/mask.png"
+    },
+    "sha256": {
+      "clean": "7ff247a6989f3b2897c5e2cbc883f9b5f47dd5a3888be6022a5cf92f2e3647e0",
+      "watermarked": "d2305eaf40e3ec335f4c4cd659eb5bc7171b1142ab778aac5c359103a884c1b4",
+      "overlay_rgba": "616edf65c9813bd19340511b79eac61db7d5758f1c0c1558eb633e584b9c4d9a",
+      "alpha": "f01fb79c9c5bbe47c0e9a6f3c3d1c6aea08e7bc6db89d53a862a95846694d913",
+      "mask": "96ea636c2da39eaf75b32a1835e4f840536b41f991494d44946c66e8d86322cd"
+    },
+    "parameters": {
+      "style": "local_text",
+      "seed": 123425281405412,
+      "opacity": 0.7,
+      "color": [
+        23,
+        116,
+        103
+      ],
+      "text": "训练素材 5412",
+      "asset_partition": "train",
+      "asset_id": "train:photo_024__local_text",
+      "watermark_origin": "project_synthetic",
+      "placement": "bottom_right",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 178,
+      "support_fraction": 0.0020194237385321103,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "photo_024__center_text",
+    "kind": "image",
+    "scenario": "C03",
+    "subtype": "center_text",
+    "label": "居中大字",
+    "split": "train",
+    "source_group": "commons:71349842",
+    "split_group": "commons-creator:998a64159fea2d65",
+    "base_id": "photo_024",
+    "background": "photo_objects",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      872
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_024.png",
+      "watermarked": "images/train/photo_024__center_text/watermarked.png",
+      "overlay_rgba": "images/train/photo_024__center_text/overlay_rgba.png",
+      "alpha": "images/train/photo_024__center_text/alpha.png",
+      "mask": "images/train/photo_024__center_text/mask.png"
+    },
+    "sha256": {
+      "clean": "7ff247a6989f3b2897c5e2cbc883f9b5f47dd5a3888be6022a5cf92f2e3647e0",
+      "watermarked": "74876d85d0e5a4664b99de6a3b206a79085d788f07eba27a66de285e1c590478",
+      "overlay_rgba": "46011c13efae6d8d43c1d14bcb58d5089f7a768f6d7140c3972305aeee85eb30",
+      "alpha": "9f4aa9d0436f0e0106abc3ff4ea32b659fa250f3ee947dfe24d7da5b2220acf2",
+      "mask": "f024c7dbf273442178940d3832e32ccb47315a54d87b8316c54bd9ffa3ba9d48"
+    },
+    "parameters": {
+      "style": "center_text",
+      "seed": 53064429921,
+      "opacity": 0.7,
+      "color": [
+        46,
+        43,
+        128
+      ],
+      "text": "训练素材 9921",
+      "asset_partition": "train",
+      "asset_id": "train:photo_024__center_text",
+      "watermark_origin": "project_synthetic",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 222,
+      "support_fraction": 0.016966205561926604,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "photo_024__center_white",
+    "kind": "image",
+    "scenario": "C03",
+    "subtype": "center_white",
+    "label": "白色半透明大字",
+    "split": "train",
+    "source_group": "commons:71349842",
+    "split_group": "commons-creator:998a64159fea2d65",
+    "base_id": "photo_024",
+    "background": "photo_objects",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      872
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_024.png",
+      "watermarked": "images/train/photo_024__center_white/watermarked.png",
+      "overlay_rgba": "images/train/photo_024__center_white/overlay_rgba.png",
+      "alpha": "images/train/photo_024__center_white/alpha.png",
+      "mask": "images/train/photo_024__center_white/mask.png"
+    },
+    "sha256": {
+      "clean": "7ff247a6989f3b2897c5e2cbc883f9b5f47dd5a3888be6022a5cf92f2e3647e0",
+      "watermarked": "b7ec13e9bef4228346d69093006e3242e5f010aab0ca098a251ccc500ca0113d",
+      "overlay_rgba": "0292afc4b9632e64591e0f9b240c34644eac046044bf42cb7753ba5eb676d4ec",
+      "alpha": "97732fe16a648c929719524f6272364bd7d37a6a3db072464dc16590f8295bfe",
+      "mask": "bcf56ca8d6249e0946c6306edaad1013d95c94fcc53dbbe728f54d66673d98cd"
+    },
+    "parameters": {
+      "style": "center_white",
+      "seed": 99797516132321,
+      "opacity": 0.15,
+      "color": [
+        255,
+        255,
+        255
+      ],
+      "text": "训练素材 2321",
+      "asset_partition": "train",
+      "asset_id": "train:photo_024__center_white",
+      "watermark_origin": "project_synthetic",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 47,
+      "support_fraction": 0.016169724770642203,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "photo_024__tiled_diagonal",
+    "kind": "image",
+    "scenario": "C04",
+    "subtype": "tiled_diagonal",
+    "label": "斜向平铺文字",
+    "split": "train",
+    "source_group": "commons:71349842",
+    "split_group": "commons-creator:998a64159fea2d65",
+    "base_id": "photo_024",
+    "background": "photo_objects",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      872
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_024.png",
+      "watermarked": "images/train/photo_024__tiled_diagonal/watermarked.png",
+      "overlay_rgba": "images/train/photo_024__tiled_diagonal/overlay_rgba.png",
+      "alpha": "images/train/photo_024__tiled_diagonal/alpha.png",
+      "mask": "images/train/photo_024__tiled_diagonal/mask.png"
+    },
+    "sha256": {
+      "clean": "7ff247a6989f3b2897c5e2cbc883f9b5f47dd5a3888be6022a5cf92f2e3647e0",
+      "watermarked": "d6ed0126254b355fd8b456c7897330dec75a83ce0036eee3e9f2794e3ad68d15",
+      "overlay_rgba": "5f15382d441cd4cca2184e954f343ab23e9ad2f7c2e68f26699cb3c5d1857089",
+      "alpha": "f3dbd3be1c41ce969d3e5d94f3e0e13213fb4ab6b8e828a53930147e142f9694",
+      "mask": "6849bfc5f6c705ff7403de2d234f7164d2f7962647b0b848116c915f53ea65a6"
+    },
+    "parameters": {
+      "style": "tiled_diagonal",
+      "seed": 35053469719881,
+      "opacity": 0.3,
+      "color": [
+        88,
+        72,
+        87
+      ],
+      "text": "训练素材 9881",
+      "asset_partition": "train",
+      "asset_id": "train:photo_024__tiled_diagonal",
+      "watermark_origin": "project_synthetic",
+      "rotation_degrees": 32,
+      "irregular": false,
+      "alpha_min_nonzero": 1,
+      "alpha_max": 98,
+      "support_fraction": 0.03718015338302752,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "photo_024__negative",
+    "kind": "image",
+    "scenario": "N00",
+    "subtype": "no_watermark",
+    "label": "无水印负例",
+    "split": "train",
+    "source_group": "commons:71349842",
+    "split_group": "commons-creator:998a64159fea2d65",
+    "base_id": "photo_024",
+    "background": "photo_objects",
+    "provenance": "downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      872
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_024.png",
+      "watermarked": "bases/photos/photo_024.png",
+      "mask": "images/train/photo_024__negative/mask.png",
+      "alpha": "images/train/photo_024__negative/alpha.png"
+    },
+    "sha256": {
+      "clean": "7ff247a6989f3b2897c5e2cbc883f9b5f47dd5a3888be6022a5cf92f2e3647e0",
+      "watermarked": "7ff247a6989f3b2897c5e2cbc883f9b5f47dd5a3888be6022a5cf92f2e3647e0",
+      "mask": "07040eb65886a45e16a18cf3cba9e3d0063e62a989ae08e0eee852a3f563458a",
+      "alpha": "07040eb65886a45e16a18cf3cba9e3d0063e62a989ae08e0eee852a3f563458a"
+    },
+    "parameters": {},
+    "watermark_origin": "none",
+    "is_negative": true,
+    "mask_definition": "all_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "photo_033__local_text",
+    "kind": "image",
+    "scenario": "C01",
+    "subtype": "local_text",
+    "label": "局部文字",
+    "split": "validation",
+    "source_group": "commons:174730734",
+    "split_group": "commons-creator:74b7ca86ed697245",
+    "base_id": "photo_033",
+    "background": "photo_architecture",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      960
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_033.png",
+      "watermarked": "images/validation/photo_033__local_text/watermarked.png",
+      "overlay_rgba": "images/validation/photo_033__local_text/overlay_rgba.png",
+      "alpha": "images/validation/photo_033__local_text/alpha.png",
+      "mask": "images/validation/photo_033__local_text/mask.png"
+    },
+    "sha256": {
+      "clean": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "watermarked": "ded64d32af5302a95cfd60fd3c299a11ef18749d10f1943cf26e6a7bffb9877e",
+      "overlay_rgba": "394fadb4125062a02cae1ab32282ef1af6ba5e2925d19b11abd62a5792872818",
+      "alpha": "ae7fec474e7d60984cfdc96be5e784b1632954e2664f0f513bf5ffdb4f5b0135",
+      "mask": "4412878a6d3517085985a99167c3193143bc520f9be8bddd09436d987e1e985e"
+    },
+    "parameters": {
+      "style": "local_text",
+      "seed": 227724079618059,
+      "opacity": 0.15,
+      "color": [
+        148,
+        135,
+        34
+      ],
+      "text": "验证素材 8059",
+      "asset_partition": "validation",
+      "asset_id": "validation:photo_033__local_text",
+      "watermark_origin": "project_synthetic",
+      "placement": "body_overlap",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 38,
+      "support_fraction": 0.0021476236979166667,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "photo_033__timestamp",
+    "kind": "image",
+    "scenario": "C01",
+    "subtype": "timestamp",
+    "label": "日期时间戳",
+    "split": "validation",
+    "source_group": "commons:174730734",
+    "split_group": "commons-creator:74b7ca86ed697245",
+    "base_id": "photo_033",
+    "background": "photo_architecture",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      960
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_033.png",
+      "watermarked": "images/validation/photo_033__timestamp/watermarked.png",
+      "overlay_rgba": "images/validation/photo_033__timestamp/overlay_rgba.png",
+      "alpha": "images/validation/photo_033__timestamp/alpha.png",
+      "mask": "images/validation/photo_033__timestamp/mask.png"
+    },
+    "sha256": {
+      "clean": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "watermarked": "72b40f83e784b8bd4b03369037787a74b56c17450c9e67d86f800e2ebc70ecd3",
+      "overlay_rgba": "d6d9cbb92a2695e3a8c9e72fad3088339ca46ae90c92c4c4f86729b6d6979225",
+      "alpha": "37b8f8a35eead017681fc30e69f6a9d3a5dd6e2f02ba5060822209fff0370226",
+      "mask": "8aafbdbd45c574e15b3c4a5421ba0e0bf2e2d421ac27f23ac2d9ba76d725561b"
+    },
+    "parameters": {
+      "style": "timestamp",
+      "seed": 100806354864990,
+      "opacity": 0.3,
+      "color": [
+        39,
+        45,
+        125
+      ],
+      "text": "2026-10-27 08:07",
+      "asset_partition": "validation",
+      "asset_id": "validation:photo_033__timestamp",
+      "watermark_origin": "project_synthetic",
+      "placement": "body_overlap",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 76,
+      "support_fraction": 0.0018766276041666666,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "photo_033__website",
+    "kind": "image",
+    "scenario": "C01",
+    "subtype": "website",
+    "label": "网址文字",
+    "split": "validation",
+    "source_group": "commons:174730734",
+    "split_group": "commons-creator:74b7ca86ed697245",
+    "base_id": "photo_033",
+    "background": "photo_architecture",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      960
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_033.png",
+      "watermarked": "images/validation/photo_033__website/watermarked.png",
+      "overlay_rgba": "images/validation/photo_033__website/overlay_rgba.png",
+      "alpha": "images/validation/photo_033__website/alpha.png",
+      "mask": "images/validation/photo_033__website/mask.png"
+    },
+    "sha256": {
+      "clean": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "watermarked": "cab72bbd15f86e98ceabf048ee5822645c4874d3f323a10053754a83b2777cc8",
+      "overlay_rgba": "26cf62b0976a68c4ccd008d27a5a2b997bb520b0ca3e38ae4c152c19566a2b19",
+      "alpha": "15ca33d6de706458b7026c640cf03be74ae9483bd716d5cc17752dae59711082",
+      "mask": "12759d17a94d9afa06f3c3314718227877b68e168569aef55096b55470a4d2fb"
+    },
+    "parameters": {
+      "style": "website",
+      "seed": 7233762383040,
+      "opacity": 0.7,
+      "color": [
+        101,
+        134,
+        50
+      ],
+      "text": "https://validation-40.example.test",
+      "asset_partition": "validation",
+      "asset_id": "validation:photo_033__website",
+      "watermark_origin": "project_synthetic",
+      "placement": "top_left",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 178,
+      "support_fraction": 0.003964029947916667,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "photo_033__signature",
+    "kind": "image",
+    "scenario": "C02",
+    "subtype": "signature",
+    "label": "模拟手写签名",
+    "split": "validation",
+    "source_group": "commons:174730734",
+    "split_group": "commons-creator:74b7ca86ed697245",
+    "base_id": "photo_033",
+    "background": "photo_architecture",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      960
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_033.png",
+      "watermarked": "images/validation/photo_033__signature/watermarked.png",
+      "overlay_rgba": "images/validation/photo_033__signature/overlay_rgba.png",
+      "alpha": "images/validation/photo_033__signature/alpha.png",
+      "mask": "images/validation/photo_033__signature/mask.png"
+    },
+    "sha256": {
+      "clean": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "watermarked": "a973e8f7c4f48d98b5a5aa02a02b5c03bff2ccc483d459d5062e2e031083912e",
+      "overlay_rgba": "1466a004fe55ba6a6c53a79c800c6f1b80f4ee098f5ac18d812445302951106b",
+      "alpha": "4a7f61b4d1f6574693a54ad73fedc62fb3ca3a489a752befeac4d3d1c73871e3",
+      "mask": "173706aebcfe9c46abeab83befd81a42cf448df128252fada3aaa0446f8e4b23"
+    },
+    "parameters": {
+      "style": "signature",
+      "seed": 237906942164248,
+      "opacity": 0.7,
+      "color": [
+        47,
+        43,
+        117
+      ],
+      "text": "验证素材 4248",
+      "asset_partition": "validation",
+      "asset_id": "validation:photo_033__signature",
+      "watermark_origin": "project_synthetic",
+      "signature_kind": "procedural_stroke_not_human_handwriting",
+      "alpha_min_nonzero": 178,
+      "alpha_max": 178,
+      "support_fraction": 0.0011751302083333334,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "photo_033__logo_transparent",
+    "kind": "image",
+    "scenario": "C02",
+    "subtype": "logo_transparent",
+    "label": "透明几何 Logo",
+    "split": "validation",
+    "source_group": "commons:174730734",
+    "split_group": "commons-creator:74b7ca86ed697245",
+    "base_id": "photo_033",
+    "background": "photo_architecture",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      960
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_033.png",
+      "watermarked": "images/validation/photo_033__logo_transparent/watermarked.png",
+      "overlay_rgba": "images/validation/photo_033__logo_transparent/overlay_rgba.png",
+      "alpha": "images/validation/photo_033__logo_transparent/alpha.png",
+      "mask": "images/validation/photo_033__logo_transparent/mask.png"
+    },
+    "sha256": {
+      "clean": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "watermarked": "0e00adb539d72ff50c0aea5b097a42479b4a8b2757dcbb8f0b4974c818b7d41d",
+      "overlay_rgba": "ae1005575d82d206a26a9ac69602bd509a74ef33d996e0233e26321eb62e2b8b",
+      "alpha": "480af8991702ffedceb0e8af5c6846187eb47aba4dc08d980acb9f2f81094023",
+      "mask": "b96e586c309eccc2292e01f9e06738fbbbbacc0178cd11710981c6e477fe440f"
+    },
+    "parameters": {
+      "style": "logo_transparent",
+      "seed": 30163271845693,
+      "opacity": 0.3,
+      "color": [
+        159,
+        120,
+        39
+      ],
+      "text": "验证素材 5693",
+      "asset_partition": "validation",
+      "asset_id": "validation:photo_033__logo_transparent",
+      "watermark_origin": "project_synthetic",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 76,
+      "support_fraction": 0.011080729166666666,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "photo_033__logo_opaque",
+    "kind": "image",
+    "scenario": "C02",
+    "subtype": "logo_opaque",
+    "label": "不透明几何 Logo",
+    "split": "validation",
+    "source_group": "commons:174730734",
+    "split_group": "commons-creator:74b7ca86ed697245",
+    "base_id": "photo_033",
+    "background": "photo_architecture",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      960
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_033.png",
+      "watermarked": "images/validation/photo_033__logo_opaque/watermarked.png",
+      "overlay_rgba": "images/validation/photo_033__logo_opaque/overlay_rgba.png",
+      "alpha": "images/validation/photo_033__logo_opaque/alpha.png",
+      "mask": "images/validation/photo_033__logo_opaque/mask.png"
+    },
+    "sha256": {
+      "clean": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "watermarked": "1ed320a8a9deb6add9ac21d0cce63f492a50443782a28f2858ddb8dd2d6d2dc2",
+      "overlay_rgba": "b61f7d68b694b92167260c47a32f37b6980bba561b5ec288d620a9f81a58ec0c",
+      "alpha": "b157b1371de68b254b046a997ce92f64921964282f92080bbc88e5704c9282d7",
+      "mask": "2d03ebad16440a8ae17b0f871a6e9082eb2d6561f22e34e3c2ba9098fac446fd"
+    },
+    "parameters": {
+      "style": "logo_opaque",
+      "seed": 108053412669542,
+      "opacity": 1.0,
+      "color": [
+        30,
+        62,
+        145
+      ],
+      "text": "验证素材 9542",
+      "asset_partition": "validation",
+      "asset_id": "validation:photo_033__logo_opaque",
+      "watermark_origin": "project_synthetic",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 255,
+      "support_fraction": 0.011910807291666667,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "photo_033__center_text",
+    "kind": "image",
+    "scenario": "C03",
+    "subtype": "center_text",
+    "label": "居中大字",
+    "split": "validation",
+    "source_group": "commons:174730734",
+    "split_group": "commons-creator:74b7ca86ed697245",
+    "base_id": "photo_033",
+    "background": "photo_architecture",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      960
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_033.png",
+      "watermarked": "images/validation/photo_033__center_text/watermarked.png",
+      "overlay_rgba": "images/validation/photo_033__center_text/overlay_rgba.png",
+      "alpha": "images/validation/photo_033__center_text/alpha.png",
+      "mask": "images/validation/photo_033__center_text/mask.png"
+    },
+    "sha256": {
+      "clean": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "watermarked": "3e44e1b6ce4e499f5fb51ca9e7cfe124b1ed35efb5993d68d00c51d022552240",
+      "overlay_rgba": "ef5a91a24fb0880b8da69204e8b890545fe19ac452b1f9622c28873ec263d1fe",
+      "alpha": "0dac48c029cdc70f1f78b555484a8421c920d04f1df42e768dae5be665037bcb",
+      "mask": "d1838b6c867031930bb6ae22cc0333c50dfe55a2bc5256913b056552d790a4d1"
+    },
+    "parameters": {
+      "style": "center_text",
+      "seed": 1453623078634,
+      "opacity": 0.15,
+      "color": [
+        65,
+        105,
+        61
+      ],
+      "text": "验证素材 8634",
+      "asset_partition": "validation",
+      "asset_id": "validation:photo_033__center_text",
+      "watermark_origin": "project_synthetic",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 47,
+      "support_fraction": 0.018347981770833334,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "photo_033__center_white",
+    "kind": "image",
+    "scenario": "C03",
+    "subtype": "center_white",
+    "label": "白色半透明大字",
+    "split": "validation",
+    "source_group": "commons:174730734",
+    "split_group": "commons-creator:74b7ca86ed697245",
+    "base_id": "photo_033",
+    "background": "photo_architecture",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      960
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_033.png",
+      "watermarked": "images/validation/photo_033__center_white/watermarked.png",
+      "overlay_rgba": "images/validation/photo_033__center_white/overlay_rgba.png",
+      "alpha": "images/validation/photo_033__center_white/alpha.png",
+      "mask": "images/validation/photo_033__center_white/mask.png"
+    },
+    "sha256": {
+      "clean": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "watermarked": "a4dead329edcd1410a9df3b75ee279d5600f6058b3c79378a881409992f5c22a",
+      "overlay_rgba": "3f50622715f6e4b3d2e4e3b7983d493c432fe720d44d441dc3309e78ac5fa5b9",
+      "alpha": "cbe36d3960bdd0a0bdeb052e6f54ee4ee833d93e1c64fb5ef8fea0d61d66fd07",
+      "mask": "18bd92ed76bb83f833bcb23f8b0ddf30ed8172e7869d49301affa0dc1e77f785"
+    },
+    "parameters": {
+      "style": "center_white",
+      "seed": 235292067427970,
+      "opacity": 0.15,
+      "color": [
+        255,
+        255,
+        255
+      ],
+      "text": "验证素材 7970",
+      "asset_partition": "validation",
+      "asset_id": "validation:photo_033__center_white",
+      "watermark_origin": "project_synthetic",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 47,
+      "support_fraction": 0.01750732421875,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "photo_033__tiled_diagonal",
+    "kind": "image",
+    "scenario": "C04",
+    "subtype": "tiled_diagonal",
+    "label": "斜向平铺文字",
+    "split": "validation",
+    "source_group": "commons:174730734",
+    "split_group": "commons-creator:74b7ca86ed697245",
+    "base_id": "photo_033",
+    "background": "photo_architecture",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      960
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_033.png",
+      "watermarked": "images/validation/photo_033__tiled_diagonal/watermarked.png",
+      "overlay_rgba": "images/validation/photo_033__tiled_diagonal/overlay_rgba.png",
+      "alpha": "images/validation/photo_033__tiled_diagonal/alpha.png",
+      "mask": "images/validation/photo_033__tiled_diagonal/mask.png"
+    },
+    "sha256": {
+      "clean": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "watermarked": "8e6883599dbec0d9b5bcbff4f13fc706c26dbdaf033db5869598f8588bd68359",
+      "overlay_rgba": "234eb66cb650b5d72b5791b41fdf671712cd7bcdaa7653e28fbcba707abba5b0",
+      "alpha": "72ca5e91101fc1701a065a906d1e0b062e29aa8fc1ca694ea130d9278fe7b69c",
+      "mask": "ace103e5a4da8bf86d82f507825e204fc19ddf03183598f7049bd06b3cdb0092"
+    },
+    "parameters": {
+      "style": "tiled_diagonal",
+      "seed": 279631157390146,
+      "opacity": 0.5,
+      "color": [
+        24,
+        127,
+        102
+      ],
+      "text": "验证素材 0146",
+      "asset_partition": "validation",
+      "asset_id": "validation:photo_033__tiled_diagonal",
+      "watermark_origin": "project_synthetic",
+      "rotation_degrees": 32,
+      "irregular": false,
+      "alpha_min_nonzero": 1,
+      "alpha_max": 161,
+      "support_fraction": 0.03756103515625,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "photo_033__tiled_irregular",
+    "kind": "image",
+    "scenario": "C04",
+    "subtype": "tiled_irregular",
+    "label": "非等距密集文字",
+    "split": "validation",
+    "source_group": "commons:174730734",
+    "split_group": "commons-creator:74b7ca86ed697245",
+    "base_id": "photo_033",
+    "background": "photo_architecture",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      960
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_033.png",
+      "watermarked": "images/validation/photo_033__tiled_irregular/watermarked.png",
+      "overlay_rgba": "images/validation/photo_033__tiled_irregular/overlay_rgba.png",
+      "alpha": "images/validation/photo_033__tiled_irregular/alpha.png",
+      "mask": "images/validation/photo_033__tiled_irregular/mask.png"
+    },
+    "sha256": {
+      "clean": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "watermarked": "99436f654404b679edb9446327997dc7c52220d144d6519bb6b3f635b9c4a073",
+      "overlay_rgba": "489d712d1992f142c4ce4d0268b77a85a508707f131dee73714312d671a7bb20",
+      "alpha": "fa17758ba7b19caf610efc9c4100074f8d2481d780e0a3737fb7ca83de0965f8",
+      "mask": "402028ceeadfa209ca269c3e0df768d0870341c8b044d5b8691f10d265103e31"
+    },
+    "parameters": {
+      "style": "tiled_irregular",
+      "seed": 36442096967664,
+      "opacity": 0.15,
+      "color": [
+        97,
+        146,
+        43
+      ],
+      "text": "验证素材 7664",
+      "asset_partition": "validation",
+      "asset_id": "validation:photo_033__tiled_irregular",
+      "watermark_origin": "project_synthetic",
+      "rotation_degrees": 32,
+      "irregular": true,
+      "alpha_min_nonzero": 1,
+      "alpha_max": 82,
+      "support_fraction": 0.13961344401041667,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "photo_033__dot_grid",
+    "kind": "image",
+    "scenario": "C05",
+    "subtype": "dot_grid",
+    "label": "点阵",
+    "split": "validation",
+    "source_group": "commons:174730734",
+    "split_group": "commons-creator:74b7ca86ed697245",
+    "base_id": "photo_033",
+    "background": "photo_architecture",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      960
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_033.png",
+      "watermarked": "images/validation/photo_033__dot_grid/watermarked.png",
+      "overlay_rgba": "images/validation/photo_033__dot_grid/overlay_rgba.png",
+      "alpha": "images/validation/photo_033__dot_grid/alpha.png",
+      "mask": "images/validation/photo_033__dot_grid/mask.png"
+    },
+    "sha256": {
+      "clean": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "watermarked": "8d17475da53c7889e6f6b3c5b5c64d9c7aba0864dd621fe3528b3d5a7c8f3fe5",
+      "overlay_rgba": "fe130cdde47651f86db2823ef06848fa06b920cdd3105e36bef567bac485d6b0",
+      "alpha": "4a2aea65b440e1c250b8be199986abf1436f771f4eb9d9c7a347972dba762859",
+      "mask": "73cd8db8816831b28e8e9eac68f35ad848bedaf5c69adb3e5ddb332751f11975"
+    },
+    "parameters": {
+      "style": "dot_grid",
+      "seed": 70664117323660,
+      "opacity": 0.15,
+      "color": [
+        60,
+        81,
+        131
+      ],
+      "text": "验证素材 3660",
+      "asset_partition": "validation",
+      "asset_id": "validation:photo_033__dot_grid",
+      "watermark_origin": "project_synthetic",
+      "spacing_px": [
+        48,
+        67
+      ],
+      "radius_px": 2,
+      "grid_family": "rectangular",
+      "alpha_min_nonzero": 38,
+      "alpha_max": 38,
+      "support_fraction": 0.0064599609375,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "photo_033__line_net",
+    "kind": "image",
+    "scenario": "C05",
+    "subtype": "line_net",
+    "label": "细线网格",
+    "split": "validation",
+    "source_group": "commons:174730734",
+    "split_group": "commons-creator:74b7ca86ed697245",
+    "base_id": "photo_033",
+    "background": "photo_architecture",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      960
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_033.png",
+      "watermarked": "images/validation/photo_033__line_net/watermarked.png",
+      "overlay_rgba": "images/validation/photo_033__line_net/overlay_rgba.png",
+      "alpha": "images/validation/photo_033__line_net/alpha.png",
+      "mask": "images/validation/photo_033__line_net/mask.png"
+    },
+    "sha256": {
+      "clean": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "watermarked": "a89f15a3df74b17f51a399919f63907399a2b8f0c4d189c5a31cbeba71420599",
+      "overlay_rgba": "cec0f3412eb68db7a46c215e0056719aac2647e95f1498a36b1104be98bd04b8",
+      "alpha": "239391ccf4df5e87778a36cc8876f950ad085c52e4e81ef71c6686d2b0b4cbea",
+      "mask": "39d78ba4beff9b8be7d2c0bf17cde553e5c6b0c5af64af0578929c5b00764a22"
+    },
+    "parameters": {
+      "style": "line_net",
+      "seed": 242648535006259,
+      "opacity": 0.15,
+      "color": [
+        71,
+        88,
+        131
+      ],
+      "text": "验证素材 6259",
+      "asset_partition": "validation",
+      "asset_id": "validation:photo_033__line_net",
+      "watermark_origin": "project_synthetic",
+      "spacing_px": 76,
+      "line_width_px": 1,
+      "alpha_min_nonzero": 38,
+      "alpha_max": 38,
+      "support_fraction": 0.02595947265625,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "photo_033__tiny_corner",
+    "kind": "image",
+    "scenario": "C06",
+    "subtype": "tiny_corner",
+    "label": "高清小角标",
+    "split": "validation",
+    "source_group": "commons:174730734",
+    "split_group": "commons-creator:74b7ca86ed697245",
+    "base_id": "photo_033",
+    "background": "photo_architecture",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      960
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_033.png",
+      "watermarked": "images/validation/photo_033__tiny_corner/watermarked.png",
+      "overlay_rgba": "images/validation/photo_033__tiny_corner/overlay_rgba.png",
+      "alpha": "images/validation/photo_033__tiny_corner/alpha.png",
+      "mask": "images/validation/photo_033__tiny_corner/mask.png"
+    },
+    "sha256": {
+      "clean": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "watermarked": "1f7de0728a2be20d8c2a245470147c2d58bbf85b70bec408da66196b65e8f0d0",
+      "overlay_rgba": "e6221ad6675e264ad0516a8997b7a9950bf61a09303da92b2a85e92ea73db464",
+      "alpha": "2dcfd84ad60f1153328c4be5ec0ccb6dec4e7710fada32c630415f19ad7da493",
+      "mask": "adcd99302e1e18b8721010a93f8a787d06d9ca625c0378c9a224c26ed807bad7"
+    },
+    "parameters": {
+      "style": "tiny_corner",
+      "seed": 281251102162317,
+      "opacity": 0.6666666666666666,
+      "color": [
+        104,
+        133,
+        91
+      ],
+      "text": "验证素材 2317",
+      "asset_partition": "validation",
+      "asset_id": "validation:photo_033__tiny_corner",
+      "watermark_origin": "project_synthetic",
+      "font_size_px": 11,
+      "alpha_min_nonzero": 1,
+      "alpha_max": 170,
+      "support_fraction": 0.00032389322916666667,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "photo_033__cropped_edge",
+    "kind": "image",
+    "scenario": "C06",
+    "subtype": "cropped_edge",
+    "label": "边缘裁切文字",
+    "split": "validation",
+    "source_group": "commons:174730734",
+    "split_group": "commons-creator:74b7ca86ed697245",
+    "base_id": "photo_033",
+    "background": "photo_architecture",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      960
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_033.png",
+      "watermarked": "images/validation/photo_033__cropped_edge/watermarked.png",
+      "overlay_rgba": "images/validation/photo_033__cropped_edge/overlay_rgba.png",
+      "alpha": "images/validation/photo_033__cropped_edge/alpha.png",
+      "mask": "images/validation/photo_033__cropped_edge/mask.png"
+    },
+    "sha256": {
+      "clean": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "watermarked": "50ba8e6bbd992116fd0936091934c38cd8e8ce631c08f59406028634224cc4f3",
+      "overlay_rgba": "ad6df1da70e7b0827f7c04cc0558e2151d4179812c78825ee6ce70e64a7bd9d7",
+      "alpha": "93c0fc2a5c7992628f870a22d78eac5fab8febd1ce40d58974e59f1038b6c3d1",
+      "mask": "9d4e94c64092ee6370387bf12a12018707b699e04c1b46510ec8f7c088703116"
+    },
+    "parameters": {
+      "style": "cropped_edge",
+      "seed": 127980378628358,
+      "opacity": 0.3,
+      "color": [
+        105,
+        134,
+        108
+      ],
+      "text": "验证素材 8358",
+      "asset_partition": "validation",
+      "asset_id": "validation:photo_033__cropped_edge",
+      "watermark_origin": "project_synthetic",
+      "edge_crop": true,
+      "alpha_min_nonzero": 1,
+      "alpha_max": 93,
+      "support_fraction": 0.0032706705729166666,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "photo_033__heavy_dark",
+    "kind": "image",
+    "scenario": "C07",
+    "subtype": "heavy_dark",
+    "label": "深色大字",
+    "split": "validation",
+    "source_group": "commons:174730734",
+    "split_group": "commons-creator:74b7ca86ed697245",
+    "base_id": "photo_033",
+    "background": "photo_architecture",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      960
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_033.png",
+      "watermarked": "images/validation/photo_033__heavy_dark/watermarked.png",
+      "overlay_rgba": "images/validation/photo_033__heavy_dark/overlay_rgba.png",
+      "alpha": "images/validation/photo_033__heavy_dark/alpha.png",
+      "mask": "images/validation/photo_033__heavy_dark/mask.png"
+    },
+    "sha256": {
+      "clean": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "watermarked": "1febf9773d79cd68443fb294c935c0d78e4f3d5a358f764a8d4954d5a41ba3a8",
+      "overlay_rgba": "914d7bb1adcbc18098252d5cfebb0f487090e14b11337fd16f2cca688c6fe05b",
+      "alpha": "bb6e71e360f5ea7c40297f4b3a98c3227701dda7b369adb33398102cc04083e2",
+      "mask": "418c7532eb81cff65889323d1d82f80465b019fb308a8081fb9f601d6e91d922"
+    },
+    "parameters": {
+      "style": "heavy_dark",
+      "seed": 50207741220258,
+      "opacity": 0.85,
+      "color": [
+        10,
+        12,
+        18
+      ],
+      "text": "验证素材 0258",
+      "asset_partition": "validation",
+      "asset_id": "validation:photo_033__heavy_dark",
+      "watermark_origin": "project_synthetic",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 255,
+      "support_fraction": 0.0186767578125,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "photo_033__opaque_block",
+    "kind": "image",
+    "scenario": "C07",
+    "subtype": "opaque_block",
+    "label": "大面积完全不透明图案",
+    "split": "validation",
+    "source_group": "commons:174730734",
+    "split_group": "commons-creator:74b7ca86ed697245",
+    "base_id": "photo_033",
+    "background": "photo_architecture",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      960
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_033.png",
+      "watermarked": "images/validation/photo_033__opaque_block/watermarked.png",
+      "overlay_rgba": "images/validation/photo_033__opaque_block/overlay_rgba.png",
+      "alpha": "images/validation/photo_033__opaque_block/alpha.png",
+      "mask": "images/validation/photo_033__opaque_block/mask.png"
+    },
+    "sha256": {
+      "clean": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "watermarked": "fa9afb7cd49bd98bcf3386095a4424a5d7986d2263ed88ca93b156986c044f43",
+      "overlay_rgba": "d015d7c0a924b51b0137ba203bc4d6e62dcc2edb3ba6d9f09d4e199886fdabb1",
+      "alpha": "dd2cbd905d28ab5f52405fe978dad0e0147b78399744c1baad82f538875822ce",
+      "mask": "dd2cbd905d28ab5f52405fe978dad0e0147b78399744c1baad82f538875822ce"
+    },
+    "parameters": {
+      "style": "opaque_block",
+      "seed": 210874813753533,
+      "opacity": 1.0,
+      "color": [
+        51,
+        154,
+        77
+      ],
+      "text": "验证素材 3533",
+      "asset_partition": "validation",
+      "asset_id": "validation:photo_033__opaque_block",
+      "watermark_origin": "project_synthetic",
+      "block_fraction_requested": 0.1125,
+      "alpha_min_nonzero": 255,
+      "alpha_max": 255,
+      "support_fraction": 0.11316487630208333,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "photo_033__faint",
+    "kind": "image",
+    "scenario": "C08",
+    "subtype": "faint",
+    "label": "极淡文字",
+    "split": "validation",
+    "source_group": "commons:174730734",
+    "split_group": "commons-creator:74b7ca86ed697245",
+    "base_id": "photo_033",
+    "background": "photo_architecture",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      960
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_033.png",
+      "watermarked": "images/validation/photo_033__faint/watermarked.png",
+      "overlay_rgba": "images/validation/photo_033__faint/overlay_rgba.png",
+      "alpha": "images/validation/photo_033__faint/alpha.png",
+      "mask": "images/validation/photo_033__faint/mask.png"
+    },
+    "sha256": {
+      "clean": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "watermarked": "730aaa6c892164f152b4e9e3b299883829f0f50c7e16d04c277c6794e6fab021",
+      "overlay_rgba": "764e30b3feb0f65437acca7d307344f56c0eba01df46a8d9d8e295093ea80d0e",
+      "alpha": "03698e75a8ce3f79522d76ce9714c8751bacfa9d0aaee659d3ff05f6f76c146f",
+      "mask": "da3324ac99f3864413c835ef17f0c57470ee9a3b1ec2b8aecbdc277769faa8de"
+    },
+    "parameters": {
+      "style": "faint",
+      "seed": 110084328827995,
+      "opacity": 0.05,
+      "color": [
+        95,
+        100,
+        110
+      ],
+      "text": "验证素材 7995",
+      "asset_partition": "validation",
+      "asset_id": "validation:photo_033__faint",
+      "watermark_origin": "project_synthetic",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 16,
+      "support_fraction": 0.01739013671875,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "photo_033__gradient",
+    "kind": "image",
+    "scenario": "C08",
+    "subtype": "gradient",
+    "label": "渐变文字",
+    "split": "validation",
+    "source_group": "commons:174730734",
+    "split_group": "commons-creator:74b7ca86ed697245",
+    "base_id": "photo_033",
+    "background": "photo_architecture",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      960
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_033.png",
+      "watermarked": "images/validation/photo_033__gradient/watermarked.png",
+      "overlay_rgba": "images/validation/photo_033__gradient/overlay_rgba.png",
+      "alpha": "images/validation/photo_033__gradient/alpha.png",
+      "mask": "images/validation/photo_033__gradient/mask.png"
+    },
+    "sha256": {
+      "clean": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "watermarked": "f7b993df0aa89b1a28f5765bc64b7a692da0c72e85876752513794f710dc6143",
+      "overlay_rgba": "d464fba021882cf13d5f0325032812cd643d34258379c7816a7fb7281448f357",
+      "alpha": "f0e0831951a0aa400d2d2690096709d3c57d1beadaafa4c236392ac09f679566",
+      "mask": "2d544db336082ceb6d341338ad8386db0de8d07ef841eabcdbc6102cb2c6f021"
+    },
+    "parameters": {
+      "style": "gradient",
+      "seed": 120709775508224,
+      "opacity": 0.15,
+      "color": [
+        94,
+        154,
+        74
+      ],
+      "text": "验证素材 8224",
+      "asset_partition": "validation",
+      "asset_id": "validation:photo_033__gradient",
+      "watermark_origin": "project_synthetic",
+      "opacity_min": 0.02,
+      "opacity_max": 0.85,
+      "alpha_min_nonzero": 1,
+      "alpha_max": 175,
+      "support_fraction": 0.014390462239583334,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "photo_033__outlined",
+    "kind": "image",
+    "scenario": "C08",
+    "subtype": "outlined",
+    "label": "描边文字",
+    "split": "validation",
+    "source_group": "commons:174730734",
+    "split_group": "commons-creator:74b7ca86ed697245",
+    "base_id": "photo_033",
+    "background": "photo_architecture",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      960
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_033.png",
+      "watermarked": "images/validation/photo_033__outlined/watermarked.png",
+      "overlay_rgba": "images/validation/photo_033__outlined/overlay_rgba.png",
+      "alpha": "images/validation/photo_033__outlined/alpha.png",
+      "mask": "images/validation/photo_033__outlined/mask.png"
+    },
+    "sha256": {
+      "clean": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "watermarked": "54bc36e8c9ad658d378b07c4601984d2e778dd7a21b0efdb5bbcb0b6094dcc3d",
+      "overlay_rgba": "8ba9df3ecbf844917be092fdc02642ce2a7a82faf68b8ca2b29c29765eaaf817",
+      "alpha": "37b54b9d667bc05e95e0d969f574318fff0d158bdc436268dce806701edbb6ed",
+      "mask": "69d58a03733db6e17aa5673961e9da1c09d3ab311b9a7c3d3ca6423335e56eeb"
+    },
+    "parameters": {
+      "style": "outlined",
+      "seed": 161423523885873,
+      "opacity": 0.3,
+      "color": [
+        83,
+        41,
+        43
+      ],
+      "text": "验证素材 5873",
+      "asset_partition": "validation",
+      "asset_id": "validation:photo_033__outlined",
+      "watermark_origin": "project_synthetic",
+      "outline_px": 2,
+      "alpha_min_nonzero": 1,
+      "alpha_max": 160,
+      "support_fraction": 0.011443684895833334,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "photo_033__shadow",
+    "kind": "image",
+    "scenario": "C08",
+    "subtype": "shadow",
+    "label": "带阴影文字",
+    "split": "validation",
+    "source_group": "commons:174730734",
+    "split_group": "commons-creator:74b7ca86ed697245",
+    "base_id": "photo_033",
+    "background": "photo_architecture",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      960
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_033.png",
+      "watermarked": "images/validation/photo_033__shadow/watermarked.png",
+      "overlay_rgba": "images/validation/photo_033__shadow/overlay_rgba.png",
+      "alpha": "images/validation/photo_033__shadow/alpha.png",
+      "mask": "images/validation/photo_033__shadow/mask.png"
+    },
+    "sha256": {
+      "clean": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "watermarked": "723d0cce9f2fbec804b295acec4228d777a379ca2e1800c874540208bbfe8017",
+      "overlay_rgba": "0b10f00a25f69e63ef6f5f187fda19349c29bdfac6c2ee5ec105a1ffb279e9fc",
+      "alpha": "7a2e3cdd6c21edce65c76e488dd756ba9215e8653ecc1a58ba4f8ead0ab38700",
+      "mask": "98161c3c10b400e6afa9a11d02df85b0a639b632b6776b32064f87df6aea7a25"
+    },
+    "parameters": {
+      "style": "shadow",
+      "seed": 202727321589279,
+      "opacity": 0.15,
+      "color": [
+        73,
+        123,
+        104
+      ],
+      "text": "验证素材 9279",
+      "asset_partition": "validation",
+      "asset_id": "validation:photo_033__shadow",
+      "watermark_origin": "project_synthetic",
+      "shadow_offset_px": [
+        8,
+        8
+      ],
+      "shadow_blur_px": 3,
+      "alpha_min_nonzero": 1,
+      "alpha_max": 246,
+      "support_fraction": 0.039341634114583336,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "photo_033__multiple",
+    "kind": "image",
+    "scenario": "C08",
+    "subtype": "multiple",
+    "label": "多重叠加",
+    "split": "validation",
+    "source_group": "commons:174730734",
+    "split_group": "commons-creator:74b7ca86ed697245",
+    "base_id": "photo_033",
+    "background": "photo_architecture",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      960
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_033.png",
+      "watermarked": "images/validation/photo_033__multiple/watermarked.png",
+      "overlay_rgba": "images/validation/photo_033__multiple/overlay_rgba.png",
+      "alpha": "images/validation/photo_033__multiple/alpha.png",
+      "mask": "images/validation/photo_033__multiple/mask.png"
+    },
+    "sha256": {
+      "clean": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "watermarked": "7e028a42dd3cfb2c5615aba13c86e977605ee4ff622ca42c339c0d5c9c982363",
+      "overlay_rgba": "797c9d4b9e715cc873f7ad05d309c962fce36aeaca870dde749e8c7eedf9d467",
+      "alpha": "18f16100f6ec510a8604b76b58f2c89f85c634d82d9f7ad1e0754289d876e153",
+      "mask": "eb458d3dd4df3fe6bcba941d097ebd0de334b5cbfd9e0cabf6bc0b5b5e80f59f"
+    },
+    "parameters": {
+      "style": "multiple",
+      "seed": 71492086014973,
+      "opacity": 0.15,
+      "color": [
+        106,
+        63,
+        86
+      ],
+      "text": "验证素材 4973",
+      "asset_partition": "validation",
+      "asset_id": "validation:photo_033__multiple",
+      "watermark_origin": "project_synthetic",
+      "components": 4,
+      "multicolor": false,
+      "alpha_min_nonzero": 1,
+      "alpha_max": 49,
+      "support_fraction": 0.03234537760416667,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "photo_033__mixed_color",
+    "kind": "image",
+    "scenario": "C08",
+    "subtype": "mixed_color",
+    "label": "多色文字与图案",
+    "split": "validation",
+    "source_group": "commons:174730734",
+    "split_group": "commons-creator:74b7ca86ed697245",
+    "base_id": "photo_033",
+    "background": "photo_architecture",
+    "provenance": "project_synthetic_watermark_on_downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      960
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_033.png",
+      "watermarked": "images/validation/photo_033__mixed_color/watermarked.png",
+      "overlay_rgba": "images/validation/photo_033__mixed_color/overlay_rgba.png",
+      "alpha": "images/validation/photo_033__mixed_color/alpha.png",
+      "mask": "images/validation/photo_033__mixed_color/mask.png"
+    },
+    "sha256": {
+      "clean": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "watermarked": "1c3ccfffe518da3c73f9bccbed4c162497b3c5783b8c7e9539c5ab1e79e6e229",
+      "overlay_rgba": "5101373dfebae5fe6c01924c7d1be5b56b94c361cdc9a66971a9b2d4847ccddd",
+      "alpha": "e50e7cef9a7e2733c5bcb7f81420c294c80b079898f2a5d8ccbd5dad885c5333",
+      "mask": "1d876117db07a0f75b4cd2f7844359df55d00ac5870b36caf4a394bfffb5c82f"
+    },
+    "parameters": {
+      "style": "mixed_color",
+      "seed": 81677152413572,
+      "opacity": 0.3,
+      "color": [
+        41,
+        112,
+        74
+      ],
+      "text": "验证素材 3572",
+      "asset_partition": "validation",
+      "asset_id": "validation:photo_033__mixed_color",
+      "watermark_origin": "project_synthetic",
+      "components": 4,
+      "multicolor": true,
+      "alpha_min_nonzero": 1,
+      "alpha_max": 98,
+      "support_fraction": 0.03177652994791667,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "photo_033__negative",
+    "kind": "image",
+    "scenario": "N00",
+    "subtype": "no_watermark",
+    "label": "无水印负例",
+    "split": "validation",
+    "source_group": "commons:174730734",
+    "split_group": "commons-creator:74b7ca86ed697245",
+    "base_id": "photo_033",
+    "background": "photo_architecture",
+    "provenance": "downloaded_cc0_photo",
+    "license": "CC0-1.0",
+    "size": [
+      1280,
+      960
+    ],
+    "paths": {
+      "clean": "bases/photos/photo_033.png",
+      "watermarked": "bases/photos/photo_033.png",
+      "mask": "images/validation/photo_033__negative/mask.png",
+      "alpha": "images/validation/photo_033__negative/alpha.png"
+    },
+    "sha256": {
+      "clean": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "watermarked": "91203305ffc29b1cdd7504d4589f10f5e90565cfb0b4efc896f2fff1e2450f93",
+      "mask": "c8b03e3c2ee86b8009144ddb463d17afb1528c2875644c67cd525e68c77d941b",
+      "alpha": "c8b03e3c2ee86b8009144ddb463d17afb1528c2875644c67cd525e68c77d941b"
+    },
+    "parameters": {},
+    "watermark_origin": "none",
+    "is_negative": true,
+    "mask_definition": "all_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "document_025__negative",
+    "kind": "image",
+    "scenario": "N00",
+    "subtype": "no_watermark",
+    "label": "无水印负例",
+    "split": "validation",
+    "source_group": "original:document_025",
+    "split_group": "original:document_025",
+    "base_id": "document_025",
+    "background": "document_zh",
+    "provenance": "project_original_document",
+    "license": "LicenseRef-Project-Original",
+    "size": [
+      1071,
+      1516
+    ],
+    "paths": {
+      "clean": "bases/documents/document_025.png",
+      "watermarked": "bases/documents/document_025.png",
+      "mask": "images/validation/document_025__negative/mask.png",
+      "alpha": "images/validation/document_025__negative/alpha.png"
+    },
+    "sha256": {
+      "clean": "f748a653220ae26073526ae217cb162503f52e947269228dfbabc1f1b2aa264f",
+      "watermarked": "f748a653220ae26073526ae217cb162503f52e947269228dfbabc1f1b2aa264f",
+      "mask": "d3e4e64f1d763a0a3005733e18f48e9a96af2c0fbdc07c670aff9aa293a1d693",
+      "alpha": "d3e4e64f1d763a0a3005733e18f48e9a96af2c0fbdc07c670aff9aa293a1d693"
+    },
+    "parameters": {},
+    "watermark_origin": "none",
+    "is_negative": true,
+    "mask_definition": "all_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "document_026__local_text",
+    "kind": "image",
+    "scenario": "C01",
+    "subtype": "local_text",
+    "label": "局部文字",
+    "split": "validation",
+    "source_group": "original:document_026",
+    "split_group": "original:document_026",
+    "base_id": "document_026",
+    "background": "document_en",
+    "provenance": "project_synthetic_watermark_on_project_original_document",
+    "license": "LicenseRef-Project-Original",
+    "size": [
+      1071,
+      1516
+    ],
+    "paths": {
+      "clean": "bases/documents/document_026.png",
+      "watermarked": "images/validation/document_026__local_text/watermarked.png",
+      "overlay_rgba": "images/validation/document_026__local_text/overlay_rgba.png",
+      "alpha": "images/validation/document_026__local_text/alpha.png",
+      "mask": "images/validation/document_026__local_text/mask.png"
+    },
+    "sha256": {
+      "clean": "185bc73cdd56eddade362bcd4eddfede7c6a8b3c5fca19e2a4d3ac1cfaaa5a63",
+      "watermarked": "0b56d1553e089741cd24e6d224c016c228df01c1ee82ead4fc79392d4faaae86",
+      "overlay_rgba": "395c9ce80ad1153848e3b4e4265de855913d41dba84aca14c2ce23b0c1d9ae57",
+      "alpha": "58cc389ab49c3af272cc4da27735e139aa18a20bac4f0763a86aa7bd9fd66ed2",
+      "mask": "05846181e65b362b8a64ea74f21b04f8d1681d3be93d83381f471d997dea21b5"
+    },
+    "parameters": {
+      "style": "local_text",
+      "seed": 218852727695977,
+      "opacity": 0.3,
+      "color": [
+        22,
+        32,
+        97
+      ],
+      "text": "验证素材 5977",
+      "asset_partition": "validation",
+      "asset_id": "validation:document_026__local_text",
+      "watermark_origin": "project_synthetic",
+      "placement": "top_left",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 76,
+      "support_fraction": 0.0018834270735558956,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "document_026__center_text",
+    "kind": "image",
+    "scenario": "C03",
+    "subtype": "center_text",
+    "label": "居中大字",
+    "split": "validation",
+    "source_group": "original:document_026",
+    "split_group": "original:document_026",
+    "base_id": "document_026",
+    "background": "document_en",
+    "provenance": "project_synthetic_watermark_on_project_original_document",
+    "license": "LicenseRef-Project-Original",
+    "size": [
+      1071,
+      1516
+    ],
+    "paths": {
+      "clean": "bases/documents/document_026.png",
+      "watermarked": "images/validation/document_026__center_text/watermarked.png",
+      "overlay_rgba": "images/validation/document_026__center_text/overlay_rgba.png",
+      "alpha": "images/validation/document_026__center_text/alpha.png",
+      "mask": "images/validation/document_026__center_text/mask.png"
+    },
+    "sha256": {
+      "clean": "185bc73cdd56eddade362bcd4eddfede7c6a8b3c5fca19e2a4d3ac1cfaaa5a63",
+      "watermarked": "7d732a1c142b234e22b86c38d58f0b33430e35bfb743a408205b7c446d843e0b",
+      "overlay_rgba": "58f05a59bb7f5d96768f50a0bc7a330586ad5d650fee13be07b27945db20e362",
+      "alpha": "5a13636a0a3fed9301ee245f84db217813e4338291b8a84cd40e343f744b06d9",
+      "mask": "ade6e7433f739570b9f8c3d7a0ad3e241808076109ccb0c13e9b0a61efacec50"
+    },
+    "parameters": {
+      "style": "center_text",
+      "seed": 172854725222443,
+      "opacity": 0.3,
+      "color": [
+        112,
+        139,
+        113
+      ],
+      "text": "验证素材 2443",
+      "asset_partition": "validation",
+      "asset_id": "validation:document_026__center_text",
+      "watermark_origin": "project_synthetic",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 96,
+      "support_fraction": 0.016673687944834925,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "document_026__center_white",
+    "kind": "image",
+    "scenario": "C03",
+    "subtype": "center_white",
+    "label": "白色半透明大字",
+    "split": "validation",
+    "source_group": "original:document_026",
+    "split_group": "original:document_026",
+    "base_id": "document_026",
+    "background": "document_en",
+    "provenance": "project_synthetic_watermark_on_project_original_document",
+    "license": "LicenseRef-Project-Original",
+    "size": [
+      1071,
+      1516
+    ],
+    "paths": {
+      "clean": "bases/documents/document_026.png",
+      "watermarked": "images/validation/document_026__center_white/watermarked.png",
+      "overlay_rgba": "images/validation/document_026__center_white/overlay_rgba.png",
+      "alpha": "images/validation/document_026__center_white/alpha.png",
+      "mask": "images/validation/document_026__center_white/mask.png"
+    },
+    "sha256": {
+      "clean": "185bc73cdd56eddade362bcd4eddfede7c6a8b3c5fca19e2a4d3ac1cfaaa5a63",
+      "watermarked": "dc14dbe44ed2f063f781f9fc054a49cbcc422602fdc1fc98d0dc14d8aa50f9e9",
+      "overlay_rgba": "2a0090b5ef3d7bd154c762f398d5573f918f697bdf78a72d32c738493d0e7385",
+      "alpha": "5eb4b7fa80be41103160f10140abe7cdf91d18d5e3c3c2fa913f80d6f54f1f1b",
+      "mask": "fed73ea69361f97741ba8b4d584be52cb9c51a8f6e5b3bb0a6371dd26c4154ca"
+    },
+    "parameters": {
+      "style": "center_white",
+      "seed": 275710976456585,
+      "opacity": 0.7,
+      "color": [
+        255,
+        255,
+        255
+      ],
+      "text": "验证素材 6585",
+      "asset_partition": "validation",
+      "asset_id": "validation:document_026__center_white",
+      "watermark_origin": "project_synthetic",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 225,
+      "support_fraction": 0.017362881828193018,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "document_026__tiled_diagonal",
+    "kind": "image",
+    "scenario": "C04",
+    "subtype": "tiled_diagonal",
+    "label": "斜向平铺文字",
+    "split": "validation",
+    "source_group": "original:document_026",
+    "split_group": "original:document_026",
+    "base_id": "document_026",
+    "background": "document_en",
+    "provenance": "project_synthetic_watermark_on_project_original_document",
+    "license": "LicenseRef-Project-Original",
+    "size": [
+      1071,
+      1516
+    ],
+    "paths": {
+      "clean": "bases/documents/document_026.png",
+      "watermarked": "images/validation/document_026__tiled_diagonal/watermarked.png",
+      "overlay_rgba": "images/validation/document_026__tiled_diagonal/overlay_rgba.png",
+      "alpha": "images/validation/document_026__tiled_diagonal/alpha.png",
+      "mask": "images/validation/document_026__tiled_diagonal/mask.png"
+    },
+    "sha256": {
+      "clean": "185bc73cdd56eddade362bcd4eddfede7c6a8b3c5fca19e2a4d3ac1cfaaa5a63",
+      "watermarked": "ed875f5f5e13e1f88238cbbb48c783dd737ea04d3bb7ad721e606f11524d5ac6",
+      "overlay_rgba": "6480104603d817a41861784734c463f0f027cebe3ebf0e5b23f0c94c9c66ec18",
+      "alpha": "de237f77fae8ba96bfe44385adb50255d8775a8825f7508d2534c31c2038ce43",
+      "mask": "cfbe7c65947166dec8eb562e37a2a3c84f8afed0899a8412f2f48e39d782aa29"
+    },
+    "parameters": {
+      "style": "tiled_diagonal",
+      "seed": 210087574134809,
+      "opacity": 0.5,
+      "color": [
+        23,
+        35,
+        147
+      ],
+      "text": "验证素材 4809",
+      "asset_partition": "validation",
+      "asset_id": "validation:document_026__tiled_diagonal",
+      "watermark_origin": "project_synthetic",
+      "rotation_degrees": 32,
+      "irregular": false,
+      "alpha_min_nonzero": 1,
+      "alpha_max": 154,
+      "support_fraction": 0.03874267385054286,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "document_026__negative",
+    "kind": "image",
+    "scenario": "N00",
+    "subtype": "no_watermark",
+    "label": "无水印负例",
+    "split": "validation",
+    "source_group": "original:document_026",
+    "split_group": "original:document_026",
+    "base_id": "document_026",
+    "background": "document_en",
+    "provenance": "project_original_document",
+    "license": "LicenseRef-Project-Original",
+    "size": [
+      1071,
+      1516
+    ],
+    "paths": {
+      "clean": "bases/documents/document_026.png",
+      "watermarked": "bases/documents/document_026.png",
+      "mask": "images/validation/document_026__negative/mask.png",
+      "alpha": "images/validation/document_026__negative/alpha.png"
+    },
+    "sha256": {
+      "clean": "185bc73cdd56eddade362bcd4eddfede7c6a8b3c5fca19e2a4d3ac1cfaaa5a63",
+      "watermarked": "185bc73cdd56eddade362bcd4eddfede7c6a8b3c5fca19e2a4d3ac1cfaaa5a63",
+      "mask": "d3e4e64f1d763a0a3005733e18f48e9a96af2c0fbdc07c670aff9aa293a1d693",
+      "alpha": "d3e4e64f1d763a0a3005733e18f48e9a96af2c0fbdc07c670aff9aa293a1d693"
+    },
+    "parameters": {},
+    "watermark_origin": "none",
+    "is_negative": true,
+    "mask_definition": "all_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "document_027__local_text",
+    "kind": "image",
+    "scenario": "C01",
+    "subtype": "local_text",
+    "label": "局部文字",
+    "split": "validation",
+    "source_group": "original:document_027",
+    "split_group": "original:document_027",
+    "base_id": "document_027",
+    "background": "table",
+    "provenance": "project_synthetic_watermark_on_project_original_document",
+    "license": "LicenseRef-Project-Original",
+    "size": [
+      1071,
+      1516
+    ],
+    "paths": {
+      "clean": "bases/documents/document_027.png",
+      "watermarked": "images/validation/document_027__local_text/watermarked.png",
+      "overlay_rgba": "images/validation/document_027__local_text/overlay_rgba.png",
+      "alpha": "images/validation/document_027__local_text/alpha.png",
+      "mask": "images/validation/document_027__local_text/mask.png"
+    },
+    "sha256": {
+      "clean": "8c8c59ec28a6b6f679dbf237d526b65aa2325a7faa9ff7f98fb173e6a0ece79f",
+      "watermarked": "5fafde7f08931145edfc56eb22e1034d125feec738ac8cf82b8b9dd324954c4c",
+      "overlay_rgba": "3e61ab8a09308fb52f6a8e1547f532f0647707c9ce8109bc1685f8ba4e6d7052",
+      "alpha": "09774613bff97368595ef98898d9d1a7fdde91430baedd1abf1d030a0ffce545",
+      "mask": "ad4b01d4df1f717b15dc1fb40dca9d18222b33a0e419310b2b37ca92e809befc"
+    },
+    "parameters": {
+      "style": "local_text",
+      "seed": 258039943975709,
+      "opacity": 0.15,
+      "color": [
+        156,
+        60,
+        65
+      ],
+      "text": "验证素材 5709",
+      "asset_partition": "validation",
+      "asset_id": "validation:document_027__local_text",
+      "watermark_origin": "project_synthetic",
+      "placement": "top_left",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 38,
+      "support_fraction": 0.001925308381927969,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "document_027__center_text",
+    "kind": "image",
+    "scenario": "C03",
+    "subtype": "center_text",
+    "label": "居中大字",
+    "split": "validation",
+    "source_group": "original:document_027",
+    "split_group": "original:document_027",
+    "base_id": "document_027",
+    "background": "table",
+    "provenance": "project_synthetic_watermark_on_project_original_document",
+    "license": "LicenseRef-Project-Original",
+    "size": [
+      1071,
+      1516
+    ],
+    "paths": {
+      "clean": "bases/documents/document_027.png",
+      "watermarked": "images/validation/document_027__center_text/watermarked.png",
+      "overlay_rgba": "images/validation/document_027__center_text/overlay_rgba.png",
+      "alpha": "images/validation/document_027__center_text/alpha.png",
+      "mask": "images/validation/document_027__center_text/mask.png"
+    },
+    "sha256": {
+      "clean": "8c8c59ec28a6b6f679dbf237d526b65aa2325a7faa9ff7f98fb173e6a0ece79f",
+      "watermarked": "1468a237ad939f20a141a10d092a229cb5227b434f4950718462d9b70bb30849",
+      "overlay_rgba": "d6dd9cfe1362fd399c65cba28e1f841c4f695ef874c9532da345638d621702d3",
+      "alpha": "cea086e7e3f694230edc22240654d92f4a16b74f03bb8783e500ad5073e3f580",
+      "mask": "b65c4a2da25fd4893956c35f98cfbe2b0bb75089ce3ed9eba2d7aaf67d316915"
+    },
+    "parameters": {
+      "style": "center_text",
+      "seed": 180317076564307,
+      "opacity": 0.15,
+      "color": [
+        31,
+        102,
+        124
+      ],
+      "text": "验证素材 4307",
+      "asset_partition": "validation",
+      "asset_id": "validation:document_027__center_text",
+      "watermark_origin": "project_synthetic",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 48,
+      "support_fraction": 0.016412545669103173,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "document_027__center_white",
+    "kind": "image",
+    "scenario": "C03",
+    "subtype": "center_white",
+    "label": "白色半透明大字",
+    "split": "validation",
+    "source_group": "original:document_027",
+    "split_group": "original:document_027",
+    "base_id": "document_027",
+    "background": "table",
+    "provenance": "project_synthetic_watermark_on_project_original_document",
+    "license": "LicenseRef-Project-Original",
+    "size": [
+      1071,
+      1516
+    ],
+    "paths": {
+      "clean": "bases/documents/document_027.png",
+      "watermarked": "images/validation/document_027__center_white/watermarked.png",
+      "overlay_rgba": "images/validation/document_027__center_white/overlay_rgba.png",
+      "alpha": "images/validation/document_027__center_white/alpha.png",
+      "mask": "images/validation/document_027__center_white/mask.png"
+    },
+    "sha256": {
+      "clean": "8c8c59ec28a6b6f679dbf237d526b65aa2325a7faa9ff7f98fb173e6a0ece79f",
+      "watermarked": "fe926e77ab535b61195224c80bb426deb2fd236d86de039156d0ad5b94978cbf",
+      "overlay_rgba": "40e0cc8403d0acfe559fc4f4d7e42d6d5b86b9a1dac89d896b1fec1a5a4a75ed",
+      "alpha": "cbbd544904113df269799d4313a3eb024f2dda22ff5b68bcdb04e333c8c75608",
+      "mask": "fe901ee050708b980253b7a37ec4d2392cb12ac696cf3d3594eedfb7eff497b0"
+    },
+    "parameters": {
+      "style": "center_white",
+      "seed": 205015825839755,
+      "opacity": 0.3,
+      "color": [
+        255,
+        255,
+        255
+      ],
+      "text": "验证素材 9755",
+      "asset_partition": "validation",
+      "asset_id": "validation:document_027__center_white",
+      "watermark_origin": "project_synthetic",
+      "alpha_min_nonzero": 1,
+      "alpha_max": 96,
+      "support_fraction": 0.016615177293432766,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "document_027__tiled_diagonal",
+    "kind": "image",
+    "scenario": "C04",
+    "subtype": "tiled_diagonal",
+    "label": "斜向平铺文字",
+    "split": "validation",
+    "source_group": "original:document_027",
+    "split_group": "original:document_027",
+    "base_id": "document_027",
+    "background": "table",
+    "provenance": "project_synthetic_watermark_on_project_original_document",
+    "license": "LicenseRef-Project-Original",
+    "size": [
+      1071,
+      1516
+    ],
+    "paths": {
+      "clean": "bases/documents/document_027.png",
+      "watermarked": "images/validation/document_027__tiled_diagonal/watermarked.png",
+      "overlay_rgba": "images/validation/document_027__tiled_diagonal/overlay_rgba.png",
+      "alpha": "images/validation/document_027__tiled_diagonal/alpha.png",
+      "mask": "images/validation/document_027__tiled_diagonal/mask.png"
+    },
+    "sha256": {
+      "clean": "8c8c59ec28a6b6f679dbf237d526b65aa2325a7faa9ff7f98fb173e6a0ece79f",
+      "watermarked": "29c1291d6e414c9d4b223b4ffdf91a28e5cebc21f868838baf5c98d99cfb7e39",
+      "overlay_rgba": "b574770777f1c67a7dc7782f639299956239c6e2ee483b0346c08f11f77d1c92",
+      "alpha": "410c5e301e17ff78c79467b65b2960ded18c94a02f801a4f3c03535c0a8f7165",
+      "mask": "f8d1d6ee3486c7a9e1761b66b0160b69c948d82e0e7233cffb9a6ce352d773ed"
+    },
+    "parameters": {
+      "style": "tiled_diagonal",
+      "seed": 123931376910585,
+      "opacity": 0.3,
+      "color": [
+        148,
+        90,
+        104
+      ],
+      "text": "验证素材 0585",
+      "asset_partition": "validation",
+      "asset_id": "validation:document_027__tiled_diagonal",
+      "watermark_origin": "project_synthetic",
+      "rotation_degrees": 32,
+      "irregular": false,
+      "alpha_min_nonzero": 1,
+      "alpha_max": 92,
+      "support_fraction": 0.03803438701777985,
+      "alpha_definition": "effective_8bit_alpha_of_composited_synthetic_layer"
+    },
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "mask_definition": "support_of_known_composited_layer_alpha_gt_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "document_027__negative",
+    "kind": "image",
+    "scenario": "N00",
+    "subtype": "no_watermark",
+    "label": "无水印负例",
+    "split": "validation",
+    "source_group": "original:document_027",
+    "split_group": "original:document_027",
+    "base_id": "document_027",
+    "background": "table",
+    "provenance": "project_original_document",
+    "license": "LicenseRef-Project-Original",
+    "size": [
+      1071,
+      1516
+    ],
+    "paths": {
+      "clean": "bases/documents/document_027.png",
+      "watermarked": "bases/documents/document_027.png",
+      "mask": "images/validation/document_027__negative/mask.png",
+      "alpha": "images/validation/document_027__negative/alpha.png"
+    },
+    "sha256": {
+      "clean": "8c8c59ec28a6b6f679dbf237d526b65aa2325a7faa9ff7f98fb173e6a0ece79f",
+      "watermarked": "8c8c59ec28a6b6f679dbf237d526b65aa2325a7faa9ff7f98fb173e6a0ece79f",
+      "mask": "d3e4e64f1d763a0a3005733e18f48e9a96af2c0fbdc07c670aff9aa293a1d693",
+      "alpha": "d3e4e64f1d763a0a3005733e18f48e9a96af2c0fbdc07c670aff9aa293a1d693"
+    },
+    "parameters": {},
+    "watermark_origin": "none",
+    "is_negative": true,
+    "mask_definition": "all_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "document_028__negative",
+    "kind": "image",
+    "scenario": "N00",
+    "subtype": "no_watermark",
+    "label": "无水印负例",
+    "split": "validation",
+    "source_group": "original:document_028",
+    "split_group": "original:document_028",
+    "base_id": "document_028",
+    "background": "document_chart",
+    "provenance": "project_original_document",
+    "license": "LicenseRef-Project-Original",
+    "size": [
+      1071,
+      1516
+    ],
+    "paths": {
+      "clean": "bases/documents/document_028.png",
+      "watermarked": "bases/documents/document_028.png",
+      "mask": "images/validation/document_028__negative/mask.png",
+      "alpha": "images/validation/document_028__negative/alpha.png"
+    },
+    "sha256": {
+      "clean": "e4d80793a48daa957cc36df4839aa1fe2d8d14251936e7577a73361c8c44abd4",
+      "watermarked": "e4d80793a48daa957cc36df4839aa1fe2d8d14251936e7577a73361c8c44abd4",
+      "mask": "d3e4e64f1d763a0a3005733e18f48e9a96af2c0fbdc07c670aff9aa293a1d693",
+      "alpha": "d3e4e64f1d763a0a3005733e18f48e9a96af2c0fbdc07c670aff9aa293a1d693"
+    },
+    "parameters": {},
+    "watermark_origin": "none",
+    "is_negative": true,
+    "mask_definition": "all_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "charts_013__negative",
+    "kind": "image",
+    "scenario": "N00",
+    "subtype": "no_watermark",
+    "label": "无水印负例",
+    "split": "validation",
+    "source_group": "original:charts_013",
+    "split_group": "original:charts_013",
+    "base_id": "charts_013",
+    "background": "chart",
+    "provenance": "project_original_procedural",
+    "license": "LicenseRef-Project-Original",
+    "size": [
+      1152,
+      864
+    ],
+    "paths": {
+      "clean": "bases/charts/charts_013.png",
+      "watermarked": "bases/charts/charts_013.png",
+      "mask": "images/validation/charts_013__negative/mask.png",
+      "alpha": "images/validation/charts_013__negative/alpha.png"
+    },
+    "sha256": {
+      "clean": "4a35ddaa41008b02938f35c65926a07d3a232909cc8d52a5eb66096a0a3b5058",
+      "watermarked": "4a35ddaa41008b02938f35c65926a07d3a232909cc8d52a5eb66096a0a3b5058",
+      "mask": "abca5f582bba5958d1eb83e540b95af10f793798bf315a6875dc662d5db3d758",
+      "alpha": "abca5f582bba5958d1eb83e540b95af10f793798bf315a6875dc662d5db3d758"
+    },
+    "parameters": {},
+    "watermark_origin": "none",
+    "is_negative": true,
+    "mask_definition": "all_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "charts_014__negative",
+    "kind": "image",
+    "scenario": "N00",
+    "subtype": "no_watermark",
+    "label": "无水印负例",
+    "split": "validation",
+    "source_group": "original:charts_014",
+    "split_group": "original:charts_014",
+    "base_id": "charts_014",
+    "background": "chart",
+    "provenance": "project_original_procedural",
+    "license": "LicenseRef-Project-Original",
+    "size": [
+      1152,
+      864
+    ],
+    "paths": {
+      "clean": "bases/charts/charts_014.png",
+      "watermarked": "bases/charts/charts_014.png",
+      "mask": "images/validation/charts_014__negative/mask.png",
+      "alpha": "images/validation/charts_014__negative/alpha.png"
+    },
+    "sha256": {
+      "clean": "062a369bd1a0446cada950ad09c5beee94fc61051b581aed16bc9b240af9babf",
+      "watermarked": "062a369bd1a0446cada950ad09c5beee94fc61051b581aed16bc9b240af9babf",
+      "mask": "abca5f582bba5958d1eb83e540b95af10f793798bf315a6875dc662d5db3d758",
+      "alpha": "abca5f582bba5958d1eb83e540b95af10f793798bf315a6875dc662d5db3d758"
+    },
+    "parameters": {},
+    "watermark_origin": "none",
+    "is_negative": true,
+    "mask_definition": "all_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "textures_013__negative",
+    "kind": "image",
+    "scenario": "N00",
+    "subtype": "no_watermark",
+    "label": "无水印负例",
+    "split": "validation",
+    "source_group": "original:textures_013",
+    "split_group": "original:textures_013",
+    "base_id": "textures_013",
+    "background": "procedural_texture",
+    "provenance": "project_original_procedural",
+    "license": "LicenseRef-Project-Original",
+    "size": [
+      1152,
+      864
+    ],
+    "paths": {
+      "clean": "bases/textures/textures_013.png",
+      "watermarked": "bases/textures/textures_013.png",
+      "mask": "images/validation/textures_013__negative/mask.png",
+      "alpha": "images/validation/textures_013__negative/alpha.png"
+    },
+    "sha256": {
+      "clean": "54c325f68f40d7dd175dbaf776d3ddc5c6e3cf270eb69686551347c3fe49acd3",
+      "watermarked": "54c325f68f40d7dd175dbaf776d3ddc5c6e3cf270eb69686551347c3fe49acd3",
+      "mask": "abca5f582bba5958d1eb83e540b95af10f793798bf315a6875dc662d5db3d758",
+      "alpha": "abca5f582bba5958d1eb83e540b95af10f793798bf315a6875dc662d5db3d758"
+    },
+    "parameters": {},
+    "watermark_origin": "none",
+    "is_negative": true,
+    "mask_definition": "all_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "textures_014__negative",
+    "kind": "image",
+    "scenario": "N00",
+    "subtype": "no_watermark",
+    "label": "无水印负例",
+    "split": "validation",
+    "source_group": "original:textures_014",
+    "split_group": "original:textures_014",
+    "base_id": "textures_014",
+    "background": "procedural_texture",
+    "provenance": "project_original_procedural",
+    "license": "LicenseRef-Project-Original",
+    "size": [
+      1152,
+      864
+    ],
+    "paths": {
+      "clean": "bases/textures/textures_014.png",
+      "watermarked": "bases/textures/textures_014.png",
+      "mask": "images/validation/textures_014__negative/mask.png",
+      "alpha": "images/validation/textures_014__negative/alpha.png"
+    },
+    "sha256": {
+      "clean": "7838882fc5dee3fdb03897496d59c6b4d22031f0aefa6131f02b3c2486f842f6",
+      "watermarked": "7838882fc5dee3fdb03897496d59c6b4d22031f0aefa6131f02b3c2486f842f6",
+      "mask": "abca5f582bba5958d1eb83e540b95af10f793798bf315a6875dc662d5db3d758",
+      "alpha": "abca5f582bba5958d1eb83e540b95af10f793798bf315a6875dc662d5db3d758"
+    },
+    "parameters": {},
+    "watermark_origin": "none",
+    "is_negative": true,
+    "mask_definition": "all_zero",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "document_025__pdf_independent_text",
+    "kind": "pdf",
+    "scenario": "C09",
+    "subtype": "independent_text",
+    "label": "PDF 独立文字",
+    "split": "validation",
+    "source_group": "original:document_025",
+    "split_group": "original:document_025",
+    "base_id": "document_025",
+    "background": "project_original_document",
+    "provenance": "project_original_pdf_structural_fixture",
+    "license": "LicenseRef-Project-Original",
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "paths": {
+      "clean": "pdf/validation/document_025__pdf_independent_text/clean.pdf",
+      "watermarked": "pdf/validation/document_025__pdf_independent_text/watermarked.pdf"
+    },
+    "sha256": {
+      "clean": "99b4aa8dfd837eec35c9739619f59d8ea515b0d025f48c5ee5e2013a4a4eeff5",
+      "watermarked": "955bb000c308ccaf29c195437eba996669d2ebcc2989fa0aa71f205346c45160"
+    },
+    "parameters": {
+      "text": "WM VALIDATION 7759",
+      "opacity": 0.28,
+      "watermark_origin": "project_synthetic",
+      "asset_partition": "validation",
+      "seed": 160706260187759
+    },
+    "page_count": 2,
+    "pages": [
+      {
+        "page": 1,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_independent_text/page_01_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_independent_text/page_01_watermarked.png",
+          "alpha": "pdf/validation/document_025__pdf_independent_text/page_01_alpha.png",
+          "mask": "pdf/validation/document_025__pdf_independent_text/page_01_mask.png"
+        },
+        "sha256": {
+          "clean": "2e864e562cf5e8fb5cd70d7ab7471212a72b100faa6cab222bbda3bdad958be1",
+          "watermarked": "5db27f701c12a1b0b39aca7b4323be8a60af332fbc2e8fa29966d46ffd84549b",
+          "alpha": "5a05eec38b447222f208810c4cb3c4fb5389fcf62bb8dce1c44104ab74394b79",
+          "mask": "4e59790b25fe6143ca2b2ea04a9cd1ecd7070a71f41dc0f57d0d56406d948263"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      },
+      {
+        "page": 2,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_independent_text/page_02_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_independent_text/page_02_watermarked.png",
+          "alpha": "pdf/validation/document_025__pdf_independent_text/page_02_alpha.png",
+          "mask": "pdf/validation/document_025__pdf_independent_text/page_02_mask.png"
+        },
+        "sha256": {
+          "clean": "db5d300685bd455442290fe1f7a2929ebeb8ddf0195f8b43871195a44cbce526",
+          "watermarked": "77c61913b7e8d93ac76490a0576ebd406abd77240cd97784296c835780f3f2df",
+          "alpha": "5a05eec38b447222f208810c4cb3c4fb5389fcf62bb8dce1c44104ab74394b79",
+          "mask": "4e59790b25fe6143ca2b2ea04a9cd1ecd7070a71f41dc0f57d0d56406d948263"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      }
+    ],
+    "structure": {
+      "page_count": 2,
+      "ocgs": 0,
+      "pages": [
+        {
+          "text_chars": 1158,
+          "images": 0,
+          "vector_paths": 3,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        },
+        {
+          "text_chars": 1158,
+          "images": 0,
+          "vector_paths": 3,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        }
+      ]
+    },
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "document_025__pdf_unicode_text",
+    "kind": "pdf",
+    "scenario": "C09",
+    "subtype": "unicode_text",
+    "label": "PDF 中文编码文字",
+    "split": "validation",
+    "source_group": "original:document_025",
+    "split_group": "original:document_025",
+    "base_id": "document_025",
+    "background": "project_original_document",
+    "provenance": "project_original_pdf_structural_fixture",
+    "license": "LicenseRef-Project-Original",
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "paths": {
+      "clean": "pdf/validation/document_025__pdf_unicode_text/clean.pdf",
+      "watermarked": "pdf/validation/document_025__pdf_unicode_text/watermarked.pdf"
+    },
+    "sha256": {
+      "clean": "b81778abaca9f2f50ea553a88014896160a01a7047719131f662c06261b541b0",
+      "watermarked": "a7a774ea8c02f696ebc327f7ad80549627b6428d57f61d4cfe202d29a776e400"
+    },
+    "parameters": {
+      "text": "WM VALIDATION 7187",
+      "opacity": 0.28,
+      "watermark_origin": "project_synthetic",
+      "asset_partition": "validation",
+      "seed": 148497744287187
+    },
+    "page_count": 2,
+    "pages": [
+      {
+        "page": 1,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_unicode_text/page_01_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_unicode_text/page_01_watermarked.png",
+          "alpha": "pdf/validation/document_025__pdf_unicode_text/page_01_alpha.png",
+          "mask": "pdf/validation/document_025__pdf_unicode_text/page_01_mask.png"
+        },
+        "sha256": {
+          "clean": "2e864e562cf5e8fb5cd70d7ab7471212a72b100faa6cab222bbda3bdad958be1",
+          "watermarked": "b0d20354d9aa521114cbe981e2f48d3f3185ed12a447b8d92eeee78a10e03852",
+          "alpha": "132edd880137695bca01f5cdd42a068ea4e88ad524d4e45288bf76105c486135",
+          "mask": "1d637477f6134556309567df5035c1f70067256691c60a7a785995c69b95c863"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      },
+      {
+        "page": 2,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_unicode_text/page_02_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_unicode_text/page_02_watermarked.png",
+          "alpha": "pdf/validation/document_025__pdf_unicode_text/page_02_alpha.png",
+          "mask": "pdf/validation/document_025__pdf_unicode_text/page_02_mask.png"
+        },
+        "sha256": {
+          "clean": "db5d300685bd455442290fe1f7a2929ebeb8ddf0195f8b43871195a44cbce526",
+          "watermarked": "072bda60f995fdb12d2df4c2cb08995de482ecadd19f84a12d1a07e09f6d3a88",
+          "alpha": "132edd880137695bca01f5cdd42a068ea4e88ad524d4e45288bf76105c486135",
+          "mask": "1d637477f6134556309567df5035c1f70067256691c60a7a785995c69b95c863"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      }
+    ],
+    "structure": {
+      "page_count": 2,
+      "ocgs": 0,
+      "pages": [
+        {
+          "text_chars": 1167,
+          "images": 0,
+          "vector_paths": 3,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        },
+        {
+          "text_chars": 1167,
+          "images": 0,
+          "vector_paths": 3,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        }
+      ]
+    },
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "document_025__pdf_shared_content_stream",
+    "kind": "pdf",
+    "scenario": "C09",
+    "subtype": "shared_content_stream",
+    "label": "PDF 水印正文共用内容流",
+    "split": "validation",
+    "source_group": "original:document_025",
+    "split_group": "original:document_025",
+    "base_id": "document_025",
+    "background": "project_original_document",
+    "provenance": "project_original_pdf_structural_fixture",
+    "license": "LicenseRef-Project-Original",
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "paths": {
+      "clean": "pdf/validation/document_025__pdf_shared_content_stream/clean.pdf",
+      "watermarked": "pdf/validation/document_025__pdf_shared_content_stream/watermarked.pdf"
+    },
+    "sha256": {
+      "clean": "ffab8e3bbdce6489b171497d15cbc0f7896274b5a11a0a7ebe2c475002bdc354",
+      "watermarked": "1a4a5d934bfc5698a29d083cd183f2dbf94763acf81f5190b6915dd1c806d46b"
+    },
+    "parameters": {
+      "text": "WM VALIDATION 1233",
+      "opacity": 0.28,
+      "watermark_origin": "project_synthetic",
+      "asset_partition": "validation",
+      "seed": 221121445031233
+    },
+    "page_count": 2,
+    "pages": [
+      {
+        "page": 1,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_shared_content_stream/page_01_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_shared_content_stream/page_01_watermarked.png",
+          "alpha": "pdf/validation/document_025__pdf_shared_content_stream/page_01_alpha.png",
+          "mask": "pdf/validation/document_025__pdf_shared_content_stream/page_01_mask.png"
+        },
+        "sha256": {
+          "clean": "2e864e562cf5e8fb5cd70d7ab7471212a72b100faa6cab222bbda3bdad958be1",
+          "watermarked": "8e64049a6ade3d93197519118c6a818dd32f87fd7b13b6204ecd6ab106cc94a3",
+          "alpha": "d108e45962aac328b11b495bbe92d8caac5db7b30cd10f12e549ca8b8c78c941",
+          "mask": "21e2c3989b2a7af716853983184cc80a92da129a33700ee428475b048de8354b"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      },
+      {
+        "page": 2,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_shared_content_stream/page_02_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_shared_content_stream/page_02_watermarked.png",
+          "alpha": "pdf/validation/document_025__pdf_shared_content_stream/page_02_alpha.png",
+          "mask": "pdf/validation/document_025__pdf_shared_content_stream/page_02_mask.png"
+        },
+        "sha256": {
+          "clean": "db5d300685bd455442290fe1f7a2929ebeb8ddf0195f8b43871195a44cbce526",
+          "watermarked": "2bb6ac6f030eadfe6911e14854e1962b2f339b5f797cba830524a0703fd77d62",
+          "alpha": "d108e45962aac328b11b495bbe92d8caac5db7b30cd10f12e549ca8b8c78c941",
+          "mask": "21e2c3989b2a7af716853983184cc80a92da129a33700ee428475b048de8354b"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      }
+    ],
+    "structure": {
+      "page_count": 2,
+      "ocgs": 0,
+      "pages": [
+        {
+          "text_chars": 1158,
+          "images": 0,
+          "vector_paths": 3,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        },
+        {
+          "text_chars": 1158,
+          "images": 0,
+          "vector_paths": 3,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        }
+      ]
+    },
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "document_025__pdf_independent_image",
+    "kind": "pdf",
+    "scenario": "C10",
+    "subtype": "independent_image",
+    "label": "PDF 独立透明图片",
+    "split": "validation",
+    "source_group": "original:document_025",
+    "split_group": "original:document_025",
+    "base_id": "document_025",
+    "background": "project_original_document",
+    "provenance": "project_original_pdf_structural_fixture",
+    "license": "LicenseRef-Project-Original",
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "paths": {
+      "clean": "pdf/validation/document_025__pdf_independent_image/clean.pdf",
+      "watermarked": "pdf/validation/document_025__pdf_independent_image/watermarked.pdf"
+    },
+    "sha256": {
+      "clean": "ee9d507289b82eb799c8fc190b2d749cf039f21eedcab7d0b5b4e49ec9b5be7e",
+      "watermarked": "4d11029a884c6ac283d580c5357bee0265fbcf47bb7ec99fc3c39effacefd5de"
+    },
+    "parameters": {
+      "text": "WM VALIDATION 6670",
+      "opacity": 0.28,
+      "watermark_origin": "project_synthetic",
+      "asset_partition": "validation",
+      "seed": 117005902946670
+    },
+    "page_count": 2,
+    "pages": [
+      {
+        "page": 1,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_independent_image/page_01_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_independent_image/page_01_watermarked.png",
+          "alpha": "pdf/validation/document_025__pdf_independent_image/page_01_alpha.png",
+          "mask": "pdf/validation/document_025__pdf_independent_image/page_01_mask.png"
+        },
+        "sha256": {
+          "clean": "2e864e562cf5e8fb5cd70d7ab7471212a72b100faa6cab222bbda3bdad958be1",
+          "watermarked": "0e752e060b1424dc3e8160401030e0e3162773b464063e4731b5758a6fd7dc17",
+          "alpha": "8c8047a54591be4edd8344792b1e463dddc9e50baafcba80f70b01b667957854",
+          "mask": "050358bb0f1833ca2a6f67aac0c7fa1bae15ca99445d77446564090fd198de48"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      },
+      {
+        "page": 2,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_independent_image/page_02_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_independent_image/page_02_watermarked.png",
+          "alpha": "pdf/validation/document_025__pdf_independent_image/page_02_alpha.png",
+          "mask": "pdf/validation/document_025__pdf_independent_image/page_02_mask.png"
+        },
+        "sha256": {
+          "clean": "db5d300685bd455442290fe1f7a2929ebeb8ddf0195f8b43871195a44cbce526",
+          "watermarked": "6c79c24f5fd6eb2aac9f6c437488ce3cb029fd68daaef614428a44b1e0e13180",
+          "alpha": "8c8047a54591be4edd8344792b1e463dddc9e50baafcba80f70b01b667957854",
+          "mask": "050358bb0f1833ca2a6f67aac0c7fa1bae15ca99445d77446564090fd198de48"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      }
+    ],
+    "structure": {
+      "page_count": 2,
+      "ocgs": 0,
+      "pages": [
+        {
+          "text_chars": 1139,
+          "images": 2,
+          "vector_paths": 3,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        },
+        {
+          "text_chars": 1139,
+          "images": 2,
+          "vector_paths": 3,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        }
+      ]
+    },
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "document_025__pdf_vector_paths",
+    "kind": "pdf",
+    "scenario": "C10",
+    "subtype": "vector_paths",
+    "label": "PDF 矢量路径",
+    "split": "validation",
+    "source_group": "original:document_025",
+    "split_group": "original:document_025",
+    "base_id": "document_025",
+    "background": "project_original_document",
+    "provenance": "project_original_pdf_structural_fixture",
+    "license": "LicenseRef-Project-Original",
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "paths": {
+      "clean": "pdf/validation/document_025__pdf_vector_paths/clean.pdf",
+      "watermarked": "pdf/validation/document_025__pdf_vector_paths/watermarked.pdf"
+    },
+    "sha256": {
+      "clean": "657c7af1c83c905c29668fe12dc216011979458fb92df186daa088fa1ae4c764",
+      "watermarked": "9a796fa124c4751263037ee8c6365a728bba31a1ba2f350099e47920b73989fb"
+    },
+    "parameters": {
+      "text": "WM VALIDATION 1589",
+      "opacity": 0.28,
+      "watermark_origin": "project_synthetic",
+      "asset_partition": "validation",
+      "seed": 64276359351589
+    },
+    "page_count": 2,
+    "pages": [
+      {
+        "page": 1,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_vector_paths/page_01_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_vector_paths/page_01_watermarked.png",
+          "alpha": "pdf/validation/document_025__pdf_vector_paths/page_01_alpha.png",
+          "mask": "pdf/validation/document_025__pdf_vector_paths/page_01_mask.png"
+        },
+        "sha256": {
+          "clean": "2e864e562cf5e8fb5cd70d7ab7471212a72b100faa6cab222bbda3bdad958be1",
+          "watermarked": "2a3afff54f8e28e9068389b91bfdddd7c6d7231d56eebf16e43c16a46ea7ec7d",
+          "alpha": "23125fd34b7f190a1f490353e45a3bbbb94f7374545aa5cf9345490a61a5e00d",
+          "mask": "62772029f4718d9e5e76a3b1d988b9fcd73da664787f65a041cb6f22f3c4f528"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      },
+      {
+        "page": 2,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_vector_paths/page_02_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_vector_paths/page_02_watermarked.png",
+          "alpha": "pdf/validation/document_025__pdf_vector_paths/page_02_alpha.png",
+          "mask": "pdf/validation/document_025__pdf_vector_paths/page_02_mask.png"
+        },
+        "sha256": {
+          "clean": "db5d300685bd455442290fe1f7a2929ebeb8ddf0195f8b43871195a44cbce526",
+          "watermarked": "2dc1cbb832f7dd91a14b6714aab112b3d68f9b7419047ca3c941a57498bf07a7",
+          "alpha": "23125fd34b7f190a1f490353e45a3bbbb94f7374545aa5cf9345490a61a5e00d",
+          "mask": "62772029f4718d9e5e76a3b1d988b9fcd73da664787f65a041cb6f22f3c4f528"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      }
+    ],
+    "structure": {
+      "page_count": 2,
+      "ocgs": 0,
+      "pages": [
+        {
+          "text_chars": 1139,
+          "images": 0,
+          "vector_paths": 4,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        },
+        {
+          "text_chars": 1139,
+          "images": 0,
+          "vector_paths": 4,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        }
+      ]
+    },
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "document_025__pdf_outlined_text",
+    "kind": "pdf",
+    "scenario": "C10",
+    "subtype": "outlined_text",
+    "label": "PDF 描边文字",
+    "split": "validation",
+    "source_group": "original:document_025",
+    "split_group": "original:document_025",
+    "base_id": "document_025",
+    "background": "project_original_document",
+    "provenance": "project_original_pdf_structural_fixture",
+    "license": "LicenseRef-Project-Original",
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "paths": {
+      "clean": "pdf/validation/document_025__pdf_outlined_text/clean.pdf",
+      "watermarked": "pdf/validation/document_025__pdf_outlined_text/watermarked.pdf"
+    },
+    "sha256": {
+      "clean": "7088a318093077ef19d93622f47fc131607519dab0aca126bad2e76e9ca9e8e5",
+      "watermarked": "7bec358e5f952b7dd1bdb3ff5fd1ff634e2c940e242f8601264d43df3274bafc"
+    },
+    "parameters": {
+      "text": "WM VALIDATION 2033",
+      "opacity": 0.28,
+      "watermark_origin": "project_synthetic",
+      "asset_partition": "validation",
+      "seed": 55766988232033
+    },
+    "page_count": 2,
+    "pages": [
+      {
+        "page": 1,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_outlined_text/page_01_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_outlined_text/page_01_watermarked.png",
+          "alpha": "pdf/validation/document_025__pdf_outlined_text/page_01_alpha.png",
+          "mask": "pdf/validation/document_025__pdf_outlined_text/page_01_mask.png"
+        },
+        "sha256": {
+          "clean": "2e864e562cf5e8fb5cd70d7ab7471212a72b100faa6cab222bbda3bdad958be1",
+          "watermarked": "56f18252434d2e45d80ffeb6805b3b7ae45437e4199ab45b8b329ee058bc83c6",
+          "alpha": "18167ffd84e4005bbd3f71a493a704a6c4fc6c53b5e78f95a35cc1d8f9b02f78",
+          "mask": "7002f97c7119ac86a42a7029f512e4dc40064f4e5a59c3d3e51c53e210a4131a"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      },
+      {
+        "page": 2,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_outlined_text/page_02_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_outlined_text/page_02_watermarked.png",
+          "alpha": "pdf/validation/document_025__pdf_outlined_text/page_02_alpha.png",
+          "mask": "pdf/validation/document_025__pdf_outlined_text/page_02_mask.png"
+        },
+        "sha256": {
+          "clean": "db5d300685bd455442290fe1f7a2929ebeb8ddf0195f8b43871195a44cbce526",
+          "watermarked": "0835b761c420b37649a6080840175e07c9abaae2f507dc9f4dcf37b4bcc3e8b2",
+          "alpha": "18167ffd84e4005bbd3f71a493a704a6c4fc6c53b5e78f95a35cc1d8f9b02f78",
+          "mask": "7002f97c7119ac86a42a7029f512e4dc40064f4e5a59c3d3e51c53e210a4131a"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      }
+    ],
+    "structure": {
+      "page_count": 2,
+      "ocgs": 0,
+      "pages": [
+        {
+          "text_chars": 1158,
+          "images": 0,
+          "vector_paths": 3,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        },
+        {
+          "text_chars": 1158,
+          "images": 0,
+          "vector_paths": 3,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        }
+      ]
+    },
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "document_025__pdf_nested_form",
+    "kind": "pdf",
+    "scenario": "C11",
+    "subtype": "nested_form",
+    "label": "PDF 嵌套 Form XObject",
+    "split": "validation",
+    "source_group": "original:document_025",
+    "split_group": "original:document_025",
+    "base_id": "document_025",
+    "background": "project_original_document",
+    "provenance": "project_original_pdf_structural_fixture",
+    "license": "LicenseRef-Project-Original",
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "paths": {
+      "clean": "pdf/validation/document_025__pdf_nested_form/clean.pdf",
+      "watermarked": "pdf/validation/document_025__pdf_nested_form/watermarked.pdf"
+    },
+    "sha256": {
+      "clean": "aef60ca1339f4e3ab099beb15c730389298c3f9eea3e33f4826bac8c7d532387",
+      "watermarked": "6a0388c9ad1dbee35e138a270f8bfd90e76d415b175346e43ca60e153bc57a64"
+    },
+    "parameters": {
+      "text": "WM VALIDATION 2586",
+      "opacity": 0.28,
+      "watermark_origin": "project_synthetic",
+      "asset_partition": "validation",
+      "seed": 138135006872586
+    },
+    "page_count": 2,
+    "pages": [
+      {
+        "page": 1,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_nested_form/page_01_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_nested_form/page_01_watermarked.png",
+          "alpha": "pdf/validation/document_025__pdf_nested_form/page_01_alpha.png",
+          "mask": "pdf/validation/document_025__pdf_nested_form/page_01_mask.png"
+        },
+        "sha256": {
+          "clean": "2e864e562cf5e8fb5cd70d7ab7471212a72b100faa6cab222bbda3bdad958be1",
+          "watermarked": "b1e30fab6f830892472dfe062320c26b67839be90bd1e38e41e7dac4063dbd5f",
+          "alpha": "219b54aec99d955ae31c7c3174948e62f046dc1831a06a7af7aa7780bcc44603",
+          "mask": "9d17905703aad324559c2a246dc09e804e8b323b0db8b4a54911b87ec775d90a"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      },
+      {
+        "page": 2,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_nested_form/page_02_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_nested_form/page_02_watermarked.png",
+          "alpha": "pdf/validation/document_025__pdf_nested_form/page_02_alpha.png",
+          "mask": "pdf/validation/document_025__pdf_nested_form/page_02_mask.png"
+        },
+        "sha256": {
+          "clean": "db5d300685bd455442290fe1f7a2929ebeb8ddf0195f8b43871195a44cbce526",
+          "watermarked": "7aedc5152cb1013931213cd7d011be0a13469c532bef0dd7f4872ba3b37d4dfe",
+          "alpha": "219b54aec99d955ae31c7c3174948e62f046dc1831a06a7af7aa7780bcc44603",
+          "mask": "9d17905703aad324559c2a246dc09e804e8b323b0db8b4a54911b87ec775d90a"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      }
+    ],
+    "structure": {
+      "page_count": 2,
+      "ocgs": 0,
+      "pages": [
+        {
+          "text_chars": 1158,
+          "images": 0,
+          "vector_paths": 3,
+          "xobjects": 5,
+          "nested_form": true,
+          "annotations": []
+        },
+        {
+          "text_chars": 1158,
+          "images": 0,
+          "vector_paths": 3,
+          "xobjects": 5,
+          "nested_form": true,
+          "annotations": []
+        }
+      ]
+    },
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "document_025__pdf_stamp_annotation",
+    "kind": "pdf",
+    "scenario": "C11",
+    "subtype": "stamp_annotation",
+    "label": "PDF 图章批注",
+    "split": "validation",
+    "source_group": "original:document_025",
+    "split_group": "original:document_025",
+    "base_id": "document_025",
+    "background": "project_original_document",
+    "provenance": "project_original_pdf_structural_fixture",
+    "license": "LicenseRef-Project-Original",
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "paths": {
+      "clean": "pdf/validation/document_025__pdf_stamp_annotation/clean.pdf",
+      "watermarked": "pdf/validation/document_025__pdf_stamp_annotation/watermarked.pdf"
+    },
+    "sha256": {
+      "clean": "74aef06ab6de9a778306b03845cb39b5a548a2952dd3cc69a452b97948374d3c",
+      "watermarked": "193434cd201b9afc9efb66479e26c0e20759c842d3c0dc0099282da913fd6140"
+    },
+    "parameters": {
+      "text": "WM VALIDATION 1869",
+      "opacity": 0.28,
+      "watermark_origin": "project_synthetic",
+      "asset_partition": "validation",
+      "seed": 251705279041869
+    },
+    "page_count": 2,
+    "pages": [
+      {
+        "page": 1,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_stamp_annotation/page_01_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_stamp_annotation/page_01_watermarked.png",
+          "alpha": "pdf/validation/document_025__pdf_stamp_annotation/page_01_alpha.png",
+          "mask": "pdf/validation/document_025__pdf_stamp_annotation/page_01_mask.png"
+        },
+        "sha256": {
+          "clean": "2e864e562cf5e8fb5cd70d7ab7471212a72b100faa6cab222bbda3bdad958be1",
+          "watermarked": "630aba68c6360d9fd6e67f1fe38c50005fc3e8e81eabf269b304046fa368be0f",
+          "alpha": "b9f726514ae3075a2a7d40b66192923c59a4e0de67587e994721d2065b5525c2",
+          "mask": "aecf071e276b58482a40b912081333083dd7a204a1fa2e249e2a1c3b1eba1507"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      },
+      {
+        "page": 2,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_stamp_annotation/page_02_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_stamp_annotation/page_02_watermarked.png",
+          "alpha": "pdf/validation/document_025__pdf_stamp_annotation/page_02_alpha.png",
+          "mask": "pdf/validation/document_025__pdf_stamp_annotation/page_02_mask.png"
+        },
+        "sha256": {
+          "clean": "db5d300685bd455442290fe1f7a2929ebeb8ddf0195f8b43871195a44cbce526",
+          "watermarked": "52712b103ecf6ab6bb88ac91645f09278be5f2fc0a13f03017fe02085131fe31",
+          "alpha": "b9f726514ae3075a2a7d40b66192923c59a4e0de67587e994721d2065b5525c2",
+          "mask": "aecf071e276b58482a40b912081333083dd7a204a1fa2e249e2a1c3b1eba1507"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      }
+    ],
+    "structure": {
+      "page_count": 2,
+      "ocgs": 0,
+      "pages": [
+        {
+          "text_chars": 1145,
+          "images": 0,
+          "vector_paths": 4,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": [
+            "Stamp"
+          ]
+        },
+        {
+          "text_chars": 1145,
+          "images": 0,
+          "vector_paths": 4,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": [
+            "Stamp"
+          ]
+        }
+      ]
+    },
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "document_025__pdf_optional_content",
+    "kind": "pdf",
+    "scenario": "C11",
+    "subtype": "optional_content",
+    "label": "PDF 可选图层 OCG",
+    "split": "validation",
+    "source_group": "original:document_025",
+    "split_group": "original:document_025",
+    "base_id": "document_025",
+    "background": "project_original_document",
+    "provenance": "project_original_pdf_structural_fixture",
+    "license": "LicenseRef-Project-Original",
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "paths": {
+      "clean": "pdf/validation/document_025__pdf_optional_content/clean.pdf",
+      "watermarked": "pdf/validation/document_025__pdf_optional_content/watermarked.pdf"
+    },
+    "sha256": {
+      "clean": "23320b502233190507708264a76da9acf8cf56eecfeb518e286707477a58a733",
+      "watermarked": "c5521f8dcbafedf0b702030580a548151012f8ff98f8cf901688c6e0db084b28"
+    },
+    "parameters": {
+      "text": "WM VALIDATION 3787",
+      "opacity": 0.28,
+      "watermark_origin": "project_synthetic",
+      "asset_partition": "validation",
+      "seed": 229804505023787
+    },
+    "page_count": 2,
+    "pages": [
+      {
+        "page": 1,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_optional_content/page_01_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_optional_content/page_01_watermarked.png",
+          "alpha": "pdf/validation/document_025__pdf_optional_content/page_01_alpha.png",
+          "mask": "pdf/validation/document_025__pdf_optional_content/page_01_mask.png"
+        },
+        "sha256": {
+          "clean": "2e864e562cf5e8fb5cd70d7ab7471212a72b100faa6cab222bbda3bdad958be1",
+          "watermarked": "5aa4be5be7bcc3ace6d38ed0b0f4064ecdd509bf726a03e8a2e5cc53a2fc6a01",
+          "alpha": "0501b524fb11e9d4dbb3e60ee98bf83b09c4c7bf2d6e917a7f812837c4ddd922",
+          "mask": "2ca15ac13eea48252db8cd9c8c7d6131132a159b0c371a1817fe783632121635"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      },
+      {
+        "page": 2,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_optional_content/page_02_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_optional_content/page_02_watermarked.png",
+          "alpha": "pdf/validation/document_025__pdf_optional_content/page_02_alpha.png",
+          "mask": "pdf/validation/document_025__pdf_optional_content/page_02_mask.png"
+        },
+        "sha256": {
+          "clean": "db5d300685bd455442290fe1f7a2929ebeb8ddf0195f8b43871195a44cbce526",
+          "watermarked": "42bddd7517841eff8a46f5199a1499175f080603a777dce4988810f02a07b820",
+          "alpha": "0501b524fb11e9d4dbb3e60ee98bf83b09c4c7bf2d6e917a7f812837c4ddd922",
+          "mask": "2ca15ac13eea48252db8cd9c8c7d6131132a159b0c371a1817fe783632121635"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      }
+    ],
+    "structure": {
+      "page_count": 2,
+      "ocgs": 2,
+      "pages": [
+        {
+          "text_chars": 1158,
+          "images": 0,
+          "vector_paths": 3,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        },
+        {
+          "text_chars": 1158,
+          "images": 0,
+          "vector_paths": 3,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        }
+      ]
+    },
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "document_025__pdf_raster_flattened",
+    "kind": "pdf",
+    "scenario": "C12",
+    "subtype": "raster_flattened",
+    "label": "PDF 数字栅格化压平",
+    "split": "validation",
+    "source_group": "original:document_025",
+    "split_group": "original:document_025",
+    "base_id": "document_025",
+    "background": "project_original_document",
+    "provenance": "project_original_pdf_structural_fixture",
+    "license": "LicenseRef-Project-Original",
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "paths": {
+      "clean": "pdf/validation/document_025__pdf_raster_flattened/clean.pdf",
+      "watermarked": "pdf/validation/document_025__pdf_raster_flattened/watermarked.pdf"
+    },
+    "sha256": {
+      "clean": "08a3441bd845e4eb3195b8ae4c29e38337e7663b8638435bbf895a66274339a5",
+      "watermarked": "f0152996b7b59eed141c29c33e1866392523b9fb54e1a4c42fab5c85e0983908"
+    },
+    "parameters": {
+      "text": "WM VALIDATION 3197",
+      "opacity": 0.28,
+      "watermark_origin": "project_synthetic",
+      "asset_partition": "validation",
+      "seed": 12265816963197
+    },
+    "page_count": 2,
+    "pages": [
+      {
+        "page": 1,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_raster_flattened/page_01_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_raster_flattened/page_01_watermarked.png",
+          "alpha": "pdf/validation/document_025__pdf_raster_flattened/page_01_alpha.png",
+          "mask": "pdf/validation/document_025__pdf_raster_flattened/page_01_mask.png"
+        },
+        "sha256": {
+          "clean": "2e864e562cf5e8fb5cd70d7ab7471212a72b100faa6cab222bbda3bdad958be1",
+          "watermarked": "5db052d2028d6fb2f1ca804a5f3dba2cb5013b27881eb6215cc3a645fdfd34d6",
+          "alpha": "1b739b405f6a39308af83caba7a6b7035dc8739c5e45fd0cea82e52700da9953",
+          "mask": "a86a297cec3f2d3fda4a65fc002d822fca5c55a08bbe02787fb7163071eb79ee"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha_before_final_flattening"
+      },
+      {
+        "page": 2,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_raster_flattened/page_02_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_raster_flattened/page_02_watermarked.png",
+          "alpha": "pdf/validation/document_025__pdf_raster_flattened/page_02_alpha.png",
+          "mask": "pdf/validation/document_025__pdf_raster_flattened/page_02_mask.png"
+        },
+        "sha256": {
+          "clean": "db5d300685bd455442290fe1f7a2929ebeb8ddf0195f8b43871195a44cbce526",
+          "watermarked": "f8893d100dce325b4000468ef2f4828053864a28a56c02812094145f3df832a0",
+          "alpha": "1b739b405f6a39308af83caba7a6b7035dc8739c5e45fd0cea82e52700da9953",
+          "mask": "a86a297cec3f2d3fda4a65fc002d822fca5c55a08bbe02787fb7163071eb79ee"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha_before_final_flattening"
+      }
+    ],
+    "structure": {
+      "page_count": 2,
+      "ocgs": 0,
+      "pages": [
+        {
+          "text_chars": 0,
+          "images": 1,
+          "vector_paths": 0,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        },
+        {
+          "text_chars": 0,
+          "images": 1,
+          "vector_paths": 0,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        }
+      ]
+    },
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "document_025__pdf_mixed_storage",
+    "kind": "pdf",
+    "scenario": "C12",
+    "subtype": "mixed_storage",
+    "label": "PDF 文字与图像混合存储",
+    "split": "validation",
+    "source_group": "original:document_025",
+    "split_group": "original:document_025",
+    "base_id": "document_025",
+    "background": "project_original_document",
+    "provenance": "project_original_pdf_structural_fixture",
+    "license": "LicenseRef-Project-Original",
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "paths": {
+      "clean": "pdf/validation/document_025__pdf_mixed_storage/clean.pdf",
+      "watermarked": "pdf/validation/document_025__pdf_mixed_storage/watermarked.pdf"
+    },
+    "sha256": {
+      "clean": "520d5922b80ceefb692144b21e9ca5151d359abe7d91f853d454df5cc6e4f2be",
+      "watermarked": "890efb2fcecedd836fa9eb4e43784b98d05898075b9d9750e8d5373c199afa4e"
+    },
+    "parameters": {
+      "text": "WM VALIDATION 1998",
+      "opacity": 0.28,
+      "watermark_origin": "project_synthetic",
+      "asset_partition": "validation",
+      "seed": 241689672871998
+    },
+    "page_count": 2,
+    "pages": [
+      {
+        "page": 1,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_mixed_storage/page_01_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_mixed_storage/page_01_watermarked.png",
+          "alpha": "pdf/validation/document_025__pdf_mixed_storage/page_01_alpha.png",
+          "mask": "pdf/validation/document_025__pdf_mixed_storage/page_01_mask.png"
+        },
+        "sha256": {
+          "clean": "bcf07a1036761751250f79b833cdb1b2b57bd37248170d40c8de369e52f4e149",
+          "watermarked": "0693933aea938d2780f69f0ab069df2a090a91578e5bb83b2b168793f88c42d9",
+          "alpha": "9ae50be0367893197488660243b4c721bcc5692670bd6f16f947212f37fcba16",
+          "mask": "ad1301c0dcaade79d856646c5c59d2a345e6ca49600fce855db05c22cbc06a40"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      },
+      {
+        "page": 2,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_mixed_storage/page_02_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_mixed_storage/page_02_watermarked.png",
+          "alpha": "pdf/validation/document_025__pdf_mixed_storage/page_02_alpha.png",
+          "mask": "pdf/validation/document_025__pdf_mixed_storage/page_02_mask.png"
+        },
+        "sha256": {
+          "clean": "db5d300685bd455442290fe1f7a2929ebeb8ddf0195f8b43871195a44cbce526",
+          "watermarked": "b3f59643cbcbf73252b4cd485c25f23252ca975f90b9a5c9edfbe65beb704e99",
+          "alpha": "9ae50be0367893197488660243b4c721bcc5692670bd6f16f947212f37fcba16",
+          "mask": "ad1301c0dcaade79d856646c5c59d2a345e6ca49600fce855db05c22cbc06a40"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      }
+    ],
+    "structure": {
+      "page_count": 2,
+      "ocgs": 0,
+      "pages": [
+        {
+          "text_chars": 1158,
+          "images": 1,
+          "vector_paths": 3,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        },
+        {
+          "text_chars": 0,
+          "images": 1,
+          "vector_paths": 0,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        }
+      ]
+    },
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "document_025__pdf_negative",
+    "kind": "pdf",
+    "scenario": "N00",
+    "subtype": "no_watermark",
+    "label": "PDF 无水印负例",
+    "split": "validation",
+    "source_group": "original:document_025",
+    "split_group": "original:document_025",
+    "base_id": "document_025",
+    "background": "document_zh",
+    "provenance": "project_original_document",
+    "license": "LicenseRef-Project-Original",
+    "watermark_origin": "none",
+    "is_negative": true,
+    "paths": {
+      "clean": "bases/documents/document_025.pdf",
+      "watermarked": "bases/documents/document_025.pdf"
+    },
+    "sha256": {
+      "clean": "30c27f5759bda3ffa4612abc9dee5ff9a14049713a0656382af88b528ce9e925",
+      "watermarked": "30c27f5759bda3ffa4612abc9dee5ff9a14049713a0656382af88b528ce9e925"
+    },
+    "page_count": 2,
+    "pages": [
+      {
+        "page": 1,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_negative/page_01_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_negative/page_01_clean.png",
+          "alpha": "pdf/validation/document_025__pdf_negative/page_01_zero.png",
+          "mask": "pdf/validation/document_025__pdf_negative/page_01_zero.png"
+        },
+        "sha256": {
+          "clean": "2e864e562cf5e8fb5cd70d7ab7471212a72b100faa6cab222bbda3bdad958be1",
+          "watermarked": "2e864e562cf5e8fb5cd70d7ab7471212a72b100faa6cab222bbda3bdad958be1",
+          "alpha": "7e4d6a31b0d364cc517aa4f4a3399a281898f50d67d3fabbb64821c57fec7284",
+          "mask": "7e4d6a31b0d364cc517aa4f4a3399a281898f50d67d3fabbb64821c57fec7284"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "all_zero"
+      },
+      {
+        "page": 2,
+        "paths": {
+          "clean": "pdf/validation/document_025__pdf_negative/page_02_clean.png",
+          "watermarked": "pdf/validation/document_025__pdf_negative/page_02_clean.png",
+          "alpha": "pdf/validation/document_025__pdf_negative/page_02_zero.png",
+          "mask": "pdf/validation/document_025__pdf_negative/page_02_zero.png"
+        },
+        "sha256": {
+          "clean": "db5d300685bd455442290fe1f7a2929ebeb8ddf0195f8b43871195a44cbce526",
+          "watermarked": "db5d300685bd455442290fe1f7a2929ebeb8ddf0195f8b43871195a44cbce526",
+          "alpha": "7e4d6a31b0d364cc517aa4f4a3399a281898f50d67d3fabbb64821c57fec7284",
+          "mask": "7e4d6a31b0d364cc517aa4f4a3399a281898f50d67d3fabbb64821c57fec7284"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "all_zero"
+      }
+    ],
+    "parameters": {},
+    "structure": {
+      "page_count": 2,
+      "ocgs": 0,
+      "pages": [
+        {
+          "text_chars": 1139,
+          "images": 0,
+          "vector_paths": 3,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        },
+        {
+          "text_chars": 1139,
+          "images": 0,
+          "vector_paths": 3,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        }
+      ]
+    },
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "document_026__pdf_unicode_text",
+    "kind": "pdf",
+    "scenario": "C09",
+    "subtype": "unicode_text",
+    "label": "PDF 中文编码文字",
+    "split": "validation",
+    "source_group": "original:document_026",
+    "split_group": "original:document_026",
+    "base_id": "document_026",
+    "background": "project_original_document",
+    "provenance": "project_original_pdf_structural_fixture",
+    "license": "LicenseRef-Project-Original",
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "paths": {
+      "clean": "pdf/validation/document_026__pdf_unicode_text/clean.pdf",
+      "watermarked": "pdf/validation/document_026__pdf_unicode_text/watermarked.pdf"
+    },
+    "sha256": {
+      "clean": "72fb641d9f5dc293fd56cb7fe4717053372faa2117cb413d05a8b89992fe9365",
+      "watermarked": "0e0dbd27f1d315ab65a1a0e0c8681d2f5d9ad88368b684978a3b70edf2321995"
+    },
+    "parameters": {
+      "text": "WM VALIDATION 9867",
+      "opacity": 0.28,
+      "watermark_origin": "project_synthetic",
+      "asset_partition": "validation",
+      "seed": 108484266309867
+    },
+    "page_count": 2,
+    "pages": [
+      {
+        "page": 1,
+        "paths": {
+          "clean": "pdf/validation/document_026__pdf_unicode_text/page_01_clean.png",
+          "watermarked": "pdf/validation/document_026__pdf_unicode_text/page_01_watermarked.png",
+          "alpha": "pdf/validation/document_026__pdf_unicode_text/page_01_alpha.png",
+          "mask": "pdf/validation/document_026__pdf_unicode_text/page_01_mask.png"
+        },
+        "sha256": {
+          "clean": "2f147eb8d22bba07367f843b457a6ed73018b4ab146980e15feade1d8bf16a65",
+          "watermarked": "62bc5a543c76746251a27f7f5157630d7dc1b9f16dc2a250f432e974b246c3e6",
+          "alpha": "e91cccd4f575d227435692fd5db976372904e745c6f7f0927f44e37a9e64d299",
+          "mask": "0c887eee50cc0677e0cd6f6142ee84fb964eb27b1fd4b1f4b42cc70fbd6d7a61"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      },
+      {
+        "page": 2,
+        "paths": {
+          "clean": "pdf/validation/document_026__pdf_unicode_text/page_02_clean.png",
+          "watermarked": "pdf/validation/document_026__pdf_unicode_text/page_02_watermarked.png",
+          "alpha": "pdf/validation/document_026__pdf_unicode_text/page_02_alpha.png",
+          "mask": "pdf/validation/document_026__pdf_unicode_text/page_02_mask.png"
+        },
+        "sha256": {
+          "clean": "8a6feef3e703fcf719c150d10680ecb8ef47d0946b65a536f400e018861584ce",
+          "watermarked": "e0ea93aff79b791ba3c5bb0174a19fd1c66384ab612e924b31060743a8d71db3",
+          "alpha": "e91cccd4f575d227435692fd5db976372904e745c6f7f0927f44e37a9e64d299",
+          "mask": "0c887eee50cc0677e0cd6f6142ee84fb964eb27b1fd4b1f4b42cc70fbd6d7a61"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      }
+    ],
+    "structure": {
+      "page_count": 2,
+      "ocgs": 0,
+      "pages": [
+        {
+          "text_chars": 1738,
+          "images": 0,
+          "vector_paths": 3,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        },
+        {
+          "text_chars": 1738,
+          "images": 0,
+          "vector_paths": 3,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        }
+      ]
+    },
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "document_026__pdf_independent_image",
+    "kind": "pdf",
+    "scenario": "C10",
+    "subtype": "independent_image",
+    "label": "PDF 独立透明图片",
+    "split": "validation",
+    "source_group": "original:document_026",
+    "split_group": "original:document_026",
+    "base_id": "document_026",
+    "background": "project_original_document",
+    "provenance": "project_original_pdf_structural_fixture",
+    "license": "LicenseRef-Project-Original",
+    "watermark_origin": "project_synthetic",
+    "is_negative": false,
+    "paths": {
+      "clean": "pdf/validation/document_026__pdf_independent_image/clean.pdf",
+      "watermarked": "pdf/validation/document_026__pdf_independent_image/watermarked.pdf"
+    },
+    "sha256": {
+      "clean": "d33fa6e6a128b5c9a1f02043e771d896deace3ad4186838b20ae180f45d58af3",
+      "watermarked": "49db9632ecc4380a12e31363c4ff6bf198dc7ce69e82cf35463b89951d0a7255"
+    },
+    "parameters": {
+      "text": "WM VALIDATION 6281",
+      "opacity": 0.28,
+      "watermark_origin": "project_synthetic",
+      "asset_partition": "validation",
+      "seed": 193742583336281
+    },
+    "page_count": 2,
+    "pages": [
+      {
+        "page": 1,
+        "paths": {
+          "clean": "pdf/validation/document_026__pdf_independent_image/page_01_clean.png",
+          "watermarked": "pdf/validation/document_026__pdf_independent_image/page_01_watermarked.png",
+          "alpha": "pdf/validation/document_026__pdf_independent_image/page_01_alpha.png",
+          "mask": "pdf/validation/document_026__pdf_independent_image/page_01_mask.png"
+        },
+        "sha256": {
+          "clean": "2f147eb8d22bba07367f843b457a6ed73018b4ab146980e15feade1d8bf16a65",
+          "watermarked": "1d9be26ed94fd3f9a9a6a0c67cd71667796c378ae459bd6518ed86591ebc010c",
+          "alpha": "0987157fd9b0b2871d53579d797e3f83114b92109971433b79abe6c1b1886c51",
+          "mask": "29ac9ea47fa898ac92d698a9fec4d18a8d6e2b2cc912de179a00f31445fdaa1a"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      },
+      {
+        "page": 2,
+        "paths": {
+          "clean": "pdf/validation/document_026__pdf_independent_image/page_02_clean.png",
+          "watermarked": "pdf/validation/document_026__pdf_independent_image/page_02_watermarked.png",
+          "alpha": "pdf/validation/document_026__pdf_independent_image/page_02_alpha.png",
+          "mask": "pdf/validation/document_026__pdf_independent_image/page_02_mask.png"
+        },
+        "sha256": {
+          "clean": "8a6feef3e703fcf719c150d10680ecb8ef47d0946b65a536f400e018861584ce",
+          "watermarked": "a8b40c61af9f1eb19e6eaa351346368eb2112155d7ce15fbd04830065e8ff438",
+          "alpha": "0987157fd9b0b2871d53579d797e3f83114b92109971433b79abe6c1b1886c51",
+          "mask": "29ac9ea47fa898ac92d698a9fec4d18a8d6e2b2cc912de179a00f31445fdaa1a"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "support_of_separately_rendered_known_watermark_objects",
+        "alpha_definition": "isolated_object_render_alpha"
+      }
+    ],
+    "structure": {
+      "page_count": 2,
+      "ocgs": 0,
+      "pages": [
+        {
+          "text_chars": 1710,
+          "images": 2,
+          "vector_paths": 3,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        },
+        {
+          "text_chars": 1710,
+          "images": 2,
+          "vector_paths": 3,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        }
+      ]
+    },
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "document_026__pdf_negative",
+    "kind": "pdf",
+    "scenario": "N00",
+    "subtype": "no_watermark",
+    "label": "PDF 无水印负例",
+    "split": "validation",
+    "source_group": "original:document_026",
+    "split_group": "original:document_026",
+    "base_id": "document_026",
+    "background": "document_en",
+    "provenance": "project_original_document",
+    "license": "LicenseRef-Project-Original",
+    "watermark_origin": "none",
+    "is_negative": true,
+    "paths": {
+      "clean": "bases/documents/document_026.pdf",
+      "watermarked": "bases/documents/document_026.pdf"
+    },
+    "sha256": {
+      "clean": "c89d89009fd71c04230d5a46289971a362755453fb997c30542856f1ab5b2c7f",
+      "watermarked": "c89d89009fd71c04230d5a46289971a362755453fb997c30542856f1ab5b2c7f"
+    },
+    "page_count": 2,
+    "pages": [
+      {
+        "page": 1,
+        "paths": {
+          "clean": "pdf/validation/document_026__pdf_negative/page_01_clean.png",
+          "watermarked": "pdf/validation/document_026__pdf_negative/page_01_clean.png",
+          "alpha": "pdf/validation/document_026__pdf_negative/page_01_zero.png",
+          "mask": "pdf/validation/document_026__pdf_negative/page_01_zero.png"
+        },
+        "sha256": {
+          "clean": "2f147eb8d22bba07367f843b457a6ed73018b4ab146980e15feade1d8bf16a65",
+          "watermarked": "2f147eb8d22bba07367f843b457a6ed73018b4ab146980e15feade1d8bf16a65",
+          "alpha": "7e4d6a31b0d364cc517aa4f4a3399a281898f50d67d3fabbb64821c57fec7284",
+          "mask": "7e4d6a31b0d364cc517aa4f4a3399a281898f50d67d3fabbb64821c57fec7284"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "all_zero"
+      },
+      {
+        "page": 2,
+        "paths": {
+          "clean": "pdf/validation/document_026__pdf_negative/page_02_clean.png",
+          "watermarked": "pdf/validation/document_026__pdf_negative/page_02_clean.png",
+          "alpha": "pdf/validation/document_026__pdf_negative/page_02_zero.png",
+          "mask": "pdf/validation/document_026__pdf_negative/page_02_zero.png"
+        },
+        "sha256": {
+          "clean": "8a6feef3e703fcf719c150d10680ecb8ef47d0946b65a536f400e018861584ce",
+          "watermarked": "8a6feef3e703fcf719c150d10680ecb8ef47d0946b65a536f400e018861584ce",
+          "alpha": "7e4d6a31b0d364cc517aa4f4a3399a281898f50d67d3fabbb64821c57fec7284",
+          "mask": "7e4d6a31b0d364cc517aa4f4a3399a281898f50d67d3fabbb64821c57fec7284"
+        },
+        "size": [
+          893,
+          1263
+        ],
+        "mask_definition": "all_zero"
+      }
+    ],
+    "parameters": {},
+    "structure": {
+      "page_count": 2,
+      "ocgs": 0,
+      "pages": [
+        {
+          "text_chars": 1710,
+          "images": 0,
+          "vector_paths": 3,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        },
+        {
+          "text_chars": 1710,
+          "images": 0,
+          "vector_paths": 3,
+          "xobjects": 0,
+          "nested_form": false,
+          "annotations": []
+        }
+      ]
+    },
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "document_025__normal_logo_signature_negative",
+    "kind": "image",
+    "scenario": "N00",
+    "subtype": "normal_logo_signature_negative",
+    "label": "正常页眉 Logo 与正文签署负例",
+    "split": "validation",
+    "source_group": "original:document_025",
+    "split_group": "original:document_025",
+    "base_id": "document_025",
+    "background": "document_zh",
+    "provenance": "project_original_document_with_legitimate_body_content",
+    "license": "LicenseRef-Project-Original",
+    "size": [
+      1071,
+      1516
+    ],
+    "paths": {
+      "clean": "images/validation/document_025__normal_logo_signature_negative/clean.png",
+      "watermarked": "images/validation/document_025__normal_logo_signature_negative/clean.png",
+      "mask": "images/validation/document_025__normal_logo_signature_negative/zero.png",
+      "alpha": "images/validation/document_025__normal_logo_signature_negative/zero.png"
+    },
+    "sha256": {
+      "clean": "2b463497e15a8ecf208c0cce7e69c9f7d3135566abba14f845c57b58d278cbe0",
+      "watermarked": "2b463497e15a8ecf208c0cce7e69c9f7d3135566abba14f845c57b58d278cbe0",
+      "mask": "d3e4e64f1d763a0a3005733e18f48e9a96af2c0fbdc07c670aff9aa293a1d693",
+      "alpha": "d3e4e64f1d763a0a3005733e18f48e9a96af2c0fbdc07c670aff9aa293a1d693"
+    },
+    "parameters": {},
+    "watermark_origin": "none",
+    "is_negative": true,
+    "mask_definition": "all_zero_normal_header_logo_and_body_signature_are_content",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "original"
+  },
+  {
+    "id": "document_026__normal_logo_signature_negative",
+    "kind": "image",
+    "scenario": "N00",
+    "subtype": "normal_logo_signature_negative",
+    "label": "正常页眉 Logo 与正文签署负例",
+    "split": "validation",
+    "source_group": "original:document_026",
+    "split_group": "original:document_026",
+    "base_id": "document_026",
+    "background": "document_en",
+    "provenance": "project_original_document_with_legitimate_body_content",
+    "license": "LicenseRef-Project-Original",
+    "size": [
+      1071,
+      1516
+    ],
+    "paths": {
+      "clean": "images/validation/document_026__normal_logo_signature_negative/clean.png",
+      "watermarked": "images/validation/document_026__normal_logo_signature_negative/clean.png",
+      "mask": "images/validation/document_026__normal_logo_signature_negative/zero.png",
+      "alpha": "images/validation/document_026__normal_logo_signature_negative/zero.png"
+    },
+    "sha256": {
+      "clean": "0eb0808d800f947c6b87438ee9f5747817ce1dab8f83563e41c51261d8db1394",
+      "watermarked": "0eb0808d800f947c6b87438ee9f5747817ce1dab8f83563e41c51261d8db1394",
+      "mask": "d3e4e64f1d763a0a3005733e18f48e9a96af2c0fbdc07c670aff9aa293a1d693",
+      "alpha": "d3e4e64f1d763a0a3005733e18f48e9a96af2c0fbdc07c670aff9aa293a1d693"
+    },
+    "parameters": {},
+    "watermark_origin": "none",
+    "is_negative": true,
+    "mask_definition": "all_zero_normal_header_logo_and_body_signature_are_content",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "document_027__normal_logo_signature_negative",
+    "kind": "image",
+    "scenario": "N00",
+    "subtype": "normal_logo_signature_negative",
+    "label": "正常页眉 Logo 与正文签署负例",
+    "split": "validation",
+    "source_group": "original:document_027",
+    "split_group": "original:document_027",
+    "base_id": "document_027",
+    "background": "table",
+    "provenance": "project_original_document_with_legitimate_body_content",
+    "license": "LicenseRef-Project-Original",
+    "size": [
+      1071,
+      1516
+    ],
+    "paths": {
+      "clean": "images/validation/document_027__normal_logo_signature_negative/clean.png",
+      "watermarked": "images/validation/document_027__normal_logo_signature_negative/clean.png",
+      "mask": "images/validation/document_027__normal_logo_signature_negative/zero.png",
+      "alpha": "images/validation/document_027__normal_logo_signature_negative/zero.png"
+    },
+    "sha256": {
+      "clean": "76df983a21b9579ed858162636c58043fdc84ba6dd6f9c954546be50b4c8f721",
+      "watermarked": "76df983a21b9579ed858162636c58043fdc84ba6dd6f9c954546be50b4c8f721",
+      "mask": "d3e4e64f1d763a0a3005733e18f48e9a96af2c0fbdc07c670aff9aa293a1d693",
+      "alpha": "d3e4e64f1d763a0a3005733e18f48e9a96af2c0fbdc07c670aff9aa293a1d693"
+    },
+    "parameters": {},
+    "watermark_origin": "none",
+    "is_negative": true,
+    "mask_definition": "all_zero_normal_header_logo_and_body_signature_are_content",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  },
+  {
+    "id": "document_028__normal_logo_signature_negative",
+    "kind": "image",
+    "scenario": "N00",
+    "subtype": "normal_logo_signature_negative",
+    "label": "正常页眉 Logo 与正文签署负例",
+    "split": "validation",
+    "source_group": "original:document_028",
+    "split_group": "original:document_028",
+    "base_id": "document_028",
+    "background": "document_chart",
+    "provenance": "project_original_document_with_legitimate_body_content",
+    "license": "LicenseRef-Project-Original",
+    "size": [
+      1071,
+      1516
+    ],
+    "paths": {
+      "clean": "images/validation/document_028__normal_logo_signature_negative/clean.png",
+      "watermarked": "images/validation/document_028__normal_logo_signature_negative/clean.png",
+      "mask": "images/validation/document_028__normal_logo_signature_negative/zero.png",
+      "alpha": "images/validation/document_028__normal_logo_signature_negative/zero.png"
+    },
+    "sha256": {
+      "clean": "2ecbc874bd797fa4c81a5b917eadce43233f842ef2042d9af3821e076773dd35",
+      "watermarked": "2ecbc874bd797fa4c81a5b917eadce43233f842ef2042d9af3821e076773dd35",
+      "mask": "d3e4e64f1d763a0a3005733e18f48e9a96af2c0fbdc07c670aff9aa293a1d693",
+      "alpha": "d3e4e64f1d763a0a3005733e18f48e9a96af2c0fbdc07c670aff9aa293a1d693"
+    },
+    "parameters": {},
+    "watermark_origin": "none",
+    "is_negative": true,
+    "mask_definition": "all_zero_normal_header_logo_and_body_signature_are_content",
+    "review_status": "automated_integrity_verified_base_and_subtype_visual_reviewed_not_individual_review",
+    "suite": "extra"
+  }
+]

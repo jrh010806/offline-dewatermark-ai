@@ -54,7 +54,8 @@ def strip_translucent_text(data: bytes) -> tuple[bytes, tuple[int, ...]]:
             resources = page.get("/Resources")
             resources = resources.get_object() if resources is not None else {}
             ext = resources.get("/ExtGState", {}).get_object() if "/ExtGState" in resources else {}
-            state = dict(matrix=fitz.Matrix(1, 0, 0, 1, 0, 0), size=0., alpha=1., mode=0)
+            state = dict(matrix=fitz.Matrix(1, 0, 0, 1, 0, 0), size=0., alpha=1., mode=0,
+                         colour=(0.,))
             stack = []
             text_matrix = fitz.Matrix(1, 0, 0, 1, 0, 0)
             blocks, block = [], None
@@ -82,6 +83,10 @@ def strip_translucent_text(data: bytes) -> tuple[bytes, tuple[int, ...]]:
                     state["size"] = float(args[1])
                 elif op == b"Tr":
                     state["mode"] = int(args[0])
+                elif op in (b"rg", b"g", b"k"):
+                    state["colour"] = tuple(round(float(v), 4) for v in args)
+                elif op in (b"cs", b"sc", b"scn"):
+                    state["colour"] = None
                 elif op == b"BT":
                     if block is not None:
                         unsafe = True
@@ -102,7 +107,9 @@ def strip_translucent_text(data: bytes) -> tuple[bytes, tuple[int, ...]]:
                     candidate = (state["mode"] == 0 and .10 <= state["alpha"] <= .40
                                  and physical_size >= max(20., 1.5 * body_size)
                                  and len(text.strip()) >= 6)
-                    block.append((position, candidate, 15 <= angle <= 65, text))
+                    block.append((position, candidate, 15 <= angle <= 65, text,
+                                  round(state["alpha"], 3), state["colour"],
+                                  physical_size, (matrix.e, matrix.f)))
                 elif op == b"ET":
                     if block:
                         blocks.append(block)
@@ -112,9 +119,21 @@ def strip_translucent_text(data: bytes) -> tuple[bytes, tuple[int, ...]]:
             remove = set()
             count = 0
             if not unsafe and block is None and not stack:
+                # A second, horizontal line may belong to an already confirmed
+                # overlay (including a different/CJK font). It is not sufficient
+                # for a page to contain *any* large translucent heading: require
+                # matching paint, comparable size and spatial proximity to the
+                # independent rotated/repeated evidence.
+                anchors = [x for b in blocks if all(x[1] for x in b)
+                           and (all(x[2] for x in b) or repeats[tuple(x[3] for x in b)] >= 3)
+                           for x in b]
                 for b in blocks:
+                    associated = bool(anchors) and all(any(
+                        x[5] is not None and x[4:6] == a[4:6] and .65 <= x[6] / a[6] <= 1.5
+                        and math.dist(x[7], a[7]) <= 8 * a[6]
+                        for a in anchors) for x in b)
                     if all(x[1] for x in b) and (all(x[2] for x in b)
-                            or repeats[tuple(x[3] for x in b)] >= 3):
+                            or repeats[tuple(x[3] for x in b)] >= 3 or associated):
                         remove.update(x[0] for x in b)
                         count += 1
             if remove:

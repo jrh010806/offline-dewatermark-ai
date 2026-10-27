@@ -7,6 +7,13 @@ from wm.contract import MaskLayer,Thresholds
 
 
 class PriorTests(unittest.TestCase):
+    def test_repeated_layout_cannot_authorise_erasure_without_single_page_evidence(self):
+        empty = np.zeros((80, 90), np.float32)
+        layout = empty.copy(); layout[70:72, 10:80] = 1
+        own = MaskLayer(empty, confidence=0)
+        prior = MaskLayer(layout, confidence=1, method='crosspage')
+        self.assertIs(masks.with_prior(own, prior), own)
+
     def test_unrelated_prior_cannot_replace_specific_detection(self):
         a=np.zeros((80,90),np.float32);a[10:15,10:50]=1
         b=np.zeros_like(a);b[40:65,10:70]=1

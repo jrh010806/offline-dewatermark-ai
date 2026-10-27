@@ -79,12 +79,15 @@ def strip_pdf(path: str | Path, out_path: str | Path) -> int:
 @lru_cache(maxsize=2)
 def _text_copy(path: str, revision: tuple[int, int]):
     from .pdf_text import strip_translucent_text
+    from .pdf_images import strip_translucent_images
     source = Path(path)
     data = source.read_bytes()
     stat = source.stat()
     if (stat.st_mtime_ns, stat.st_size) != revision:
         raise ValueError("PDF changed since upload")
-    return strip_translucent_text(data)
+    data, text_counts = strip_translucent_text(data)
+    data, image_counts = strip_translucent_images(data)
+    return data, text_counts, image_counts
 
 
 def process_text_page(page, thr):
@@ -103,9 +106,9 @@ def process_text_page(page, thr):
         stat = source.stat()
         if (stat.st_mtime_ns, stat.st_size) != page.source_revision:
             return None
-        data, counts = _text_copy(page.source_path, page.source_revision)
+        data, counts, image_counts = _text_copy(page.source_path, page.source_revision)
         index = page.source_page_index
-        if index >= len(counts) or not counts[index]:
+        if index >= len(counts) or not (counts[index] or image_counts[index]):
             return None
         # Do not apply the structural result to a caller-modified input image.
         with fitz.open(page.source_path) as original:
@@ -117,8 +120,10 @@ def process_text_page(page, thr):
             pix = cleaned[index].get_pixmap(dpi=page.dpi, colorspace=fitz.csRGB)
             output = np.frombuffer(pix.samples, np.uint8).reshape(pix.height, pix.width, pix.n)[..., :3].copy()
         region = np.any(page.image != output, axis=2)
+        method = ("transparent_pdf_text_and_image" if counts[index] and image_counts[index]
+                  else "transparent_pdf_image" if image_counts[index] else "transparent_pdf_text")
         mask = MaskLayer(region.astype(np.float32), source=MaskSource.STRUCTURE,
-                         confidence=.95, footprint=region, method="transparent_pdf_text",
+                         confidence=.95, footprint=region, method=method,
                          repair_mode="structure",
                          veil_strength=np.zeros(3, np.float32), veil_offset=np.zeros(3, np.float32))
         ms = round((perf_counter()-t0)*1000)
@@ -126,6 +131,7 @@ def process_text_page(page, thr):
                     engine=EngineKind.STRUCTURE, repairs=[], elapsed_ms=ms,
                     stage_ms={"structure_ms": ms}, thr=thr)
         report.metrics["text_blocks_removed"] = float(counts[index])
+        report.metrics["image_draws_removed"] = float(image_counts[index])
         report.page_key = page.key
         dst = PageImage(output, page.dpi, page.doc_id, page.page_index, page.source_kind)
         return PageResult(page, dst, mask, report)

@@ -4,7 +4,6 @@ from __future__ import annotations
 import json
 import logging
 import time
-import tempfile
 from collections.abc import Iterable, Iterator
 from datetime import datetime
 from dataclasses import asdict
@@ -117,32 +116,6 @@ def iter_raster(pages_iter: Iterator[PageImage], thr: Thresholds,
         yield _process_one(page, mask, thr, mask_ms=_ms(t0))
 
 
-def _run_structure(path: Path, thr: Thresholds) -> list[PageResult] | None:
-    probes = structure.probe_pdf(path)
-    if not probes or not all(p.applicable for p in probes):
-        return None
-    # Keep the user's input directory read-only, including this older image-object path.
-    with tempfile.TemporaryDirectory(prefix="wm-structure-") as folder:
-        stripped = Path(folder)/"stripped.pdf"
-        removed = structure.strip_pdf(path, stripped)
-        before = documents.load_pages(path, dpi=200)
-        after = documents.load_pages(stripped, dpi=200)
-    results = []
-    for src, dst in zip(before, after):
-        t0 = time.perf_counter()
-        mask = masks.estimate_single_page(src.image, thr)
-        report = verdict_mod.build_verdict(
-            source=src.image, output=dst.image, mask=mask,
-            engine=EngineKind.STRUCTURE,
-            repairs=[], elapsed_ms=_ms(t0),
-            stage_ms={"probe_ms": 0, "strip_ms": 0}, thr=thr,
-        )
-        report.metrics["objects_removed"] = float(removed)
-        report.page_key = src.key
-        results.append(PageResult(source=src, output=dst, mask=mask, verdict=report))
-    return results
-
-
 def process_pages(pages: list[PageImage], thr: Thresholds = Thresholds(),
                  gt: GroundTruth | None = None, force_single: bool = False,
                  use_ocr: bool = True, style: str | None = None) -> list[PageResult]:
@@ -161,10 +134,9 @@ def process_file(path: str | Path, thr: Thresholds = Thresholds(), dpi: int = 20
                  skip_structure: bool = False, use_ocr: bool = True,
                  style: str | None = None) -> list[PageResult]:
     p = Path(path)
-    if p.suffix.lower() == ".pdf" and not skip_structure:
-        structural = _run_structure(p, thr)
-        if structural is not None:
-            return structural
+    # Per-page structural preflight is shared with streaming and the desktop
+    # worker. Do not globally delete an image xref or render at a fixed 200 DPI:
+    # a shared image can be legitimate elsewhere and the caller controls DPI.
     pages = documents.load_pages(p, dpi=dpi)
     return _run_raster(pages, thr, gt=None, force_single=len(pages) < 2, use_ocr=use_ocr,
                        use_structure=not skip_structure, style=style)

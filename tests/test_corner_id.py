@@ -43,6 +43,22 @@ class CornerIdTests(unittest.TestCase):
         self.assertTrue(corner_id._id_like("ZG-053-8F3A"))
         self.assertTrue(corner_id._id_like("CONF-2026"))
 
+    def test_document_group_and_page_labels_are_not_identifiers(self):
+        self.assertFalse(corner_id._id_like("FICTITIOUS TRAINING MATERIAL | GROUP 025 | PAGE 1"))
+        self.assertFalse(corner_id._id_like("INTERNAL SAMPLE 025/01"))
+
+    def test_short_identifier_inside_table_is_body_content(self):
+        import cv2
+        image = np.full((400, 500), 255, np.uint8)
+        for y in (40, 80, 120):
+            cv2.line(image, (20, y), (450, y), 190, 1)
+        for x in (20, 230, 450):
+            cv2.line(image, (x, 40), (x, 120), 190, 1)
+        box = np.array([[30, 50], [95, 50], [95, 70], [30, 70]], np.float32)
+        self.assertTrue(corner_id._inside_table(image, box, 255))
+        image[:, 230] = 255
+        self.assertFalse(corner_id._inside_table(image, box, 255))
+
 
 class RecognitionVacuousTests(unittest.TestCase):
     def test_recognition_passes_when_region_has_no_body_text(self):

@@ -33,7 +33,7 @@ pip install -r requirements.lock
 python -c "import numpy, cv2, skimage, fitz, PySide6, PIL; print('依赖 OK')"
 python -c "from wm.lama import is_available; print('LaMa:', '可用' if is_available() else '缺失，修复将报错（放入 models/ 目录）')"
 python -c "from wm import ocr; print('OCR:', '可用' if ocr.available() else '未装，检测走保守阈值')"
-python -m wm.cli synth --out data/syn     # 生成带真值语料，约 30 页 / 1 分钟
+python -m wm.cli synth --out out/generated_fixtures/synthetic     # 生成带真值语料，约 30 页 / 1 分钟
 python -m wm.cli fixtures                 # 打成测试用 PDF（光栅页 + 结构水印页）
 python -m wm.cli eval                     # 跑四条件评测，出成功率表
 ```

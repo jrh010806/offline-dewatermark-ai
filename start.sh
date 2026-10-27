@@ -3,18 +3,16 @@
 # 用法：
 #   ./start.sh              等价于 ./start.sh test
 #   ./start.sh setup        只装环境（磁盘预检 + venv + 依赖 + LaMa 模型 + 字体检查）
-#   ./start.sh test         全量自动化测试（real_samples + watermark_samples + 单测）+ 生成报告
+#   ./start.sh test         固定最小回归集（核心 + 真实扩展）+ 生成新结果报告
+#   ./start.sh check-data   校验固定回归集，不运行模型
 #   ./start.sh gui [文件]   启动桌面前端
-#   ./start.sh eval         合成集四条件评测（环境自证基准）
-#   ./start.sh report       只重新生成测试报告（基于已有 out/audit 结果）
+#   ./start.sh eval         仅跑固定核心回归集
+#   ./start.sh report       显示最近一次最小回归报告路径
 set -euo pipefail
 cd "$(dirname "$0")"
 
 PY="${PYTHON:-}"
 VENV=.venv
-REAL_ROOT="${REAL_ROOT:-../real_samples}"
-WM_ROOT="${WM_ROOT:-../watermark_samples}"
-OUT="${OUT:-out/audit}"
 MIN_FREE_GB=5
 
 say()  { printf '\033[1;34m[start]\033[0m %s\n' "$*"; }
@@ -133,24 +131,23 @@ cmd_setup() {
 }
 
 cmd_eval() {
-    say "生成合成语料并跑四条件评测（约数分钟）"
-    "$VENV/bin/python" -m wm.cli synth --out data/syn --docs 5 --pages 6
-    "$VENV/bin/python" -m wm.cli fixtures --data data/syn --out data/pdf
-    HF_HUB_OFFLINE=1 "$VENV/bin/python" -m wm.cli eval --data data/syn
+    say "固定核心回归：36 个输入文件 / 48 张或页"
+    HF_HUB_OFFLINE=1 "$VENV/bin/python" tools/run_min_regression.py --suite core
 }
 
 cmd_test() {
-    say "全量自动化测试：real=$(REAL_ROOT) wm=$(WM_ROOT) out=$(OUT)"
-    [ -d "$REAL_ROOT" ] || die "示例目录不存在：${REAL_ROOT}（可用 REAL_ROOT=... 指定）"
-    [ -d "$WM_ROOT" ]   || die "示例目录不存在：${WM_ROOT}（可用 WM_ROOT=... 指定）"
-    HF_HUB_OFFLINE=1 "$VENV/bin/python" tools/run_full_audit.py all \
-        --real-root "$REAL_ROOT" --wm-root "$WM_ROOT" --out "$OUT"
-    say "测试完成，报告：$OUT/测试报告.md"
+    say "固定完整回归：核心 36 + 真实扩展 10 个输入文件"
+    HF_HUB_OFFLINE=1 "$VENV/bin/python" tools/run_min_regression.py --suite all
 }
 
 cmd_report() {
-    HF_HUB_OFFLINE=1 "$VENV/bin/python" tools/run_full_audit.py report \
-        --real-root "$REAL_ROOT" --wm-root "$WM_ROOT" --out "$OUT"
+    "$VENV/bin/python" - <<'EOF'
+from pathlib import Path
+reports=sorted(Path('out/min_regression').glob('*/report.html'))
+if not reports:
+    raise SystemExit('尚无固定最小回归结果；请先执行 ./start.sh test 或 ./start.sh eval。')
+print(reports[-1].resolve())
+EOF
 }
 
 cmd_gui() {
@@ -165,8 +162,9 @@ main() {
         eval)   cmd_setup; cmd_eval ;;
         test)   cmd_setup; cmd_test ;;
         report) cmd_report ;;
+        check-data) "$VENV/bin/python" tools/run_min_regression.py --validate-only ;;
         gui)    cmd_setup; cmd_gui "$@" ;;
-        *) die "未知子命令：${sub}（可用：setup/eval/test/report/gui）" ;;
+        *) die "未知子命令：${sub}（可用：setup/check-data/eval/test/report/gui）" ;;
     esac
 }
 main "$@"

@@ -88,6 +88,10 @@ def _load_session() -> ort.InferenceSession:
     # The exported graph carries unused initializers; ORT drops them with a
     # warning per node — harmless noise, the repair path logs its own summary.
     opts.log_severity_level = 3
+    # Large host-wide default thread pools slow these 512px FFT tiles and can
+    # starve the UI/OCR. Keep a small, configurable CPU pool.
+    opts.intra_op_num_threads = max(1, int(os.environ.get("WM_ORT_THREADS", "4")))
+    opts.inter_op_num_threads = 1
     try:
         _sess = ort.InferenceSession(path, sess_options=opts,
                                      providers=_providers())
@@ -294,6 +298,23 @@ def repair_with_lama(img: np.ndarray, mask, thr) -> tuple[np.ndarray, list[Repai
     if mask.repair_mode == 'paper_repeat_cleanup':
         from .paper_repeat import restore
         return restore(img, mask), [RepairName.PAPER_CLEANUP]
+
+    if mask.repair_mode == 'thin_photo_text':
+        region = mask.footprint
+        distance = cv2.distanceTransform(region.astype(np.uint8), cv2.DIST_L2, 3)
+        if np.percentile(distance[region], 95) <= 4:
+            # Thin confirmed strokes have nearby source observations on both
+            # sides. Local interpolation avoids inventing texture in a broad
+            # model tile, while larger glyphs retain the neural repair path.
+            target = region
+            if thr.lama_mask_dilate > 0:
+                k = 2*int(thr.lama_mask_dilate)+1
+                target = cv2.dilate(region.astype(np.uint8), cv2.getStructuringElement(
+                    cv2.MORPH_ELLIPSE, (k, k))) > 0
+            out = cv2.inpaint(img, target.astype(np.uint8)*255, 3, cv2.INPAINT_TELEA)
+            out[~target] = img[~target]
+            return out, [RepairName.INPAINT]
+        return inpaint(img, region, thr), [RepairName.LAMA]
 
     if mask.repair_mode == 'periodic_paper_overlay':
         out = _alpha_unmix(img, mask)

@@ -19,12 +19,37 @@ _WORD = re.compile(r"[A-Za-z]")
 
 
 def _id_like(text: str) -> bool:
-    t = text.strip().replace(" ", "")
+    # OCR may return a whole header/footer line as one span. A group/page label
+    # can look alphanumeric after whitespace is removed, but it is document
+    # content rather than a short corner identifier.
+    t = re.sub(r"\s+", "", text.strip())
+    upper = t.upper()
+    if any(label in upper for label in (
+        "INTERNAL", "SAMPLE", "GROUP", "PAGE", "TRAINING", "MATERIAL", "FICTITIOUS",
+    )):
+        return False
     if len(t) < 5 or not _ID.match(t):
         return False
     # Page numbers and pure words are not identifiers.
     has_digit = any(c.isdigit() for c in t)
     return has_digit and bool(_WORD.search(t))
+
+
+def _inside_table(gray, box, paper):
+    """A short cell label is body content even when it looks like an ID."""
+    height, _, _ = ocr._geometry(box)
+    cx, cy = np.round(box.mean(0)).astype(int)
+    radius = max(24, int(height*16))
+    x0, y0 = max(0, cx-radius), max(0, cy-radius)
+    x1, y1 = min(gray.shape[1], cx+radius), min(gray.shape[0], cy+radius)
+    ink = (gray[y0:y1, x0:x1] < paper-12).astype(np.uint8)
+    length = max(20, int(height*3))
+    horizontal = cv2.morphologyEx(ink, cv2.MORPH_OPEN, np.ones((1, length), np.uint8))
+    vertical = cv2.morphologyEx(ink, cv2.MORPH_OPEN, np.ones((length, 1), np.uint8))
+    x, y = cx-x0, cy-y0
+    # Require all four cell boundaries; a lone footer rule is not a table.
+    return (horizontal[:y, x].any() and horizontal[y+1:, x].any()
+            and vertical[y, :x].any() and vertical[y, x+1:].any())
 
 
 def estimate(img: np.ndarray) -> MaskLayer | None:
@@ -46,6 +71,8 @@ def estimate(img: np.ndarray) -> MaskLayer | None:
             box = box / 2.0
             height, length, tilt = ocr._geometry(box)
             if height > 90 or tilt > 25:
+                continue
+            if _inside_table(gray, box + [x0, y0], paper):
                 continue
             bx0 = int(max(0, box[:, 0].min() - 3))
             bx1 = int(min(cw, box[:, 0].max() + 3))

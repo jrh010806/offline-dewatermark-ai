@@ -2,32 +2,39 @@
 
 离线工作站本地部署的可视化文档去水印原型：PDF / JPG 单张与批量处理，复杂样式（字母、数字、点状图案）。
 
+## 拿到代码后先看这里
+
+代码、当前报告和报告引用的测试结果通过 Git 提供；数据与模型通过两个 ZIP 单独提供。
+请先按 [数据与模型放置说明](资源放置说明.md) 解压，再运行下面的命令。
+只查看报告不需要模型；查看全部原尺寸样本还需要解压数据包。
+项目当前状态见 [项目现状与后续开发说明](docs/项目现状与后续开发说明.html)，全部样本见 [水印分类样本与最新测试](docs/水印分类样本与最新测试.html)。HTML 请下载或拉取后用浏览器打开。
+
 ## 快速开始
 
 ```bash
-python -m venv .venv
-# Linux/macOS: source .venv/bin/activate    Windows: .venv\Scripts\activate
-./.venv/bin/pip install -r requirements.lock   # Windows: .venv\Scripts\pip
+# 首次环境准备
+./start.sh setup
 
-# 生成带真值的合成样本集（手上没有真实样本，这是唯一可自证的基准）
-# 需中文字体：找不到时直接报错，不设 WM_FONTS_DIR 时本机 macOS 会失败，见 MIGRATION.md §3
-python -m wm.cli synth --out data/syn --docs 5 --pages 6
+# 检查固定数据，不运行模型
+./start.sh check-data
 
-# 把合成集打成两种 PDF 形态：压平光栅页（引擎B）与独立透明水印图层（引擎A）
-python -m wm.cli fixtures --data data/syn --out data/pdf
+# 每轮固定回归：核心36个输入 + 真实扩展10个输入
+./start.sh test
 
-# 四条件协议评测（掩码质量 / 保真 / 残膜 / OCR 一致性 / 时限）
-python -m wm.cli eval --data data/syn
+# 仅跑核心36个输入
+./start.sh eval
 
-# 不依赖中文字体的端到端自测（5 种样式，纯 OpenCV 渲染，随时可跑）
-python -m wm.e2e_test --out out/e2e_ort
-
-# 处理一个文件或图片
-python -m wm.cli run data/pdf/doc00_tiled_text/raster_flattened.pdf --out out/run
-
-# 打开桌面前端
-python -m wm.app data/pdf/doc00_tiled_text/raster_flattened.pdf
+# 打开当前样本或最近一轮报告
+./start.sh gui data/watermark_regression_min_v1/inputs/core/core_001.png
+./start.sh report
 ```
+
+当前只管理 3 套：`watermark_training_v1`、`watermark_training_increment_v1_1`、`watermark_regression_min_v1`。
+旧 `real_samples`、`syn`、公开40对样本及配套格式已退役，旧诊断脚本直接执行时会提示改用固定回归入口。
+`./start.sh test` 是数据回归；工程单元测试另跑 `QT_QPA_PLATFORM=offscreen .venv/bin/python -m unittest discover -s tests`。
+需要临时合成夹具时，`wm.cli synth/fixtures` 默认写到 `out/generated_fixtures/`，不再重建退役目录。
+历史研发数字与方案留在下文和 `out/`，不能代替当前回归成绩。
+
 
 ## 代码地图
 
@@ -55,7 +62,7 @@ python -m wm.app data/pdf/doc00_tiled_text/raster_flattened.pdf
 
 两条保护性规则来自实测：半透明叠加只有当同一窗口内还存在未覆盖纸面时才"可验证"（照片渐变色块与水印一样逐页不变，但没有纸面锚点）；真实墨旁的像素优先归给文字而不是水印（83–91% 的假阳性落在墨笔画 3–5 px 内）。
 
-## 当前状态（2026-10-21）
+## 历史状态（2026-10-21，旧数据已退役）
 
 - 经典通道（纯 CPU）端到端打通；合成集掩码精确率 dot_grid 0.97 / tiled_text 0.90，整页 PSNR 33–41（Windows 机实测）。
 - 学习式重建（原"唯一硬缺口"WM-402）**已接入**：LaMa ONNX 走 onnxruntime，不需要 torch，CPU 即可跑，`WM_LAMA_CUDA=1` 预留 GPU 开关；5 样式端到端单页 13.3–29.4 秒（`out/e2e_ort/results.json`）。

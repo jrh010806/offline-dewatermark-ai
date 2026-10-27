@@ -1,0 +1,9 @@
+{
+  "device": "mps",
+  "model_sha256": "3436862ba63e4678f52e63b453b2adde15d22542f433942fc71b74f6d3cc5948",
+  "source": "https://github.com/bcmi/SLBR-Visible-Watermark-Removal",
+  "commit": "47c665f1855ab6624cd52b28cefa797a9c8b96f7",
+  "split": "validation",
+  "composition": "background*probability+source*(1-probability); no threshold",
+  "production_enabled": false
+}

@@ -1,0 +1,28 @@
+{
+  "image_original": {
+    "before": 0,
+    "after": 0,
+    "total": 22
+  },
+  "image_extra": {
+    "before": 1,
+    "after": 3,
+    "total": 20
+  },
+  "pdf_original": {
+    "before": 6,
+    "after": 10,
+    "total": 22
+  },
+  "pdf_extra": {
+    "before": 0,
+    "after": 4,
+    "total": 4
+  },
+  "clean": {
+    "before": 10,
+    "after": 20,
+    "total": 20
+  },
+  "unit_tests": 74
+}

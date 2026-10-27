@@ -118,7 +118,7 @@ def main(argv: list[str] | None = None) -> None:
     sub = parser.add_subparsers(dest="cmd", required=True)
 
     p = sub.add_parser("synth", help="生成带真值的合成样本集")
-    p.add_argument("--out", default="data/syn")
+    p.add_argument("--out", default="out/generated_fixtures/synthetic")
     p.add_argument("--docs", type=int, default=5)
     p.add_argument("--pages", type=int, default=6)
     p.add_argument("--dpi", type=int, default=200)
@@ -127,13 +127,13 @@ def main(argv: list[str] | None = None) -> None:
     p.set_defaults(fn=cmd_synth)
 
     p = sub.add_parser("eval", help="在合成集上按四条件协议统计成功率")
-    p.add_argument("--data", default="data/syn")
+    p.add_argument("--data", default="out/generated_fixtures/synthetic")
     p.add_argument("--dpi", type=int, default=200)
     p.set_defaults(fn=cmd_eval)
 
     p = sub.add_parser("fixtures", help="把合成集打成光栅 PDF 与结构水印 PDF")
-    p.add_argument("--data", default="data/syn")
-    p.add_argument("--out", default="data/pdf")
+    p.add_argument("--data", default="out/generated_fixtures/synthetic")
+    p.add_argument("--out", default="out/generated_fixtures/pdf")
     p.set_defaults(fn=cmd_fixtures)
 
     p = sub.add_parser("run", help="处理一个 PDF 或图片")

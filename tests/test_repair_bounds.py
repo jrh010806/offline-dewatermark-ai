@@ -7,6 +7,19 @@ from wm.contract import Thresholds
 
 
 class RepairBoundsTests(unittest.TestCase):
+    def test_selected_pixels_on_all_four_image_edges_are_actually_repaired(self):
+        for shape in [(335, 596), (650, 730), (958, 1276)]:
+            with self.subTest(shape=shape):
+                image = np.full((*shape, 3), 80, np.uint8)
+                region = np.zeros(shape, bool)
+                region[[0, -1], :] = True
+                region[:, [0, -1]] = True
+                with patch('wm.lama._load_session', return_value=object()), \
+                     patch('wm.lama._run_tile', side_effect=lambda s, i, m: np.full_like(i, 230)):
+                    output = lama.inpaint(image, region)
+                self.assertTrue((output[region] > 220).all())
+                np.testing.assert_array_equal(output[~region], image[~region])
+
     def test_context_never_reaches_output_across_native_and_padded_tiles(self):
         rng = np.random.default_rng(19)
         for shape in [(80,130),(335,596),(650,730)]:

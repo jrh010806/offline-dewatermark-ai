@@ -343,6 +343,19 @@ def estimate_single_page(img: np.ndarray, thr: Thresholds = Thresholds(),
                          keepout: np.ndarray | None = None,
                          use_ocr: bool = True,
                          style: str | None = None) -> MaskLayer:
+    mask = _estimate_single_page(img, thr, close_px, keepout, use_ocr, style)
+    if thr.watermark_recall_priority:
+        from . import recall
+        mask = recall.expand(img, mask, thr, use_ocr=use_ocr, style=style)
+        mask.instances = _instances(mask.alpha, thr)
+    return mask
+
+
+def _estimate_single_page(img: np.ndarray, thr: Thresholds = Thresholds(),
+                         close_px: int = 11,
+                         keepout: np.ndarray | None = None,
+                         use_ocr: bool = True,
+                         style: str | None = None) -> MaskLayer:
     """Hybrid detection: tonal spike for light veils + scale filter for stamp watermarks.
 
     ``keepout`` is the OCR body-text zone (see wm.ocr). Where it exists the scale
@@ -359,6 +372,7 @@ def estimate_single_page(img: np.ndarray, thr: Thresholds = Thresholds(),
     from . import periodic, paper_grid
     from .styles import STYLE_CHANNELS
     channels = STYLE_CHANNELS.get(style, ()) if style else None
+    photo_fallback = None
 
     def wanted(name: str) -> bool:
         return channels is None or name in channels
@@ -388,6 +402,30 @@ def estimate_single_page(img: np.ndarray, thr: Thresholds = Thresholds(),
         if located is not None:
             located.instances = _instances(located.alpha, thr)
             return located
+    if use_ocr and (channels is None or any(c in channels for c in ("repeated", "document_overlay", "chromatic"))):
+        from . import observed_text, ocr
+        observations = ocr.read_lines(img) or []
+        located = None
+        if paper_background_fraction(img) < .65 and wanted("repeated"):
+            located = observed_text.repeated_photo(img, observations)
+        if located is None and (wanted("document_overlay") or wanted("chromatic")):
+            located = observed_text.shadow_paper(img, observations)
+        if located is not None:
+            located.instances = _instances(located.alpha, thr)
+            return located
+    if use_ocr and paper_background_fraction(img) < .65 and (channels is None or
+            any(c in channels for c in ("corner_id", "chromatic", "repeated"))):
+        # Prefer the verified repeated strokes above before trying broader
+        # whole-row reconstruction. Keep enhanced local text as a fallback.
+        from . import photo_observations, ocr
+        lines = photo_observations.observations(img, ocr.read_lines(img) or [])
+        located = photo_observations.repeated_lines(img, lines) if wanted("repeated") else None
+        if located is None and (wanted("corner_id") or wanted("chromatic")):
+            located = photo_observations.local_lines(img, lines,
+                allow_corner=wanted("corner_id"), allow_center=wanted("chromatic"))
+        if located is not None:
+            located.instances = _instances(located.alpha, thr)
+            return located
     if use_ocr and (channels is None or any(c in channels for c in ("corner_id", "repeated", "chromatic"))):
         if paper_background_fraction(img) < .65:
             from . import photo_text
@@ -396,14 +434,32 @@ def estimate_single_page(img: np.ndarray, thr: Thresholds = Thresholds(),
                 allow_oblique=channels is None or any(c in channels for c in ("repeated", "chromatic")),
                 require_repeat=channels is not None and "repeated" in channels and "chromatic" not in channels)
             if located is not None:
-                located.instances = _instances(located.alpha, thr)
-                return located
+                if located.repair_mode == "thin_photo_text" and wanted("repeated"):
+                    # A few verified strokes do not establish that a tiled
+                    # watermark is complete. Give repeat matching a chance.
+                    photo_fallback = located
+                else:
+                    located.instances = _instances(located.alpha, thr)
+                    return located
     if use_ocr and (channels is None or any(c in channels for c in
                                             ("repeated", "paper_repeat", "document_overlay", "chromatic"))):
         from . import repeated, ocr, paper_repeat
         located = None
         if wanted("repeated"):
             located = repeated.estimate(img)
+            if photo_fallback is not None:
+                local_region = photo_fallback.binary(thr.mask_alpha_min) > 0
+                repeat_region = (located.binary(thr.mask_alpha_min) > 0
+                                 if located is not None else np.zeros_like(local_region))
+                # Prefer a broader independent detection only when it agrees
+                # with the already verified strokes. Do not union unrelated
+                # masks or replace a good local result with a weaker one.
+                agrees = (repeat_region[local_region].mean()
+                          if local_region.any() else 0.)
+                if agrees < .65 or repeat_region.sum() <= local_region.sum():
+                    located = photo_fallback
+                located.instances = _instances(located.alpha, thr)
+                return located
             if located is not None and located.repair_mode == 'document_overlay':
                 located.instances = _instances(located.alpha, thr)
                 return located
@@ -429,6 +485,16 @@ def estimate_single_page(img: np.ndarray, thr: Thresholds = Thresholds(),
                 return located
         if keepout is None:
             keepout = ocr.text_zones(img)
+    if use_ocr and (channels is None or any(c in channels for c in
+                    ("dark_text", "repeated", "paper_repeat", "chromatic"))):
+        from . import contrast_text
+        located = contrast_text.estimate(
+            img, allow_dark=wanted("dark_text"),
+            allow_bright=wanted("paper_repeat") or wanted("repeated"),
+            allow_photo=wanted("chromatic") or wanted("repeated"))
+        if located is not None:
+            located.instances = _instances(located.alpha, thr)
+            return located
     if channels:
         # A locked style that produced no evidence must not silently fall back
         # to generic repainting; report no detection for this style instead.
@@ -552,7 +618,7 @@ def with_prior(single: MaskLayer, prior: MaskLayer | None,
     In particular, repeated table text or unrelated photo backgrounds must not
     overrule a more specific per-image localization.
     """
-    if prior is None or single.method.startswith(('repeated_', 'single_', 'paper_repeat_', 'photo_')):
+    if prior is None or single.method.startswith(('repeated_', 'single_', 'paper_repeat_', 'photo_', 'contrast_', 'recall_')):
         return single
     a, b = single.binary(thr.mask_alpha_min)>0, prior.binary(thr.mask_alpha_min)>0
     if a.shape != b.shape or prior.confidence < .12:
@@ -645,16 +711,16 @@ def residual_background_fraction(img: np.ndarray, mask: MaskLayer,
     background as residue (measured null floor 0.018, larger than the value it
     was meant to catch)."""
     if mask.paper is None or mask.veil_offset is None or mask.veil_strength is None:
-        return 0.0
+        return float('nan')
     pole = mask.veil_strength * mask.paper + mask.veil_offset
     gray = img.astype(np.float32).mean(2)
     P = float(np.median(mask.paper))
     gap = P - float(np.mean(pole))
     if gap < 4.0:
-        return 0.0
+        return float('nan')
     flat = flat_background(img, mask.paper)
     if not flat.any():
-        return 0.0
+        return float('nan')
     dev = np.abs(img.astype(np.float32) - pole).mean(2)
     return float((dev[flat] < min(tol, 0.4 * gap)).mean())
 

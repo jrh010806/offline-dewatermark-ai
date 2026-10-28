@@ -53,7 +53,7 @@ def _repeat_locations(image, candidates):
     return result
 
 
-def _fit(image, background, region):
+def _fit(image, background, region, *, min_strength=.22):
     core = cv2.erode(region.astype(np.uint8), np.ones((3, 3), np.uint8)) > 0
     if core.sum() < 25:
         return None
@@ -68,7 +68,7 @@ def _fit(image, background, region):
         offset = np.median(y-s*x, axis=0)
         errors = np.abs(y-(s*x+offset)).mean(1)
         keep = errors <= max(2., np.percentile(errors, 75))
-    if not .22 < s < .90 or np.any(offset < -3) or np.any(offset > 255*(1-s)+3):
+    if not min_strength < s < .90 or np.any(offset < -3) or np.any(offset > 255*(1-s)+3):
         return None
     signal = np.abs(y-x).mean(1)
     if np.median(errors) > 3.5 or np.mean(errors < .35*np.maximum(signal, 4)) < .7:
@@ -136,6 +136,7 @@ def estimate(image, *, allow_corner=True, allow_oblique=True, require_repeat=Fal
                 if not any(np.linalg.norm(mapped.mean(0)-b.mean(0)) < 10 for b, _, _ in lines):
                     lines.append((mapped, text, confidence))
     candidates = []
+    local_domains = []
     for box, text, confidence in lines:
         height, length, tilt = ocr._geometry(box)
         if confidence < .65 or len(text.strip()) < 4 or length < height*2.5:
@@ -149,6 +150,16 @@ def estimate(image, *, allow_corner=True, allow_oblique=True, require_repeat=Fal
         located = _strokes(image, box)
         if located is not None:
             candidates.append((*located, text))
+            if corner and tilt < 8 and height < .065*min(h,w):
+                # The fitted translucent corner line is already confirmed.
+                # At a scene edge its stroke contrast can change sign, leaving
+                # holes in the narrow mask. Give the inpainter the bounded OCR
+                # line plus a small fringe so retained source letters cannot
+                # leak back into that repair.
+                domain=np.zeros((h,w),np.uint8)
+                cv2.fillConvexPoly(domain,np.rint(box).astype(np.int32),1)
+                domain=cv2.dilate(domain,np.ones((7,7),np.uint8))>0
+                local_domains.append(domain)
     if not candidates:
         return None
     region = np.logical_or.reduce([x[0] for x in candidates])
@@ -159,6 +170,13 @@ def estimate(image, *, allow_corner=True, allow_oblique=True, require_repeat=Fal
         region |= repeated
     if region.mean() > .12:
         return None
+    if local_domains and not require_repeat:
+        region |= np.logical_or.reduce(local_domains)
+        if region.mean() < .035:
+            return MaskLayer(region.astype(np.float32),source=MaskSource.PRIOR,
+                footprint=region,confidence=.75,repair_mode='inpaint',
+                veil_strength=np.ones(3,np.float32),veil_offset=np.zeros(3,np.float32),
+                method='photo_confirmed_corner_line')
     # Separate lines can have different colours/opacity. Use only the measured
     # location for LaMa; do not impose one guessed inverse on all of them.
     return MaskLayer(region.astype(np.float32), source=MaskSource.PRIOR,

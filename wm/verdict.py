@@ -70,9 +70,10 @@ def build_verdict(
         residual_cov = mask_mod.residual_background_fraction(output, mask)
         metrics["residual_basis"] = 0.0
     metrics["residual_coverage"] = residual_cov
-    conditions["residual"] = bool(residual_cov <= thr.residual_coverage_max)
-    if not conditions["residual"]:
-        failures.append(FailureCode.RESIDUAL_WATERMARK)
+    if np.isfinite(residual_cov):
+        conditions["residual"] = bool(residual_cov <= thr.residual_coverage_max)
+        if not conditions["residual"]:
+            failures.append(FailureCode.RESIDUAL_WATERMARK)
 
     if alpha_reference is not None:
         metrics["mask_iou"] = mask_mod.mask_iou(mask.alpha, alpha_reference, thr.mask_alpha_min)

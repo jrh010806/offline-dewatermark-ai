@@ -13,6 +13,17 @@ from .contract import MaskLayer, MaskSource
 
 
 def estimate(img: np.ndarray, keepout: np.ndarray | None = None) -> MaskLayer | None:
+    # Keep existing successful fits unchanged. Faint coloured stamps need a
+    # second candidate band: their covered paper can be brighter than 88% of
+    # white, and their transmittance can exceed 85%.
+    located = _estimate_overlay(img, keepout, allow_faint=False)
+    if located is not None:
+        return located
+    return _estimate_overlay(img, keepout, allow_faint=True)
+
+
+def _estimate_overlay(img: np.ndarray, keepout: np.ndarray | None,
+                      *, allow_faint: bool) -> MaskLayer | None:
     pixels = img.astype(np.float32)
     gray = pixels.mean(2)
     paper_rgb = np.percentile(pixels.reshape(-1, 3), 97, axis=0).astype(np.float32)
@@ -23,7 +34,11 @@ def estimate(img: np.ndarray, keepout: np.ndarray | None = None) -> MaskLayer | 
     # neutral. A neutral watermark cannot be identified by this chromatic path.
     chroma = pixels-gray[:, :, None]-(paper_rgb-paper)
     energy = np.linalg.norm(chroma, axis=2)
-    eligible = (energy > 3) & (gray > .35*paper) & (gray < .88*paper)
+    # The faint pass still needs a measurable paper deficit and colour signal.
+    # The geometry, covered-ink evidence and physical colour bounds below apply
+    # to both passes; near-white noise alone must not authorize a repair.
+    upper = paper-8 if allow_faint else .88*paper
+    eligible = (energy > 3) & (gray > .35*paper) & (gray < upper)
     if eligible.sum() < 100:
         return None
     bins = np.arange(0, 258, 2)
@@ -75,7 +90,9 @@ def estimate(img: np.ndarray, keepout: np.ndarray | None = None) -> MaskLayer | 
         return None
     covered_ink = float(np.percentile(ink, 10))
     transmittance = (covered-covered_ink)/paper
-    if not .15 < transmittance < .85:
+    # Higher transmittance makes inversion better conditioned, not worse. The
+    # following per-channel bounds still reject an impossible compositing fit.
+    if not .15 < transmittance < (.97 if allow_faint else .85):
         return None
     offset = covered_rgb-transmittance*paper_rgb
     if np.any(offset < 0) or np.any(offset > 255*(1-transmittance)):

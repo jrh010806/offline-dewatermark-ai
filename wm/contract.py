@@ -85,6 +85,8 @@ class Thresholds:
     lama_context_margin: int = 256   # px of clean page the model gets as context
     lama_tile_overlap: int = 64      # px of feathered blend between 512 tiles
     lama_mask_dilate: int = 0        # px to widen the repaint region before inpaint
+    watermark_recall_priority: bool = False  # source-supported strokes, including text intersections
+    experimental_colour_refinement: bool = False  # opt-in; no independent holdout claim
 
 
 @dataclass
@@ -140,6 +142,8 @@ class MaskLayer:
     repair_mode: str = "hybrid"
     method: str = "tonal"
     text_keepout: np.ndarray | None = None
+    # Measured physical opacity, separate from selectable stroke coverage.
+    overlay_opacity: np.ndarray | None = None
 
     def binary(self, threshold: float = Thresholds.mask_alpha_min) -> np.ndarray:
         return (self.alpha >= threshold).astype(np.uint8) * 255
@@ -178,10 +182,8 @@ class VerdictReport:
 
     @property
     def review_needed(self) -> bool:
-        """A page whose recognition condition was never measured must not be
-        counted as a success: without ground truth the 60% figure would be made
-        of the three conditions we can check locally."""
-        return "recognition" not in self.conditions
+        """Unmeasured recognition or residual quality cannot count as success."""
+        return "recognition" not in self.conditions or "residual" not in self.conditions
 
     def to_dict(self) -> dict[str, Any]:
         return {

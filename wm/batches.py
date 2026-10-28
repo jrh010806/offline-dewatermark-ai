@@ -1,7 +1,7 @@
 """Session batches and a cooperative, page-by-page desktop queue."""
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from threading import Condition
 from time import perf_counter
 from uuid import uuid4
@@ -21,6 +21,7 @@ class Batch:
     params: dict[str, int] = field(default_factory=dict)
     use_ocr: bool = True
     style: str | None = None
+    recall_priority: bool = True
     results: dict[int, PageResult] = field(default_factory=dict)
     errors: dict[int, str] = field(default_factory=dict)
     states: dict[int, str] = field(default_factory=dict)
@@ -109,7 +110,9 @@ class BatchWorker(QThread):
                     elif not self._checkpoint():
                         return
                     if isinstance(result, PageResult):
-                        result.processing.update(mask_close_px=close_px, ocr_enabled=use_ocr)
+                        result.processing.update(mask_close_px=close_px, ocr_enabled=use_ocr,
+                                                 watermark_style=style,
+                                                 thresholds=asdict(thr))
                     payload = dict(result=result, error=None)
                 except Exception as exc:
                     payload = dict(result=None, error=str(exc))

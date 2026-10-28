@@ -105,7 +105,11 @@ def cmd_run(args: argparse.Namespace) -> None:
             raise SystemExit(f"无法识别的水印样式提示词：{args.style!r}；"
                              "可用：dot_grid/tiled_text/big_center/heavy_dark/corner_id 或中英文描述")
         print("样式提示词解析:", translate_prompt(args.style))
-    results = pipeline.process_file(args.input, dpi=args.dpi, skip_structure=args.force_raster,
+    experimental = getattr(args, 'experimental_colour_refinement', False)
+    results = pipeline.process_file(args.input,
+                                   thr=Thresholds(watermark_recall_priority=args.recall_priority or experimental,
+                                                  experimental_colour_refinement=experimental),
+                                   dpi=args.dpi, skip_structure=args.force_raster,
                                     style=style)
     out = pipeline.write_results(results, args.out, source_path=args.input)
     for r in results:
@@ -141,6 +145,10 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--out", default="out")
     p.add_argument("--dpi", type=int, default=200)
     p.add_argument("--force-raster", action="store_true")
+    p.add_argument("--recall-priority", action="store_true",
+                   help="按颜色与重复字形补全水印笔画，允许处理与正文交叠的水印")
+    p.add_argument("--experimental-colour-refinement", action="store_true",
+                   help="实验：细化明亮文档上的彩色笔画；未完成独立泛化验证，默认关闭")
     p.add_argument("--style", default=None,
                    help="指定水印样式（代码或中英文提示词），如 tiled_text / 平铺文字 / dot grid")
     p.set_defaults(fn=cmd_run)

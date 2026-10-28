@@ -1,9 +1,41 @@
 import unittest
+from contextlib import ExitStack
 from unittest.mock import patch
 import cv2
 import numpy as np
 from wm import masks,repeated
 from wm.contract import MaskLayer,Thresholds
+
+
+class PartialPhotoRoutingTests(unittest.TestCase):
+    def test_partial_strokes_do_not_hide_a_complete_agreeing_repeat_mask(self):
+        image = np.full((160, 220, 3), 90, np.uint8)
+        local = np.zeros(image.shape[:2], np.float32)
+        local[30:35, 20:80] = 1
+        for alternative in ('complete', 'unrelated', 'absent', 'smaller'):
+            with self.subTest(alternative=alternative), ExitStack() as stack:
+                partial = MaskLayer(local.copy(), footprint=local > 0,
+                                    repair_mode='thin_photo_text', method='photo_translucent_text')
+                full = local.copy()
+                full[80:85, 40:130] = 1
+                if alternative == 'unrelated':
+                    full[:50] = 0
+                if alternative == 'smaller':
+                    full[80:] = 0
+                    full[:, 60:] = 0
+                repeated = None if alternative == 'absent' else MaskLayer(
+                    full, footprint=full > 0, repair_mode='inpaint', method='repeated_oblique_text')
+                for name in ('paper_grid.estimate', 'periodic.estimate', 'corner_id.estimate',
+                             'observed_text.repeated_photo', 'observed_text.shadow_paper',
+                             'photo_observations.repeated_lines', 'photo_observations.local_lines'):
+                    stack.enter_context(patch('wm.' + name, return_value=None))
+                stack.enter_context(patch('wm.masks.paper_background_fraction', return_value=0.))
+                stack.enter_context(patch('wm.ocr.read_lines', return_value=[]))
+                stack.enter_context(patch('wm.photo_text.estimate', return_value=partial))
+                repeat_call = stack.enter_context(patch('wm.repeated.estimate', return_value=repeated))
+                selected = masks.estimate_single_page(image, style='tiled_text')
+                self.assertIs(selected, repeated if alternative == 'complete' else partial)
+                repeat_call.assert_called_once()
 
 
 class PriorTests(unittest.TestCase):

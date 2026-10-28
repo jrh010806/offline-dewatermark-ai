@@ -11,7 +11,7 @@ from pathlib import Path
 
 import numpy as np
 
-from . import documents, masks, ocr, repair, structure, verdict as verdict_mod
+from . import documents, export_review, masks, ocr, repair, structure, verdict as verdict_mod
 from .contract import (EngineKind, MaskLayer, PageImage, PageResult, Thresholds)
 
 GroundTruth = dict[str, tuple[np.ndarray, np.ndarray, tuple[np.ndarray, np.ndarray]]]
@@ -35,7 +35,8 @@ def extract_watermark(mask: MaskLayer) -> np.ndarray:
     color = np.clip(mask.veil_offset / np.maximum(1.0 - s, 1e-3), 0, 255)
     rgba = np.empty((*mask.alpha.shape, 4), np.uint8)
     rgba[..., :3] = color.reshape(1, 1, 3).astype(np.uint8)
-    rgba[..., 3] = (mask.alpha * 255).astype(np.uint8)
+    opacity = mask.overlay_opacity if mask.overlay_opacity is not None else mask.alpha
+    rgba[..., 3] = (opacity * 255).astype(np.uint8)
     return rgba
 
 
@@ -165,7 +166,7 @@ def _run_dir(base: Path, source_name: str | None) -> Path:
 
 def write_results(results: Iterable[PageResult], base_dir: str | Path,
                   source_path: str | Path | None = None) -> Path:
-    """Save clean/watermark PNGs plus a manifest.json.
+    """Save results, source/selection evidence, a review index and manifest.
 
     When *source_path* is given, files go under ``<base_dir>/<timestamp>_<stem>/``
     so each run lands in its own folder; otherwise they drop directly into
@@ -179,12 +180,27 @@ def write_results(results: Iterable[PageResult], base_dir: str | Path,
     passed = 0
     checks_passed = 0
     review = 0
+    used_names: set[str] = set()
     for r in results:
-        name = f"{r.source.doc_id}_p{r.source.page_index:02d}"
+        stem = "".join(c if c.isalnum() or c in "-_ " else "_"
+                       for c in r.source.doc_id)[:100] or "single"
+        base_name = f"{stem}_p{r.source.page_index:02d}"
+        name = base_name
+        suffix = 2
+        while name.casefold() in used_names:
+            name = f"{base_name}_{suffix}"
+            suffix += 1
+        used_names.add(name.casefold())
         documents.save_png(out / f"{name}_clean.png", r.output.image)
+        evidence = export_review.write_selection(r, out, name)
+        evidence["files"]["clean"] = f"{name}_clean.png"
         if r.extracted_watermark is not None:
             documents.save_png(out / f"{name}_watermark.png", r.extracted_watermark)
-        pages.append(r.to_dict())
+            evidence["files"]["watermark"] = f"{name}_watermark.png"
+        page = r.to_dict()
+        page.update(evidence)
+        page["coverage"] = round(evidence["selection"]["coverage"], 5)
+        pages.append(page)
         if r.verdict.passed:
             checks_passed += 1
             if not r.verdict.review_needed:
@@ -194,6 +210,8 @@ def write_results(results: Iterable[PageResult], base_dir: str | Path,
 
     total = len(pages)
     manifest = {
+        "schema_version": 2,
+        "review_file": "水印选区与处理结果复核.html",
         "source": str(src) if src else None,
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "summary": {
@@ -209,4 +227,5 @@ def write_results(results: Iterable[PageResult], base_dir: str | Path,
     }
     (out / "manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), "utf-8")
+    export_review.write_index(out, pages)
     return out

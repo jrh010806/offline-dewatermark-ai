@@ -208,8 +208,6 @@ def _inpaint_region(sess: ort.InferenceSession, img: np.ndarray,
 
     wy = _feather_weight(S, overlap)
     wx = _feather_weight(S, overlap)
-    tile_w = np.outer(wy, wx).astype(np.float64)
-
     ys = list(range(0, max(1, h - S + 1), stride))
     if ys[-1] + S < h:
         ys.append(h - S)
@@ -221,7 +219,19 @@ def _inpaint_region(sess: ort.InferenceSession, img: np.ndarray,
         for x0 in xs:
             tile_mask = mask_u8[y0:y0 + S, x0:x0 + S]
             th, tw = tile_mask.shape[:2]
-            tile_w_crop = tile_w[:th, :tw]
+            # Feather only where another tile can contribute. At the outer
+            # image/crop boundary there is no neighbour; a zero ramp there
+            # used to copy the original watermark back into the output.
+            local_y, local_x = wy[:th].copy(), wx[:tw].copy()
+            if y0 == 0:
+                local_y[:overlap] = 1
+            if y0 + th == h and overlap:
+                local_y[-overlap:] = 1
+            if x0 == 0:
+                local_x[:overlap] = 1
+            if x0 + tw == w and overlap:
+                local_x[-overlap:] = 1
+            tile_w_crop = np.outer(local_y, local_x).astype(np.float64)
 
             if not tile_mask.any():
                 acc[y0:y0 + th, x0:x0 + tw] += img[y0:y0 + th, x0:x0 + tw].astype(np.float64) * tile_w_crop[..., None]
@@ -299,6 +309,14 @@ def repair_with_lama(img: np.ndarray, mask, thr) -> tuple[np.ndarray, list[Repai
         from .paper_repeat import restore
         return restore(img, mask), [RepairName.PAPER_CLEANUP]
 
+    if mask.repair_mode == 'bright_paper_cleanup':
+        from .contrast_text import restore_bright
+        return restore_bright(img, mask, thr), [RepairName.LAMA]
+
+    if mask.repair_mode == 'shadow_paper_cleanup':
+        from .observed_text import restore_shadow
+        return restore_shadow(img, mask), [RepairName.PAPER_CLEANUP]
+
     if mask.repair_mode == 'thin_photo_text':
         region = mask.footprint
         distance = cv2.distanceTransform(region.astype(np.uint8), cv2.DIST_L2, 3)
@@ -315,6 +333,20 @@ def repair_with_lama(img: np.ndarray, mask, thr) -> tuple[np.ndarray, list[Repai
             out[~target] = img[~target]
             return out, [RepairName.INPAINT]
         return inpaint(img, region, thr), [RepairName.LAMA]
+
+    if mask.repair_mode == 'photo_repeat_inverse':
+        if (mask.overlay_opacity is None or mask.overlay_opacity.shape != img.shape[:2]
+                or not np.isfinite(mask.overlay_opacity).all()
+                or np.any(mask.overlay_opacity < 0) or np.any(mask.overlay_opacity > .6)):
+            raise ValueError('Repeated-photo inverse requires bounded measured opacity')
+        out = _alpha_unmix(img, mask, coverage=mask.overlay_opacity)
+        out[~mask.footprint] = img[~mask.footprint]
+        return out, [RepairName.ALPHA_UNMIX]
+
+    if mask.repair_mode == 'texture_overlay':
+        out = _alpha_unmix(img, mask)
+        out[~mask.footprint] = img[~mask.footprint]
+        return out, [RepairName.ALPHA_UNMIX]
 
     if mask.repair_mode == 'periodic_paper_overlay':
         out = _alpha_unmix(img, mask)
@@ -398,6 +430,9 @@ def repair_with_lama(img: np.ndarray, mask, thr) -> tuple[np.ndarray, list[Repai
         out[rules] = np.minimum(out[rules], img[rules])
         paper_pixels = mask.footprint & ~protected
         out[paper_pixels] = np.clip(mask.paper[paper_pixels], 0, 255).astype(np.uint8)
+        # Numerical alpha can retain a faint tail outside the selected strokes.
+        # The measured inverse still needs the explicit repair permission mask.
+        out[~mask.footprint] = img[~mask.footprint]
         return out, [RepairName.ALPHA_UNMIX]
 
     if mask.repair_mode in ("inpaint", "photo_overlay"):

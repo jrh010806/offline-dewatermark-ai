@@ -209,6 +209,14 @@ def write_results(results: Iterable[PageResult], base_dir: str | Path,
             review += 1
 
     total = len(pages)
+    def quality_group(reports):
+        pending = sum(r['review_needed'] for r in reports)
+        accepted = sum(r['passed'] and not r['review_needed'] for r in reports)
+        return dict(total=len(reports), passed=accepted,
+                    checks_passed=sum(r['passed'] for r in reports), needs_review=pending,
+                    success_rate=round(accepted/len(reports), 4) if reports and not pending else None)
+    automatic_reports = [p.get('automatic_baseline', {}).get('verdict', p['verdict']) for p in pages]
+    assisted_reports = [p['verdict'] for p in pages if p['processing_mode'] == 'human_assisted']
     manifest = {
         "schema_version": 2,
         "review_file": "水印选区与处理结果复核.html",
@@ -222,6 +230,8 @@ def write_results(results: Iterable[PageResult], base_dir: str | Path,
             "quality_evaluated": total-review,
             "success_rate": round(passed/total, 4) if total and review == 0 else None,
             "success_rate_basis": "reference_evaluated_pages_only; unknown when review is pending",
+            "automatic": quality_group(automatic_reports),
+            "human_assisted": quality_group(assisted_reports),
         },
         "pages": pages,
     }

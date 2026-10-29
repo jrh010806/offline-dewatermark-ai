@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "description": "2026-10-28 预先固定的逐张防退化规则；变更规则后必须重新建基线，不能追认旧结果。",
+  "required_modes": ["desktop", "desktop_protected", "cli"],
+  "page_timeout_seconds": 240,
+  "limits": {
+    "recall_drop": 0.01,
+    "strong_recall_drop": 0.01,
+    "precision_drop": 0.01,
+    "false_positive_increase_pixels": 0,
+    "hole_selected_increase_pixels": 0,
+    "background_mae_increase": 0.05,
+    "watermark_mae_increase": 0.5,
+    "elapsed_increase_ratio": 0.5,
+    "elapsed_increase_ms": 2000,
+    "time_budget_ms": 120000
+  },
+  "changed_output_requires_review": true,
+  "route_change_requires_review": true,
+  "no_reference_policy": "任何输出、选区或路径变化都待复核；没有标注的质量指标保持 null",
+  "independent_validation": false
+}

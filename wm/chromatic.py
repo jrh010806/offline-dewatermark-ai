@@ -35,6 +35,116 @@ def _residual(img):
     return (target-design@fit).reshape(red.shape).astype(np.float32)
 
 
+def _balanced_directions(smooth, limit=3):
+    """Give each residual polarity its own bounded, distinct-angle budget."""
+    choices = {}
+    for sign in (-1, 1):
+        signal = np.clip(sign*smooth-3, 0, 10)
+        if np.mean(signal > 2) < .01:
+            continue
+        ranked = []
+        for angle in range(-60, 61, 5):
+            if abs(angle) < 15:
+                continue
+            matrix, size = _rotate(signal.shape, angle)
+            projection = cv2.warpAffine(signal, matrix, size).sum(1)
+            score = float(np.sum(projection**2)/max(projection.sum(), 1))
+            ranked.append((score, angle))
+        picked = []
+        for _, angle in sorted(ranked, reverse=True):
+            if all(abs(angle-other) >= 10 for other in picked):
+                picked.append(angle)
+            if len(picked) >= limit:
+                break
+        choices[sign] = picked
+    return [(sign, angles[index]) for index in range(limit)
+            for sign, angles in choices.items() if index < len(angles)]
+
+
+def _native_strokes(image, residual, box, sign):
+    """A word box bounds the search; raw colour and local contrast grant pixels."""
+    from .ocr import _geometry
+    from .photo_text import _fit
+    height, _, _ = _geometry(box)
+    h, w = image.shape[:2]
+    pad = max(5, int(.3*height))
+    x0, y0 = np.maximum(np.floor(box.min(0)).astype(int)-pad, 0)
+    x1, y1 = np.minimum(np.ceil(box.max(0)).astype(int)+pad+1, [w, h])
+    crop = image[y0:y1, x0:x1]
+    if min(crop.shape[:2]) < 9:
+        return None
+    domain = np.zeros(crop.shape[:2], np.uint8)
+    cv2.fillConvexPoly(domain, np.rint(box-[x0, y0]).astype(np.int32), 1)
+    field = sign*residual[y0:y1, x0:x1]
+    # Median is used only to measure source contrast, never to fill a mask.
+    encoded = np.uint8(np.clip(128+field, 0, 255))
+    size = max(7, int(.25*height) | 1)
+    contrast = encoded.astype(np.float32)-cv2.medianBlur(encoded, size)
+    noise = float(np.median(np.abs(contrast[domain == 0]))) if (domain == 0).any() else 0.
+    region = (field > 4) & (contrast > max(4., 3*noise)) & (domain > 0)
+    n, labels, stats, _ = cv2.connectedComponentsWithStats(region.astype(np.uint8), 8)
+    keep = np.zeros(n, bool)
+    keep[1:] = ((stats[1:, cv2.CC_STAT_AREA] >= max(12, .3*height)) &
+                (np.maximum(stats[1:, cv2.CC_STAT_HEIGHT], stats[1:, cv2.CC_STAT_WIDTH]) >= .2*height))
+    if keep.sum() < 3:
+        return None
+    region = keep[labels]
+    fraction = region.sum()/max(1, domain.sum())
+    if not .025 < fraction < .50:
+        return None
+    background = cv2.inpaint(crop, region.astype(np.uint8)*255, 3, cv2.INPAINT_TELEA)
+    if _fit(crop, background, region, min_strength=.08) is None:
+        return None
+    full = np.zeros((h, w), bool)
+    full[y0:y1, x0:x1] = region
+    return full
+
+
+def estimate_balanced(img: np.ndarray) -> MaskLayer | None:
+    """Opt-in missed-direction fallback, without weakening the large-type gate."""
+    gray = img.astype(np.float32).mean(2)
+    if min(gray.shape) < 120 or np.mean(gray > 235) > .65:
+        return None
+    if float(np.mean(img.max(2).astype(float)-img.min(2))) < 3:
+        return None
+    scale = min(1., 900/max(gray.shape))
+    work = cv2.resize(img, None, fx=scale, fy=scale) if scale < 1 else img
+    residual = _residual(work)
+    smooth = cv2.GaussianBlur(residual, (0, 0), .8)
+    if np.mean(np.abs(smooth) < 4) < .65:
+        return None
+    from .ocr import read_lines, _geometry
+    native_residual = None
+    for sign, angle in _balanced_directions(smooth):
+        enhanced = np.uint8(255-np.clip(sign*residual*20, 0, 255))
+        matrix, size = _rotate(enhanced.shape, angle)
+        rotated = cv2.warpAffine(enhanced, matrix, size, borderValue=255)
+        regions = []
+        for box, text, confidence in read_lines(np.repeat(rotated[..., None], 3, axis=2)) or []:
+            height, length, tilt = _geometry(box)
+            if (float(confidence) < .5 or len(text.strip()) < 3 or tilt > 15
+                    or height < .14*min(work.shape[:2]) or length < 2.2*height):
+                continue
+            native_box = cv2.transform(box[None].astype(np.float32),
+                                      cv2.invertAffineTransform(matrix))[0]/scale
+            _, _, native_tilt = _geometry(native_box)
+            if not 20 <= native_tilt <= 65:
+                continue
+            if native_residual is None:
+                native_residual = _residual(img)
+            strokes = _native_strokes(img, native_residual, native_box, sign)
+            if strokes is not None:
+                regions.append(strokes)
+        if regions:
+            region = np.logical_or.reduce(regions)
+            if .001 < region.mean() < .12:
+                return MaskLayer(alpha=region.astype(np.float32), footprint=region,
+                    source=MaskSource.PRIOR, confidence=.75, repair_mode='inpaint',
+                    method='experimental_balanced_chromatic_strokes',
+                    veil_strength=np.ones(3, np.float32), veil_offset=np.zeros(3, np.float32))
+    return None
+
+
 def estimate(img: np.ndarray) -> MaskLayer | None:
     gray = img.astype(np.float32).mean(2)
     if min(gray.shape) < 120 or np.mean(gray > 235) > .65:

@@ -1,0 +1,44 @@
+{
+  "version": "手写样本移除V1_20261029",
+  "reason": "用户明确要求删除“真实手写前后照”和“红色手写批注”样本",
+  "authorized_by": "2026-10-29 当前会话用户请求",
+  "baseline_seal": "50bb13d0127a0747b9ae0eb5c0fb7fba749ee30f759498c11ee3a51dc9411bd9",
+  "source_manifest_sha256": "4412857d259d8dfe37e506d34669b48ad7e29127a293fc9899530ab28057b354",
+  "archive": "out/样本移除留档/20261029_101653_143257_手写样本",
+  "cases": [
+    {
+      "case_id": "real_001",
+      "inventory_id": "固定回归/real_001",
+      "label": "真实手写前后照",
+      "input_sha256": "2c8858a24debf82bc0572c7cccde087e9d4d4b7119fcb2ee6f34c71707d319cd",
+      "paths": {
+        "input": "inputs/real/real_001.png",
+        "original_clean": "references/real_001/original_clean.png",
+        "aligned_clean": "references/real_001/aligned_clean.png",
+        "annotation": "references/real_001/annotation.json"
+      }
+    },
+    {
+      "case_id": "real_002",
+      "inventory_id": "固定回归/real_002",
+      "label": "真实手写前后照",
+      "input_sha256": "b6476971903559bafcaf8b1bdc652e429f82e908924b30b3e69dcd5ba516223f",
+      "paths": {
+        "input": "inputs/real/real_002.png",
+        "original_clean": "references/real_002/original_clean.png",
+        "aligned_clean": "references/real_002/aligned_clean.png",
+        "annotation": "references/real_002/annotation.json"
+      }
+    },
+    {
+      "case_id": "real_004",
+      "inventory_id": "固定回归/real_004",
+      "label": "红色手写批注",
+      "input_sha256": "94dd9bd7f900eaf67017184af0b203cd7f34fb0e23ff15b8db5a0d172785b7b1",
+      "paths": {
+        "input": "inputs/real/real_004.png"
+      }
+    }
+  ],
+  "active_manifest_sha256": "40dcafe9279b26a092d2baf99d92fc0c1ea4a7105904117511cb4ff0d2dd4f42"
+}

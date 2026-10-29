@@ -3,7 +3,11 @@
 # 用法：
 #   ./start.sh              等价于 ./start.sh test
 #   ./start.sh setup        只装环境（磁盘预检 + venv + 依赖 + LaMa 模型 + 字体检查）
-#   ./start.sh test         固定最小回归集（核心 + 真实扩展）+ 生成新结果报告
+#   ./start.sh test         按修改影响选择日常检查；--plan 只预览范围和耗时
+#   ./start.sh test-release 工程预检后完整三模式对照，供版本放行
+#   ./start.sh freeze-baseline 冻结当前代码、资源、参数并运行，建立首次观察基线
+#   ./start.sh control-inventory 校验全部应用输入、参考和既有固定集
+#   ./start.sh control ...  防退化控制工具（resume/compare/promote 等）
 #   ./start.sh check-data   校验固定回归集，不运行模型
 #   ./start.sh gui [文件]   启动桌面前端
 #   ./start.sh eval         仅跑固定核心回归集
@@ -136,17 +140,20 @@ cmd_eval() {
 }
 
 cmd_test() {
-    say "固定完整回归：核心 36 + 真实扩展 10 个输入文件"
-    HF_HUB_OFFLINE=1 "$VENV/bin/python" tools/run_min_regression.py --suite all
+    shift || true
+    say "日常按影响分层检查；局部通过不能更新默认基线"
+    HF_HUB_OFFLINE=1 QT_QPA_PLATFORM=offscreen "$VENV/bin/python" tools/daily_check.py "$@"
 }
 
 cmd_report() {
     "$VENV/bin/python" - <<'EOF'
 from pathlib import Path
-reports=sorted(Path('out/min_regression').glob('*/report.html'))
+reports=list(Path('out/项目防退化控制').glob('*/项目防退化控制报告.html'))
+reports+=list(Path('out/防退化对照').glob('*/项目防退化控制报告.html'))
+reports+=list(Path('out/min_regression').glob('*/report.html'))
 if not reports:
     raise SystemExit('尚无固定最小回归结果；请先执行 ./start.sh test 或 ./start.sh eval。')
-print(reports[-1].resolve())
+print(max(reports,key=lambda p:p.stat().st_mtime_ns).resolve())
 EOF
 }
 
@@ -160,11 +167,15 @@ main() {
     case "$sub" in
         setup)  cmd_setup ;;
         eval)   cmd_setup; cmd_eval ;;
-        test)   cmd_setup; cmd_test ;;
+        test)   cmd_test "$@" ;;
+        test-release) shift; HF_HUB_OFFLINE=1 QT_QPA_PLATFORM=offscreen "$VENV/bin/python" tools/daily_check.py "$@" --level full ;;
+        freeze-baseline) shift; HF_HUB_OFFLINE=1 QT_QPA_PLATFORM=offscreen "$VENV/bin/python" tools/regression_control.py freeze "$@" ;;
+        control-inventory) shift; HF_HUB_OFFLINE=1 QT_QPA_PLATFORM=offscreen "$VENV/bin/python" tools/regression_control.py inventory "$@" ;;
+        control) shift; HF_HUB_OFFLINE=1 QT_QPA_PLATFORM=offscreen "$VENV/bin/python" tools/regression_control.py "$@" ;;
         report) cmd_report ;;
         check-data) "$VENV/bin/python" tools/run_min_regression.py --validate-only ;;
         gui)    cmd_setup; cmd_gui "$@" ;;
-        *) die "未知子命令：${sub}（可用：setup/check-data/eval/test/report/gui）" ;;
+        *) die "未知子命令：${sub}（可用：setup/check-data/eval/test/test-release/freeze-baseline/control-inventory/control/report/gui）" ;;
     esac
 }
 main "$@"

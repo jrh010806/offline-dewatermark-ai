@@ -19,6 +19,11 @@ def overlay_mask(image: np.ndarray, alpha: np.ndarray) -> np.ndarray:
                    0, 255).astype(np.uint8)
 
 
+def overlay_selection(image: np.ndarray, selection: np.ndarray) -> np.ndarray:
+    """Uniform brush permission overlay; opacity is a display choice only."""
+    return overlay_mask(image, selection.astype(np.float32)*(105/255/.55))
+
+
 def write_selection(result: PageResult, out: Path, name: str) -> dict:
     mask = result.mask
     threshold = result.processing.get("thresholds", {}).get(
@@ -26,14 +31,20 @@ def write_selection(result: PageResult, out: Path, name: str) -> dict:
     selected = mask.binary(threshold)
     images = {
         "source": result.source.image,
-        "selection_overlay": overlay_mask(result.source.image, mask.alpha),
+        "selection_overlay": (overlay_selection(result.source.image, mask.selection)
+                              if mask.selection is not None else overlay_mask(result.source.image, mask.alpha)),
         "mask": selected,
         "mask_alpha": np.rint(np.clip(mask.alpha, 0, 1) * 255).astype(np.uint8),
     }
     # Preserve native float values: PNG alpha quantization must not change a
     # later threshold experiment or obscure low-confidence missed strokes.
     arrays = {"alpha": mask.alpha}
-    for field in ("footprint", "text_keepout", "overlay_opacity",
+    if mask.selection is not None:
+        arrays['selection'] = mask.selection
+        if result.selection_overrides is not None:
+            arrays['selection_overrides'] = result.selection_overrides
+        images['actual_changes'] = np.any(result.output.image != result.source.image, axis=2).astype(np.uint8)*255
+    for field in ("footprint", "text_keepout", "overlay_opacity", "repeat_stroke_support",
                   "veil_strength", "veil_offset"):
         value = getattr(mask, field)
         if value is not None:
@@ -47,7 +58,7 @@ def write_selection(result: PageResult, out: Path, name: str) -> dict:
         documents.save_png(out / files[kind], image)
     files["mask_data"] = f"{name}_mask_data.npz"
     np.savez_compressed(out / files["mask_data"], **arrays)
-    return {
+    evidence = {
         "files": files,
         "selection": {
             "threshold": float(threshold),
@@ -62,6 +73,30 @@ def write_selection(result: PageResult, out: Path, name: str) -> dict:
             "binary_mask": "white = alpha >= threshold; detection selection, not guaranteed repair extent",
         },
     }
+    evidence['processing_mode'] = 'human_assisted' if result.automatic_result is not None else 'automatic'
+    if mask.selection is not None:
+        evidence['selection'].update(
+            overlay='uniform red; complete edited selection, not physical alpha',
+            binary_mask='white = complete committed selection; manual expansion is zero',
+            alpha_note='仅保留自动观测强度；人工选中不代表测得水印透明度',
+            selected_pixels=int(mask.selection.sum()),
+            actual_changed_pixels=int(np.any(result.output.image != result.source.image, axis=2).sum()))
+    if result.automatic_result is not None:
+        baseline_name = name + '_自动基线'
+        baseline = write_selection(result.automatic_result, out, baseline_name)
+        baseline['files']['clean'] = baseline_name + '_clean.png'
+        documents.save_png(out / baseline['files']['clean'], result.automatic_result.output.image)
+        baseline['verdict'] = result.automatic_result.verdict.to_dict()
+        baseline['processing'] = result.automatic_result.processing
+        evidence['automatic_baseline'] = baseline
+        steps = []
+        for index, selected_step in enumerate(result.assistance_masks, 1):
+            edited = result.processing['human_assistance'][index-1].get('operation') == 'edit_complete_selection'
+            path = f'{name}_辅助第{index:02d}次_' + ('完整选区.png' if edited else '确认笔画.png')
+            documents.save_png(out / path, selected_step.astype(np.uint8)*255)
+            steps.append(dict(mask=path, **result.processing['human_assistance'][index-1]))
+        evidence['assistance_steps'] = steps
+    return evidence
 
 
 def write_index(out: Path, pages: list[dict]) -> None:
@@ -76,6 +111,18 @@ def write_index(out: Path, pages: list[dict]) -> None:
             url = escape(quote(files[kind]), quote=True)
             figures.append(f'<figure><figcaption>{label}</figcaption><a href="{url}">'
                            f'<img loading="lazy" src="{url}" alt="{label}"></a></figure>')
+        assistance = ''
+        if page.get('processing_mode') == 'human_assisted':
+            baseline = page['automatic_baseline']['files']
+            assistance = '<p><b>人工辅助结果：不计为全自动处理效果。</b> 自动基线与每次确认的笔画已单独保存，仍需检查残留及背景损伤。</p>'
+            for kind, label in [('clean', '自动处理基线'), ('selection_overlay', '自动检测选区')]:
+                url = escape(quote(baseline[kind]), quote=True)
+                figures.append(f'<figure><figcaption>{label}</figcaption><a href="{url}">'
+                               f'<img loading="lazy" src="{url}" alt="{label}"></a></figure>')
+            assistance += '<p>' + ' · '.join(
+                f'<a href="{escape(quote(s["mask"]), quote=True)}">辅助第{i}次' +
+                ('完整选区' if s.get('operation') == 'edit_complete_selection' else '确认笔画') + '</a>'
+                for i, s in enumerate(page['assistance_steps'], 1)) + '</p>'
         links = " · ".join(f'<a href="{escape(quote(path), quote=True)}">{escape(kind)}</a>'
                            for kind, path in files.items())
         sections.append(
@@ -84,7 +131,7 @@ def write_index(out: Path, pages: list[dict]) -> None:
             f'定位方式：{escape(page["mask_method"])} · '
             f'判定阈值：{selection["threshold"]:.1%} · '
             f'选区占比：{selection["coverage"]:.2%}</p>'
-            f'<div class="images">{"".join(figures)}</div><details>'
+            f'{assistance}<div class="images">{"".join(figures)}</div><details>'
             f'<summary>诊断文件</summary><p>{links}</p>'
             f'<p>处理参数：{escape(str(page["processing"]))}</p></details></section>')
     (out / "水印选区与处理结果复核.html").write_text('''<!doctype html>
@@ -98,5 +145,6 @@ details{margin-top:16px;overflow-wrap:anywhere}@media(max-width:1000px){.images{
 </style><h1>水印选区逐图复核</h1>
 <p>逐张对照原图、选区和处理结果；点击图片查看原尺寸。原图中可见的水印没有被选中，属于漏检；已选中但结果仍有水印，需要进一步检查修复过程。</p>
 <p>红色深浅与应用的「水印选区」一致；黑白图使用该次处理保存的阈值。选区不代表真实水印标注，也不保证覆盖全部水印。footprint 是修复候选范围，text_keepout 是正文保护区域，均不等同于最终修改范围；原始数值在 mask_data.npz 中。</p>
+<p>手动画笔处理的黑白图表示编辑后的完整选区，红色只表示选中，不表示透明度。mask_alpha 保留自动观测，不能代替手工选区；actual_changes 单独记录相对原图实际变化的位置。每次处理从原图计算，未处理的编辑不导出。</p>
 <p>统计与完整参数见 <a href="manifest.json">manifest.json</a>。复核资料完全本地保存。</p>
 ''' + "".join(sections) + "</html>", encoding="utf-8")

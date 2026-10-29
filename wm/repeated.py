@@ -366,7 +366,14 @@ def estimate(img: np.ndarray) -> MaskLayer | None:
             region &= original_gray>max(35,min(65,paper_watermark*.65))
     color=np.median(img[region],axis=0).astype(np.float32)
     paper=np.broadcast_to(np.percentile(img.reshape(-1,3),97,axis=0).astype(np.float32),img.shape).copy()
+    # Retain the registered glyph core separately from the padded repair
+    # footprint. A matching template alone is insufficient at an individual
+    # pixel: the original (unblurred) input must also show the dark stroke.
+    native_feature = cv2.morphologyEx(original_gray.astype(np.float32),
+                                     cv2.MORPH_BLACKHAT, np.ones((size,size),np.uint8))
+    repeat_support = (coverage >= .75) & (native_feature > 30)
     return MaskLayer(alpha=region.astype(np.float32),source=MaskSource.PRIOR,
                      confidence=confidence,
                      veil_strength=np.zeros(3,np.float32),veil_offset=color,paper=paper,
-                     footprint=region,repair_mode='inpaint',method='repeated_oblique_text')
+                     footprint=region,repair_mode='inpaint',method='repeated_oblique_text',
+                     repeat_stroke_support=repeat_support)

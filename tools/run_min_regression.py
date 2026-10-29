@@ -25,11 +25,19 @@ def validate(root):
     files=json.loads((root/'file_hashes.json').read_text())
     for path,digest in files.items():
         assert sha(root/path)==digest,path
-    assert len(cases)==46
+    from tools.regression_retirements import load_profile
+    removal=load_profile() if root.resolve()==DEFAULT.resolve() else None
+    retired={r['case_id'] for r in removal['cases']} if removal else set()
+    if removal:
+        assert sha(root/'manifest.jsonl')==removal['active_manifest_sha256']
+        assert not retired.intersection(r['case_id'] for r in cases)
+    assert len(cases)==46-len(retired)
     assert all(r['original_split']=='validation' for r in cases if r['suite']=='core')
     assert sum(r['suite']=='core' for r in cases)==36
     assert sha(ROOT/'data/watermark_training_v1/splits/validation.jsonl')==cov['original_validation_split_sha256']
-    return cases,dict(status='passed',files_checked=len(files),core_inputs=36,real_inputs=10,total_pages=sum(r['page_count'] for r in cases))
+    return cases,dict(status='passed',files_checked=len(files),core_inputs=36,
+        real_inputs=sum(r['suite']=='real' for r in cases),total_pages=sum(r['page_count'] for r in cases),
+        retired_inputs=len(retired))
 
 
 def main():
@@ -100,7 +108,11 @@ def main():
                 record['pages'].append(dict(page=len(record['pages'])+1,status='error',passed=False,error=f'{type(exc).__name__}: {exc}'))
         results.append(record);save_reports()
         print(f'[{index}/{len(chosen)}] {case["case_id"]}: '+', '.join(p['status'] for p in record['pages']),flush=True)
-    print(out/'report.html');return 0
+    print(out/'report.html')
+    print('这是固定集诊断，不含完整基线对照；项目防退化验收请执行 ./start.sh test。')
+    # A completed diagnostic is not a quality pass. Unknown/manual pages also
+    # cannot silently report success to shell callers.
+    return int(any(p.get('passed') is not True for r in results for p in r['pages']))
 
 
 if __name__=='__main__':raise SystemExit(main())

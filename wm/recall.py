@@ -65,7 +65,8 @@ def _grow_strokes(feature, domain, seed_region, height):
     return good[labels], score
 
 
-def _pixel_strokes(image, domain, seed_region, height):
+def _pixel_strokes(image, domain, seed_region, height, *, preserve_seeds=False,
+                   repeat_support=None):
     smooth = cv2.GaussianBlur(image.astype(np.float32), (0, 0), .8)
     gray = smooth.mean(2)
     channels = [gray]
@@ -91,6 +92,13 @@ def _pixel_strokes(image, domain, seed_region, height):
         if gray[0] >= .5:
             nearby = cv2.distanceTransform((~region).astype(np.uint8), cv2.DIST_L2, 5) <= 3
             region = region | (gray[1] & nearby)
+    if preserve_seeds and coloured and repeat_support is not None:
+        gray = max((item for item in choices if item[2] == 0), key=lambda item: item[0])
+        # Luminance alone also selects the halo around a real stroke. Require
+        # the independently registered repeat core and native pixel contrast,
+        # in addition to the old seed and this connected luminance observation.
+        if gray[0] >= max(3., 2*best[0]):
+            region = region | (seed_region & gray[1] & repeat_support)
     return region
 
 
@@ -108,6 +116,10 @@ def expand(image, mask, thr, *, use_ocr=True, style=None):
     base = mask.binary(thr.mask_alpha_min) > 0
     if not base.any():
         return mask
+    if mask.method == 'experimental_balanced_chromatic_strokes':
+        # This opt-in fallback already validates native-resolution strokes.
+        # Another generic channel choice would discard its source evidence.
+        return mask
     if mask.method in ('photo_observed_repeats', 'photo_complete_repeated_rows', 'repeated_oblique_text'):
         from . import observed_text
         located = observed_text.repeated_photo(image, ocr.read_lines(image) or [],
@@ -124,7 +136,10 @@ def expand(image, mask, thr, *, use_ocr=True, style=None):
         if found is not None:
             domain |= found[0]
     seed = base & domain
-    region = _pixel_strokes(image, domain, seed, height)
+    preserve = (thr.experimental_seed_preservation and mask.repair_mode == 'inpaint'
+                and not thr.experimental_colour_refinement)
+    region = _pixel_strokes(image, domain, seed, height, preserve_seeds=preserve,
+                            repeat_support=mask.repeat_stroke_support)
     method = 'recall_pixel_strokes'
     if thr.experimental_colour_refinement:
         from .stroke_colour import refine

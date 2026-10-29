@@ -17,3 +17,6 @@ docs/*
 
 # LaMa ONNX 模型权重（~88MB，首次运行自动下载或手工放置，不入库）
 models/
+
+# 本机观察基线指针；封存证据在 out/，不把本机路径写入跨机配置
+.regression-control/

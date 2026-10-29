@@ -87,6 +87,8 @@ class Thresholds:
     lama_mask_dilate: int = 0        # px to widen the repaint region before inpaint
     watermark_recall_priority: bool = False  # source-supported strokes, including text intersections
     experimental_colour_refinement: bool = False  # opt-in; no independent holdout claim
+    experimental_seed_preservation: bool = False  # source-supported old strokes; opt-in candidate
+    experimental_oblique_detection: bool = False  # balanced chromatic fallback; opt-in candidate
 
 
 @dataclass
@@ -144,11 +146,21 @@ class MaskLayer:
     text_keepout: np.ndarray | None = None
     # Measured physical opacity, separate from selectable stroke coverage.
     overlay_opacity: np.ndarray | None = None
+    # An explicit human selection grants repair permission, not physical alpha.
+    # Automatic layers leave this unset and retain their existing behaviour.
+    selection: np.ndarray | None = None
+    # Source-only glyph core registered across verified repeats, before any
+    # footprint padding. Evidence for the opt-in seed-preservation candidate.
+    repeat_stroke_support: np.ndarray | None = None
 
     def binary(self, threshold: float = Thresholds.mask_alpha_min) -> np.ndarray:
+        if self.selection is not None:
+            return self.selection.astype(np.uint8) * 255
         return (self.alpha >= threshold).astype(np.uint8) * 255
 
     def coverage(self, threshold: float = Thresholds.mask_alpha_min) -> float:
+        if self.selection is not None:
+            return float(self.selection.mean())
         return float((self.alpha >= threshold).mean())
 
     @property
@@ -211,6 +223,12 @@ class PageResult:
     clean_reference: np.ndarray | None = None
     regions: RegionMap | None = None
     processing: dict[str, Any] = field(default_factory=dict)
+    # Assisted results retain the immutable automatic baseline for separate export.
+    automatic_result: PageResult | None = None
+    assistance_masks: list[np.ndarray] = field(default_factory=list)
+    # -1 = automatic decision; 0 = manually excluded; 1 = manually included.
+    # Only committed edits belong in a PageResult; pending edits stay in the UI.
+    selection_overrides: np.ndarray | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {

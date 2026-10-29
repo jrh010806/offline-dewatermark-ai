@@ -480,6 +480,8 @@ def _estimate_single_page(img: np.ndarray, thr: Thresholds = Thresholds(),
         if wanted("chromatic"):
             from . import chromatic
             located = chromatic.estimate(img)
+            if located is None and thr.experimental_oblique_detection:
+                located = chromatic.estimate_balanced(img)
             if located is not None:
                 located.instances = _instances(located.alpha, thr)
                 return located

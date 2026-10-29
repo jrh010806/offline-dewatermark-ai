@@ -1,0 +1,31 @@
+{
+  "version": "分层检查V1_20261029",
+  "purpose": "日常按影响范围检查；局部检查不得用于更新默认基线。原有数值退化门槛不变。",
+  "levels": ["static", "unit", "targeted", "cross", "full"],
+  "cross_files": ["wm/app.py", "wm/batches.py", "wm/cli.py", "wm/contract.py", "wm/documents.py", "wm/lama.py", "wm/masks.py", "wm/recall.py", "wm/ocr.py", "wm/pipeline.py", "wm/repair.py", "wm/structure.py", "wm/styles.py", "wm/verdict.py", "wm/contrast_text.py"],
+  "unit_files": ["wm/viewer.py", "wm/export_review.py", "wm/assisted.py", "wm/assist_worker.py", "wm/synth.py", "wm/fixtures.py", "wm/e2e_test.py"],
+  "target_styles": {
+    "wm/paper_grid.py": ["dot_grid", "line_net"],
+    "wm/periodic.py": ["dot_grid", "line_net", "tiled_diagonal"],
+    "wm/corner_id.py": ["tiny_corner", "timestamp", "website"],
+    "wm/paper_repeat.py": ["tiled_diagonal", "tiled_irregular", "heavy_dark", "center_white"],
+    "wm/repeated.py": ["tiled_diagonal", "tiled_irregular", "cropped_edge"],
+    "wm/document_overlay.py": ["center_text", "center_white", "heavy_dark", "mixed_color"],
+    "wm/chromatic.py": ["center_text", "mixed_color"],
+    "wm/stroke_colour.py": ["center_text", "center_white", "heavy_dark", "mixed_color"],
+    "wm/photo_repeat_inverse.py": ["tiled_diagonal", "tiled_irregular"],
+    "wm/photo_overlay.py": ["center_text", "local_text", "shadow"],
+    "wm/photo_text.py": ["center_text", "local_text", "tiled_diagonal", "shadow"],
+    "wm/photo_observations.py": ["local_text", "tiled_irregular", "shadow"],
+    "wm/observed_text.py": ["local_text", "center_white", "tiled_irregular", "shadow"],
+    "wm/texture_overlay.py": ["tiled_diagonal", "center_text"],
+    "wm/pdf_text.py": ["independent_text", "unicode_text", "shared_content_stream", "outlined_text", "nested_form", "optional_content"],
+    "wm/pdf_images.py": ["independent_image", "nested_form", "mixed_storage"]
+  },
+  "protection_seeds": ["固定回归/core_007", "固定回归/core_011", "固定回归/core_015", "固定回归/core_023", "固定回归/core_024", "固定回归/core_025", "固定回归/core_028", "固定回归/core_036"],
+  "targeted_mode_probes": ["固定回归/core_023", "固定回归/core_025"],
+  "cross_mode_probes": ["固定回归/core_023", "固定回归/core_025", "02_人工增量110张/19_非等距密集文字/inc11_cat_lowlight__tiled_irregular.png"],
+  "batch_context": "选择某张图片时，必须连同原基线批次全部成员一起运行；不得缩小同尺寸先验组后直接比较。",
+  "protection_note": "保护样本是固定能力哨兵，不等于已经人工确认效果满意；新增满意图和失败图可通过 --cases 增补，不能移除固定保护样本。",
+  "release_note": "大范围算法调整、模型或默认参数变更、准备更新默认版本，必须另跑完整检查；局部通过不能 promote。"
+}

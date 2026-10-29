@@ -106,9 +106,13 @@ def cmd_run(args: argparse.Namespace) -> None:
                              "可用：dot_grid/tiled_text/big_center/heavy_dark/corner_id 或中英文描述")
         print("样式提示词解析:", translate_prompt(args.style))
     experimental = getattr(args, 'experimental_colour_refinement', False)
+    preserve = getattr(args, 'experimental_seed_preservation', False)
+    oblique = getattr(args, 'experimental_oblique_detection', False)
     results = pipeline.process_file(args.input,
-                                   thr=Thresholds(watermark_recall_priority=args.recall_priority or experimental,
-                                                  experimental_colour_refinement=experimental),
+                                   thr=Thresholds(watermark_recall_priority=args.recall_priority or experimental or preserve,
+                                                  experimental_colour_refinement=experimental,
+                                                  experimental_seed_preservation=preserve,
+                                                  experimental_oblique_detection=oblique),
                                    dpi=args.dpi, skip_structure=args.force_raster,
                                     style=style)
     out = pipeline.write_results(results, args.out, source_path=args.input)
@@ -149,6 +153,10 @@ def main(argv: list[str] | None = None) -> None:
                    help="按颜色与重复字形补全水印笔画，允许处理与正文交叠的水印")
     p.add_argument("--experimental-colour-refinement", action="store_true",
                    help="实验：细化明亮文档上的彩色笔画；未完成独立泛化验证，默认关闭")
+    p.add_argument("--experimental-seed-preservation", action="store_true",
+                   help="实验：用已验证重复字形核心和原图对比保留旧笔画；默认关闭，不与色彩细化叠加")
+    p.add_argument("--experimental-oblique-detection", action="store_true",
+                   help="实验：原方法未检测到时均衡检查颜色信号与斜字方向；默认关闭，未完成独立验证")
     p.add_argument("--style", default=None,
                    help="指定水印样式（代码或中英文提示词），如 tiled_text / 平铺文字 / dot grid")
     p.set_defaults(fn=cmd_run)

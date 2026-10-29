@@ -21,7 +21,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout, QHeaderView, QLabel, QListWidget, QListWidgetItem,
     QMainWindow, QProgressBar, QPushButton, QSlider, QSplitter, QTableWidget,
     QTableWidgetItem, QVBoxLayout, QWidget, QInputDialog, QMessageBox,
-    QAbstractItemView, QScrollArea, QButtonGroup,
+    QAbstractItemView, QScrollArea, QButtonGroup, QSpinBox,
 )
 
 from . import documents, pipeline
@@ -29,6 +29,8 @@ from .batches import Batch, BatchWorker
 from .contract import PageImage, PageResult, Thresholds
 from .viewer import ImageViewer
 from .export_review import overlay_mask
+from .assist_worker import AssistWorker
+from .selection_edit import SelectionEdit
 
 VIEW_MODES = ("拖拽对比", "处理结果", "原始图片", "水印选区")
 STYLE_LABELS = {None: "自动识别", "dot_grid": "点阵水印", "tiled_text": "平铺文字",
@@ -151,10 +153,25 @@ class MainWindow(QMainWindow):
         self.results: list[PageResult] = []
         self._current = -1
         self._sliders: dict[str, QSlider] = {}
+        self.assist_worker = None
+        self._assist_busy = False
+        self._assist_pending = None
+        self._assist_context = None
+        self._assist_payload = None
+        self._assist_undo = {}
+        self._selection_edit = None
+        self._ui_busy = False
 
         self.page_list = QListWidget()
         self.page_list.currentRowChanged.connect(self.show_page)
         self.canvas = ImageViewer()
+        self.canvas.rectangleFinished.connect(self.find_assisted_strokes)
+        self.canvas.brushStarted.connect(self._begin_brush_stroke)
+        self.canvas.brushSegment.connect(self._paint_brush_segment)
+        self.canvas.brushFinished.connect(self._end_brush_stroke)
+        self.canvas.undoRequested.connect(self.undo_selection_stroke)
+        self.canvas.redoRequested.connect(self.redo_selection_stroke)
+        self.canvas.toolRequested.connect(self.set_brush_tool)
         self.page_list.setTextElideMode(Qt.ElideMiddle)
         self.page_list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self._view_mode = VIEW_MODES[0]
@@ -177,7 +194,7 @@ class MainWindow(QMainWindow):
             self.view_buttons[mode] = button
         self.open_btn = QPushButton("＋ 新增批次")
         self.open_btn.clicked.connect(self.open_file)
-        self.run_btn = QPushButton("处理全部批次")
+        self.run_btn = QPushButton("自动处理全部批次")
         # clicked 信号会携带 checked=False；直连 start_run 会被 only_page 收到，
         # 误入「重处理当前页」分支（self.pages[False] 即第 0 页）。必须用 lambda 隔参数。
         self.run_btn.clicked.connect(lambda: self.start_run())
@@ -241,7 +258,7 @@ class MainWindow(QMainWindow):
         left_layout.addWidget(label("图片列表"))
         left_layout.addWidget(self.page_list, 2)
 
-        self.run_batch_btn = QPushButton("处理当前批次")
+        self.run_batch_btn = QPushButton("自动处理当前批次")
         self.run_batch_btn.setObjectName("primary")
         self.run_batch_btn.clicked.connect(lambda: self.start_run(scope="batch"))
         self.pause_btn = QPushButton("暂停")
@@ -282,6 +299,75 @@ class MainWindow(QMainWindow):
         center_layout.addLayout(preview_bar)
         self.preview_info = label("选择图片后即可预览", "muted")
         center_layout.addWidget(self.preview_info)
+        assist_bar = QHBoxLayout()
+        self.assist_select_btn = QPushButton("编辑水印选区")
+        self.assist_select_btn.setToolTip("在原图上添加或擦除完整选区；点击处理才生效，切图丢弃未处理编辑。")
+        self.assist_select_btn.setCheckable(True)
+        self.assist_select_btn.toggled.connect(self.begin_assisted_selection)
+        self.assist_confirm_btn = QPushButton("按当前选区处理")
+        self.assist_confirm_btn.setObjectName("primary")
+        self.assist_confirm_btn.clicked.connect(self.confirm_assisted_repair)
+        self.assist_cancel_btn = QPushButton("取消编辑")
+        self.assist_cancel_btn.clicked.connect(self.cancel_assisted_selection)
+        self.assist_undo_btn = QPushButton("撤销本次处理")
+        self.assist_undo_btn.clicked.connect(self.undo_assisted_repair)
+        for button in (self.assist_select_btn, self.assist_confirm_btn,
+                       self.assist_cancel_btn, self.assist_undo_btn):
+            assist_bar.addWidget(button)
+        assist_bar.addStretch()
+        center_layout.addLayout(assist_bar)
+        self.brush_tools = QWidget()
+        tools_layout = QHBoxLayout(self.brush_tools)
+        tools_layout.setContentsMargins(0, 0, 0, 0)
+        self.add_brush_btn = QPushButton("添加 B")
+        self.erase_brush_btn = QPushButton("擦除 E")
+        self.brush_group = QButtonGroup(self)
+        for button, tool in ((self.add_brush_btn, 'add'), (self.erase_brush_btn, 'erase')):
+            button.setCheckable(True)
+            self.brush_group.addButton(button)
+            button.clicked.connect(lambda _checked=False, tool=tool: self.set_brush_tool(tool))
+            tools_layout.addWidget(button)
+        self.add_brush_btn.setChecked(True)
+        self.brush_size = QSpinBox()
+        self.brush_size.setRange(1, 300)
+        self.brush_size.setValue(12)
+        self.brush_size.setSuffix(" 像素")
+        self.brush_size.setToolTip("原图中的笔刷直径；缩放画面不会改变实际选中宽度")
+        self.brush_size.valueChanged.connect(self._brush_size_changed)
+        tools_layout.addWidget(QLabel("笔刷"))
+        tools_layout.addWidget(self.brush_size)
+        self.stroke_undo_btn = QPushButton("撤销笔画")
+        self.stroke_redo_btn = QPushButton("重做")
+        self.stroke_undo_btn.clicked.connect(self.undo_selection_stroke)
+        self.stroke_redo_btn.clicked.connect(self.redo_selection_stroke)
+        tools_layout.addWidget(self.stroke_undo_btn)
+        tools_layout.addWidget(self.stroke_redo_btn)
+        tools_layout.addStretch()
+        center_layout.addWidget(self.brush_tools)
+        self.brush_tools.hide()
+        zoom_bar = QHBoxLayout()
+        self.zoom_out_btn = QPushButton("−")
+        self.zoom_in_btn = QPushButton("＋")
+        self.fit_btn = QPushButton("适应画布")
+        self.actual_size_btn = QPushButton("原始大小")
+        self.zoom_label = QLabel("100%")
+        self.zoom_out_btn.clicked.connect(lambda: self.canvas.zoom_at(self.canvas.image_rect().center(), 1/1.5))
+        self.zoom_in_btn.clicked.connect(lambda: self.canvas.zoom_at(self.canvas.image_rect().center(), 1.5))
+        self.fit_btn.clicked.connect(self.canvas.fit_image)
+        self.actual_size_btn.clicked.connect(lambda: self.canvas.zoom_at(
+            self.canvas.image_rect().center(), 1/self.canvas.image_scale()))
+        self.canvas.zoomChanged.connect(lambda scale: self.zoom_label.setText(f"{scale:.0%}"))
+        for widget in (self.zoom_out_btn, self.zoom_label, self.zoom_in_btn, self.fit_btn, self.actual_size_btn):
+            zoom_bar.addWidget(widget)
+        self.magnifier_box = QCheckBox("画笔放大镜")
+        self.magnifier_box.setChecked(True)
+        self.magnifier_box.toggled.connect(self._set_magnifier)
+        zoom_bar.addStretch()
+        zoom_bar.addWidget(self.magnifier_box)
+        center_layout.addLayout(zoom_bar)
+        self.selection_notice = label("", "muted")
+        self.selection_notice.setWordWrap(True)
+        center_layout.addWidget(self.selection_notice)
         center_layout.addWidget(self.canvas, 1)
         self.preview_hint = label("先导入图片，再开始处理", "muted")
         self.preview_hint.setAlignment(Qt.AlignCenter)
@@ -374,6 +460,12 @@ class MainWindow(QMainWindow):
         reset.clicked.connect(self.reset_params)
         grid.addWidget(self.reprocess_btn, row, 0, 1, 2)
         grid.addWidget(reset, row, 2)
+        self.auto_redetect_btn = QPushButton("重新自动识别当前图片")
+        self.auto_redetect_btn.setToolTip("重新检测将替换该页人工选区和结果；需要保留时请先导出。")
+        self.auto_redetect_btn.clicked.connect(lambda: self.start_run(
+            only_page=self._current, force_automatic=True))
+        grid.addWidget(self.auto_redetect_btn, row + 1, 0, 1, 3)
+        self.auto_redetect_btn.hide()
         return box
 
     def current_thr(self) -> Thresholds:
@@ -403,6 +495,8 @@ class MainWindow(QMainWindow):
     def save_params(self, *_args) -> None:
         if self._loading_params or self.batch is None:
             return
+        if self._selection_edit is None:
+            self._clear_assisted_preview()
         params = {attr: slider.value() for attr, slider in self._sliders.items()}
         style = self.current_style()
         if (any(self.batch.params.get(k) != params[k] for k in ("mask_alpha_min", "close_px"))
@@ -414,8 +508,10 @@ class MainWindow(QMainWindow):
         self.batch.use_ocr = self.ocr_box.isChecked()
         self.batch.recall_priority = self.recall_box.isChecked()
         self.batch.style = style
+        self.render_canvas()
 
     def select_batch(self, row: int) -> None:
+        self._clear_assisted_preview()
         self.batch = self.batches[row] if 0 <= row < len(self.batches) else None
         self.pages = self.batch.pages if self.batch else []
         self.results = list(self.batch.results.values()) if self.batch else []
@@ -517,6 +613,9 @@ class MainWindow(QMainWindow):
         self.select_batch(self.batch_list.currentRow())
 
     def export_results(self) -> None:
+        if self._selection_edit is not None and self._selection_edit.dirty:
+            self.status.setText("选区尚未处理：请先按当前选区处理，或取消编辑后导出已有结果。")
+            return
         scope, ok = QInputDialog.getItem(self, "导出范围", "选择导出范围",
                                          ["当前图片", "当前批次", "所有批次"], 0, False)
         if not ok:
@@ -549,6 +648,8 @@ class MainWindow(QMainWindow):
         self.status.setText(f"已导出结果、原图与水印选区；各批次 review.html 可逐图复核 → {root}")
 
     def set_busy(self, busy: bool) -> None:
+        busy = busy or self._assist_busy
+        self._ui_busy = bool(busy)
         self.param_box.setEnabled(not busy)
         for button in self.batch_edit_buttons:
             button.setEnabled(not busy and self.batch is not None)
@@ -562,13 +663,249 @@ class MainWindow(QMainWindow):
         self.ocr_box.setEnabled(not busy)
         self.recall_box.setEnabled(not busy)
         self.style_box.setEnabled(not busy)
-        self.pause_btn.setEnabled(busy)
-        self.stop_btn.setEnabled(busy)
+        self.pause_btn.setEnabled(busy and not self._assist_busy)
+        self.stop_btn.setEnabled(busy and not self._assist_busy)
         self.export_btn.setEnabled(not busy and any(b.results for b in self.batches))
+        self._refresh_assisted_controls()
 
-    def start_run(self, only_page: int | None = None, scope: str = "all") -> None:
-        if not self.batches or (self.worker and self.worker.isRunning()):
+    def _refresh_assisted_controls(self):
+        busy = self._ui_busy or self._assist_busy or bool(getattr(self, 'worker', None) and self.worker.isRunning())
+        result = self.batch.results.get(self._current) if self.batch else None
+        valid = result is not None and not busy
+        pending = self._assist_pending is not None
+        editing = self._selection_edit is not None
+        changed = editing and self._selection_edit.dirty
+        self.assist_select_btn.setEnabled(valid and not pending)
+        self.assist_confirm_btn.setEnabled(valid and (pending or changed))
+        self.assist_cancel_btn.setEnabled(not busy and (pending or editing))
+        key = (self.batch.uid, self._current) if self.batch else None
+        self.assist_undo_btn.setEnabled(valid and bool(self._assist_undo.get(key)) and not pending and not editing)
+        self.brush_tools.setVisible(editing)
+        self.brush_tools.setEnabled(not busy)
+        self.stroke_undo_btn.setEnabled(not busy and editing and bool(self._selection_edit.undo_stack))
+        self.stroke_redo_btn.setEnabled(not busy and editing and bool(self._selection_edit.redo_stack))
+        self.param_box.setEnabled(not busy and not editing)
+        committed_selection = result is not None and result.mask.selection is not None
+        self.reprocess_btn.setText("按已确认选区重新处理" if committed_selection else "处理／重处理当前图片")
+        self.auto_redetect_btn.setVisible(committed_selection)
+        self.run_btn.setEnabled(not busy and not editing and bool(self.batches))
+        self.run_batch_btn.setEnabled(not busy and not editing and bool(self.pages))
+        self.export_btn.setEnabled(not busy and not changed and any(b.results for b in self.batches))
+        self.export_btn.setToolTip("请先处理或取消未应用的选区编辑" if changed else "导出已处理的结果")
+        self.batch_list.setEnabled(not self._assist_busy)
+        self.page_list.setEnabled(not self._assist_busy)
+        for button in self.view_buttons.values():
+            button.setEnabled(not self._assist_busy and not pending)
+
+    def _clear_assisted_preview(self):
+        self._selection_edit = None
+        self._assist_pending = None
+        self.assist_select_btn.blockSignals(True)
+        self.assist_select_btn.setChecked(False)
+        self.assist_select_btn.blockSignals(False)
+        self.canvas.set_selection_mode(False)
+        self.canvas.set_brush_mode(False)
+        self.canvas.set_selection_overlay()
+        self.canvas.clear_search_rectangle()
+
+    def begin_assisted_selection(self, enabled):
+        if self._assist_busy:
             return
+        if enabled and self.batch and self._current in self.batch.results:
+            self._assist_pending = None
+            self.canvas.clear_search_rectangle()
+            self.canvas.set_selection_mode(False)
+            self._selection_edit = SelectionEdit(self.batch.results[self._current])
+            self.add_brush_btn.setChecked(True)
+            self.set_view_mode("原始图片")
+            self.status.setText("在原图上添加或擦除选区；按当前选区处理才更新结果，切图直接丢弃未处理编辑。")
+        else:
+            self._clear_assisted_preview()
+            self.render_canvas()
+        self._refresh_assisted_controls()
+
+    def cancel_assisted_selection(self):
+        if self._assist_busy:
+            return
+        self._clear_assisted_preview()
+        self.render_canvas()
+        self.status.setText("已取消未处理的选区编辑，处理结果未改变")
+
+    def _set_magnifier(self, enabled):
+        self.canvas.magnifier_enabled = enabled
+        self.canvas.update()
+
+    def _brush_size_changed(self, value):
+        self.canvas.brush_diameter = value
+        self.canvas.update()
+
+    def set_brush_tool(self, tool):
+        self.add_brush_btn.setChecked(tool == 'add')
+        self.erase_brush_btn.setChecked(tool == 'erase')
+        self.canvas.finish_brush()
+        self.canvas.brush_include = tool == 'add'
+        self.canvas.update()
+
+    def _begin_brush_stroke(self):
+        if self._selection_edit is not None and not self._assist_busy:
+            self._selection_edit.begin_stroke()
+
+    def _paint_brush_segment(self, segment):
+        if self._selection_edit is not None and not self._assist_busy:
+            box = self._selection_edit.paint(*segment)
+            if box is not None:
+                self.canvas.update_selection_overlay(self._selection_edit.selected, box)
+            self.selection_notice.setText("选区已修改，尚未处理；切图丢弃。红色为当前完整选区。")
+
+    def _end_brush_stroke(self):
+        if self._selection_edit is not None:
+            self._selection_edit.end_stroke()
+            self._refresh_assisted_controls()
+
+    def undo_selection_stroke(self):
+        if self._selection_edit is not None and not self._assist_busy:
+            self._selection_edit.undo()
+            self.render_canvas()
+
+    def redo_selection_stroke(self):
+        if self._selection_edit is not None and not self._assist_busy:
+            self._selection_edit.redo()
+            self.render_canvas()
+
+    def find_assisted_strokes(self, rectangle):
+        if (self._assist_busy or (self.worker and self.worker.isRunning()) or
+                not self.batch or self._current not in self.batch.results):
+            return
+        self._assist_pending = None
+        self._selection_edit = None
+        self.canvas.set_brush_mode(False)
+        self.canvas.set_selection_overlay()
+        result = self.batch.results[self._current]
+        self._start_assisted_worker('find', result, rectangle, thr=self.current_thr(),
+                                    close_px=self.current_close_px(),
+                                    use_ocr=self.ocr_box.isChecked(), style=self.current_style())
+        self.status.setText("正在圈选范围内识别水印笔画；尚未修改图片")
+
+    def confirm_assisted_repair(self):
+        if self._assist_busy:
+            return
+        if self._selection_edit is not None and self._selection_edit.dirty:
+            result = self.batch.results[self._current]
+            request = self._selection_edit.request(self.current_thr())
+            self._start_assisted_worker('selection', result, request)
+            self.status.setText("正在使用完整选区从原图重新处理；不重新检测水印")
+            return
+        if not self._assist_pending:
+            return
+        result = self.batch.results[self._current]
+        self._start_assisted_worker('apply', result, self._assist_pending)
+        self.status.setText("正在修复已确认的红色笔画")
+
+    def _start_assisted_worker(self, action, result, argument, **options):
+        self._assist_context = (self.batch, self._current, result,
+                                self.batch.states.get(self._current, "待复核"),
+                                self._current in self.batch.dirty)
+        self._assist_payload = None
+        self._assist_busy = True
+        self.canvas.set_selection_mode(False)
+        self.canvas.set_brush_mode(False)
+        self.assist_worker = AssistWorker(action, result, argument, self, **options)
+        self.assist_worker.completed.connect(self._store_assisted_payload)
+        self.assist_worker.finished.connect(self._assisted_finished)
+        self.set_busy(True)
+        self.assist_worker.start()
+
+    def _store_assisted_payload(self, payload):
+        self._assist_payload = payload
+
+    def _assisted_finished(self):
+        worker = self.assist_worker
+        self.assist_worker = None
+        self._assist_busy = False
+        payload = self._assist_payload
+        batch, index, previous, state, dirty = self._assist_context
+        self._assist_context = None
+        self._assist_payload = None
+        self.set_busy(False)
+        if not payload:
+            self.cancel_assisted_selection()
+            self.status.setText("辅助处理未返回结果，原结果已保留")
+        elif payload['error']:
+            if payload['action'] == 'selection':
+                self.render_canvas()
+            else:
+                self.cancel_assisted_selection()
+            self.status.setText(payload['error'])
+        elif batch.results.get(index) is not previous:
+            self.cancel_assisted_selection()
+            self.status.setText("原结果已变化，请重新圈选")
+        elif payload['action'] == 'find':
+            candidate = payload['value']
+            count = int(candidate.layer.binary(candidate.thresholds.mask_alpha_min).astype(bool).sum())
+            if count:
+                self._assist_pending = candidate
+                self.render_canvas()
+                self.status.setText(f"圈内找到 {count:,} 个候选笔画像素；请检查红色选区，再确认修复。图片尚未改变。")
+            else:
+                self.cancel_assisted_selection()
+                self.status.setText("圈内未找到有足够证据的水印笔画，请调整圈选范围；图片未改变。")
+        else:
+            self._assist_undo.setdefault((batch.uid, index), []).append((previous, state, dirty))
+            batch.results[index] = payload['value']
+            batch.states[index] = ("辅助修复·待复核" if payload['value'].verdict.passed else
+                                   "辅助修复·检查未通过")
+            batch.dirty.add(index)
+            self._clear_assisted_preview()
+            self._refresh_assisted_page(index)
+            self.status.setText("已按确认选区处理，请复核残留与背景；可撤销本次处理，导出保留自动基线。")
+        self._refresh_assisted_controls()
+        worker.deleteLater()
+
+    def _refresh_assisted_page(self, index):
+        self.results = list(self.batch.results.values())
+        self.refresh_batches()
+        item = self.page_list.item(index)
+        replacement = self._page_item(index)
+        item.setText(replacement.text())
+        item.setToolTip(replacement.toolTip())
+        item.setForeground(replacement.foreground())
+        self.show_page(index)
+
+    def undo_assisted_repair(self):
+        if self._assist_busy or not self.batch:
+            return
+        key = (self.batch.uid, self._current)
+        history = self._assist_undo.get(key)
+        if not history:
+            return
+        previous, state, dirty = history.pop()
+        self.batch.results[self._current] = previous
+        self.batch.states[self._current] = state
+        if dirty:
+            self.batch.dirty.add(self._current)
+        else:
+            self.batch.dirty.discard(self._current)
+        self._clear_assisted_preview()
+        self._refresh_assisted_page(self._current)
+        self.status.setText("已撤销一次辅助修复，恢复此前结果及选区")
+
+    def start_run(self, only_page: int | None = None, scope: str = "all", *, force_automatic=False) -> None:
+        if self._assist_busy or not self.batches or (self.worker and self.worker.isRunning()):
+            return
+        if self._selection_edit is not None:
+            if only_page == self._current:
+                self.confirm_assisted_repair()
+            else:
+                self.status.setText("请先按当前选区处理或取消编辑，再启动自动批量处理。")
+            return
+        if only_page is not None and self.batch is not None and not force_automatic:
+            result = self.batch.results.get(only_page)
+            if result is not None and result.mask.selection is not None:
+                self._start_assisted_worker('selection', result,
+                    SelectionEdit(result).request(self.current_thr()))
+                self.status.setText("正在按已确认的完整选区从原图重新处理；保留人工决定")
+                return
+        self._clear_assisted_preview()
         self.save_params()
         batches = self.batches if scope == "all" and only_page is None else [self.batch]
         jobs = []
@@ -622,6 +959,7 @@ class MainWindow(QMainWindow):
             self.status.setText(f"{batch.name} · 第 {index+1} 张 · {message}")
             return
         result = payload["result"]
+        self._assist_undo.pop((batch.uid, index), None)
         if result is not None:
             batch.results[index] = result
             batch.errors.pop(index, None)
@@ -664,6 +1002,10 @@ class MainWindow(QMainWindow):
         self.status.setText(f"{'已停止' if worker.stopped else '完成'} · 本次 {worker.done}/{worker.total} 张 · {summary}")
 
     def closeEvent(self, event) -> None:
+        if self._assist_busy:
+            QMessageBox.information(self, "辅助处理运行中", "请等待当前笔画识别或修复完成后再关闭。")
+            event.ignore()
+            return
         if self.worker and self.worker.isRunning():
             QMessageBox.information(self, "队列运行中", "请先停止队列，等待当前图片完成后再关闭。")
             event.ignore()
@@ -677,6 +1019,8 @@ class MainWindow(QMainWindow):
         event.accept()
 
     def show_page(self, row: int) -> None:
+        if row != self._current:
+            self._clear_assisted_preview()
         self._current = row
         self.metrics.setRowCount(0)
         self.conditions.setText("判定：—")
@@ -690,6 +1034,8 @@ class MainWindow(QMainWindow):
             self.preview_info.setText("选择图片后即可预览")
             self.preview_hint.setText("先导入图片，再开始处理")
         self.render_canvas()
+
+        self._refresh_assisted_controls()
 
     def _fill_metrics(self, result: PageResult) -> None:
         report = result.verdict
@@ -717,11 +1063,18 @@ class MainWindow(QMainWindow):
                               "recall_pixel_strokes": "颜色与对比：笔画补全",
                               "recall_colour_refinement": "实验：彩色笔画精细定位",
                               "recall_repeated_strokes": "重复字形：笔画补全",
+                              "human_search_strokes": "人工圈选范围内识别笔画",
+                              "human_edited_selection": "人工编辑完整水印选区",
                               "corner_id_text": "角标文字定位",
                               "crosspage": "跨页统计"}.get(result.mask.method, "灰度与颜色")),
                 ("总耗时", f"{report.elapsed_ms / 1000:.2f} 秒")]
-        stages = {"mask_ms": "水印定位耗时", "repair_ms": "图像修复耗时"}
+        stages = {"mask_ms": "水印定位耗时", "repair_ms": "图像修复耗时",
+                  "assist_mask_ms": "辅助笔画识别耗时", "assist_repair_ms": "辅助修复耗时",
+                  "manual_repair_ms": "按选区重新修复耗时"}
         rows += [(stages.get(k, "其他阶段耗时"), f"{v / 1000:.2f} 秒") for k, v in report.stage_ms.items()]
+        if result.automatic_result is not None:
+            rows.append(("处理模式", "人工辅助 · 自动结果另行保留"))
+            rows.append(("已确认辅助次数", str(len(result.assistance_masks))))
         names = {"coverage": "修复选区占比", "fidelity_mean_delta": "选区外平均变化",
                  "fidelity_p99_delta": "选区外变化高位值", "ink_iou": "文字重合度",
                  "residual_basis": "残留评估依据", "residual_coverage": "水印残留率",
@@ -766,7 +1119,8 @@ class MainWindow(QMainWindow):
         item = QListWidgetItem(f"{index + 1:02d}  {page.doc_id}\n{state}")
         item.setToolTip(f"{page.doc_id} · 第 {page.page_index + 1} 页 · {state}")
         colors = {"运行失败": "#ae4940", "质量未通过": "#ae4940",
-                  "待复核": "#967329", "通过": "#287d55"}
+                  "待复核": "#967329", "通过": "#287d55",
+                  "辅助修复·待复核": "#967329", "辅助修复·检查未通过": "#ae4940"}
         item.setForeground(QColor(colors.get(state, "#52645a")))
         return item
 
@@ -783,6 +1137,15 @@ class MainWindow(QMainWindow):
             return
         source = self.pages[row].image
         result = self.batch.results.get(row) if self.batch else None
+        self._refresh_assisted_controls()
+        self.selection_notice.setText("")
+        if self._assist_pending is not None and result is not None:
+            proposal = self._assist_pending
+            selected = proposal.layer.binary(proposal.thresholds.mask_alpha_min) > 0
+            img = overlay_mask(result.output.image, selected.astype(np.float32))
+            self.canvas.set_images(img, page_key=(self.batch.uid, row), caption="候选笔画·尚未修复")
+            self.preview_hint.setText("红色为将要修复的候选笔画，黄框仅为搜索范围。请确认没有误选背景；确认前图片不变。")
+            return
         mode = self._view_mode
         comparing = result is not None and mode == "拖拽对比"
         self.preview_info.setText(f"第 {row + 1} / {len(self.pages)} 张 · {source.shape[1]} × {source.shape[0]} 像素")
@@ -792,7 +1155,10 @@ class MainWindow(QMainWindow):
         elif mode == "原始图片" or comparing:
             img, caption = source, "原图"
         elif mode == "水印选区":
-            img, caption = overlay_mask(source, result.mask.alpha), "水印选区"
+            if self._selection_edit is not None or result.mask.selection is not None:
+                img, caption = source, "完整水印选区"
+            else:
+                img, caption = overlay_mask(source, result.mask.alpha), "水印选区"
         else:
             img, caption = result.output.image, "处理结果"
         if result is not None:
@@ -801,6 +1167,22 @@ class MainWindow(QMainWindow):
                                       "可切换至「拖拽对比」查看处理前后的变化")
         self.canvas.set_images(img, result.output.image if comparing else None,
                                page_key=(self.batch.uid, row), caption=caption)
+        editable_view = mode in ("原始图片", "水印选区")
+        editing = self._selection_edit is not None
+        self.canvas.set_brush_mode(editing and editable_view and not self._assist_busy,
+                                   include=self.add_brush_btn.isChecked())
+        if editing:
+            self.canvas.set_selection_overlay(self._selection_edit.selected if editable_view else None)
+            self.selection_notice.setText(
+                "选区已修改，尚未处理；切图丢弃。红色为当前完整选区。" if self._selection_edit.dirty else
+                "编辑完整选区：添加或擦除，最后一笔优先；点击处理才更新图片。")
+            self.preview_hint.setText("滚轮缩放 · 空格＋拖动平移 · B 添加 / E 擦除 · 按住 H 隐藏选区 · ⌘/Ctrl＋Z 撤销" if editable_view else
+                                      "正在查看已有处理结果；切回原始图片或水印选区继续描涂，编辑仍保留。")
+        elif result is not None and result.mask.selection is not None and mode == "水印选区":
+            self.canvas.set_selection_overlay(result.mask.selection)
+            self.preview_hint.setText("红色为该处理结果使用的完整选区，包含人工添加与擦除的修改。")
+        else:
+            self.canvas.set_selection_overlay()
 
 
 def smoke(path: str | None) -> int:

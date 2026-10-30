@@ -229,6 +229,14 @@ def repeated_photo(image, source_lines, *, stroke_only=False, search_mask=None):
 
 
 def shadow_paper(image, source_lines):
+    legacy = _shadow_paper_search(image, source_lines)
+    if legacy is None:
+        return None
+    from .shadow_layers import prepare
+    return prepare(image, legacy)
+
+
+def _shadow_paper_search(image, source_lines):
     h,w=image.shape[:2];rgb=image.astype(np.float32);gray=rgb.mean(2)
     if np.mean(gray>235)<.65:return None
     body=[(box,float(ocr._geometry(box)[0])) for box,text,score in source_lines

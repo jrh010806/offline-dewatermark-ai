@@ -31,8 +31,10 @@ def sync():
         ('透视配准和掩码 QA 完成前不并入默认训练清单','已完成配准与检测框视觉核对，并纳入检测训练；没有同拍摄条件的修复目标'),
         ('电子源页不是同拍摄条件干净真值；纸张透视和弯曲尚未标注处理','电子源页不是同拍摄条件干净真值；现已关联检测框标注，纸张弯曲仍是精度限制'),
     ]
+    # Current overviews are generated from manifests; archived reports stay intact.
+    maintained = {'训练数据集说明.html', '样本整理与入库.html', '水印覆盖与竞品评测.html'}
     for p in (ROOT/'docs').glob('*.html'):
-        if p.name in {'首轮基线评测.html','真实样本训练标注.html','最小回归测试集.html'}:continue
+        if p.name not in maintained:continue
         s=p.read_text();s=re.sub(r'<div id="current-real-training-status".*?</div>','',s,flags=re.S)
         for a,b in replacements:s=s.replace(a,b)
         s=re.sub(r'(<main\b[^>]*>)',lambda m:m[1]+text_note,s,count=1)

@@ -156,4 +156,5 @@ def main():
         receipt=rel(AUDIT/'cleanup_receipt.json'),trash_root=str(trash)),ensure_ascii=False),flush=True)
 
 
-if __name__=='__main__':main()
+if __name__=='__main__':
+    raise SystemExit('历史整理脚本已停用：原清理收据保留，不重复移动文件。当前数据说明请运行 .venv/bin/python tools/organize_project_docs.py；校验用 ./start.sh check-data。')

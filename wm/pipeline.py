@@ -69,7 +69,8 @@ def _process_one(page: PageImage, mask: MaskLayer, thr: Thresholds,
 
 def _run_raster(pages: list[PageImage], thr: Thresholds, gt: GroundTruth | None,
                 force_single: bool = False, use_ocr: bool = True,
-                use_structure: bool = True, style: str | None = None) -> list[PageResult]:
+                use_structure: bool = True, style: str | None = None,
+                automatic_selection: bool = False) -> list[PageResult]:
     structural = {id(p): structure.process_text_page(p, thr) if use_structure else None for p in pages}
     raster_pages = [p for p in pages if structural[id(p)] is None]
     images = [p.image for p in raster_pages]
@@ -90,6 +91,14 @@ def _run_raster(pages: list[PageImage], thr: Thresholds, gt: GroundTruth | None,
             out.append(structural[id(page)])
             continue
         t0 = time.perf_counter()
+        if automatic_selection:
+            from .auto_selection import process
+            result = process(page, thr, prior=shared, use_ocr=use_ocr, style=style,
+                             mask_ms=shared_ms // max(len(pages), 1))
+            # Reference evaluation is deliberately later than source-only choice.
+            _evaluate_selected(result, thr, gt)
+            out.append(result)
+            continue
         single = masks.estimate_single_page(page.image, thr,
                                            use_ocr=use_ocr, style=style)
         mask = masks.with_prior(single, shared, thr)
@@ -100,7 +109,8 @@ def _run_raster(pages: list[PageImage], thr: Thresholds, gt: GroundTruth | None,
 
 
 def iter_raster(pages_iter: Iterator[PageImage], thr: Thresholds,
-                total: int, use_ocr: bool = True) -> Iterator[PageResult]:
+                total: int, use_ocr: bool = True,
+                automatic_selection: bool = False) -> Iterator[PageResult]:
     """Streaming single-page path: yields one result per page, memory-flat.
 
     Cross-page estimation is *not* available here — each page gets its own
@@ -113,14 +123,40 @@ def iter_raster(pages_iter: Iterator[PageImage], thr: Thresholds,
             yield structural
             continue
         t0 = time.perf_counter()
+        if automatic_selection:
+            from .auto_selection import process
+            yield process(page, thr, use_ocr=use_ocr)
+            continue
         mask = masks.estimate_single_page(page.image, thr, use_ocr=use_ocr)
         yield _process_one(page, mask, thr, mask_ms=_ms(t0))
 
 
 def process_pages(pages: list[PageImage], thr: Thresholds = Thresholds(),
                  gt: GroundTruth | None = None, force_single: bool = False,
-                 use_ocr: bool = True, style: str | None = None) -> list[PageResult]:
-    return _run_raster(pages, thr, gt, force_single, use_ocr, style=style)
+                 use_ocr: bool = True, style: str | None = None,
+                 automatic_selection: bool = False) -> list[PageResult]:
+    return _run_raster(pages, thr, gt, force_single, use_ocr, style=style,
+                       automatic_selection=automatic_selection)
+
+
+def _evaluate_selected(result, thr, gt):
+    """Optional offline scoring cannot influence candidate generation or choice."""
+    if not gt or result.source.key not in gt:
+        return
+    clean, alpha, veil = gt[result.source.key]
+    before = result.verdict
+    report = verdict_mod.build_verdict(
+        source=result.source.image, output=result.output.image, mask=result.mask,
+        engine=before.engine, repairs=before.repairs, elapsed_ms=before.elapsed_ms,
+        stage_ms=before.stage_ms, thr=thr, clean_reference=clean,
+        alpha_reference=alpha, veil_reference=veil)
+    report.page_key = result.source.key
+    report.conditions['automatic_selection_verified'] = False
+    for failure in before.failures:
+        if failure not in report.failures:
+            report.failures.append(failure)
+    result.verdict = report
+    result.clean_reference = clean
 
 
 def remask_page(page: PageImage, thr: Thresholds = Thresholds(),
@@ -133,25 +169,27 @@ def remask_page(page: PageImage, thr: Thresholds = Thresholds(),
 
 def process_file(path: str | Path, thr: Thresholds = Thresholds(), dpi: int = 200,
                  skip_structure: bool = False, use_ocr: bool = True,
-                 style: str | None = None) -> list[PageResult]:
+                 style: str | None = None, automatic_selection: bool = False) -> list[PageResult]:
     p = Path(path)
     # Per-page structural preflight is shared with streaming and the desktop
     # worker. Do not globally delete an image xref or render at a fixed 200 DPI:
     # a shared image can be legitimate elsewhere and the caller controls DPI.
     pages = documents.load_pages(p, dpi=dpi)
     return _run_raster(pages, thr, gt=None, force_single=len(pages) < 2, use_ocr=use_ocr,
-                       use_structure=not skip_structure, style=style)
+                       use_structure=not skip_structure, style=style,
+                       automatic_selection=automatic_selection)
 
 
 def process_file_streaming(path: str | Path, thr: Thresholds = Thresholds(),
-                           dpi: int = 200, use_ocr: bool = True) -> Iterator[PageResult]:
+                           dpi: int = 200, use_ocr: bool = True,
+                           automatic_selection: bool = False) -> Iterator[PageResult]:
     """Yield results one page at a time — constant memory regardless of doc size.
 
     Tries transparent-text operator removal before raster detection. Cross-page
     statistics are unavailable here; each remaining page uses single-image detection.
     """
     yield from iter_raster(documents.iter_pages(path, dpi=dpi), thr, total=0,
-                           use_ocr=use_ocr)
+                           use_ocr=use_ocr, automatic_selection=automatic_selection)
 
 
 def _run_dir(base: Path, source_name: str | None) -> Path:

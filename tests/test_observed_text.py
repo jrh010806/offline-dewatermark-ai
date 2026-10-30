@@ -79,6 +79,8 @@ class ObservedTextTests(unittest.TestCase):
                 with patch('wm.observed_text.ocr.read_lines',side_effect=read):
                     mask=observed_text.shadow_paper(source,body)
                     self.assertIsNotNone(mask)
+                    self.assertEqual(mask.repair_mode, 'shadow_paper_cleanup')
+                    self.assertIn('趋于不透明', mask.shadow_evidence['reason'])
                     output=observed_text.restore_shadow(source,mask)
                 np.testing.assert_array_equal(output[~mask.footprint],source[~mask.footprint])
                 # Broad coloured word pixels on originally blank paper clear;

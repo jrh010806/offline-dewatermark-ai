@@ -20,6 +20,8 @@ def jsave(path,value): path.write_text(json.dumps(value,ensure_ascii=False,inden
 
 
 def main():
+    if (ROOT/'config/regression_retirements.json').exists():
+        raise SystemExit('历史初始化脚本已停用：当前固定集已按授权移除样本，不能重建旧46个输入。校验用 ./start.sh check-data；更新说明用 .venv/bin/python tools/organize_project_docs.py。')
     if (DEST/'manifest.jsonl').exists():
         raise SystemExit('Frozen suite already exists; validate it instead of overwriting.')
     DEST.mkdir(parents=True,exist_ok=True)

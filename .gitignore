@@ -10,10 +10,22 @@ docs/*
 # 处理流程是长期维护的项目文档，单独允许版本管理
 !docs/去水印处理流程图.md
 !docs/单图去水印流程演示_20261028.html
+!docs/代码与工具用途说明.html
+!docs/历史开发记录_20261029.md
+!docs/项目现状与后续开发说明_历史20261027.html
+!docs/数据集清单与清理_历史20261026.html
 # 根目录调试图片与 macOS 元数据，禁止入库
 /*.png
 /*.jpg
 .DS_Store
+
+# 投标方案材料（方案内容、演示、证据）与投标工具，只留本地，不入库
+proposal/
+tools/build_tender_*
+
+# 本机图表快照与 Kimi 助手配置（含本机绝对路径），不入库
+.chart-data-*/
+.kimi-code/
 
 # LaMa ONNX 模型权重（~88MB，首次运行自动下载或手工放置，不入库）
 models/

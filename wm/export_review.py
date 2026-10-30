@@ -44,8 +44,10 @@ def write_selection(result: PageResult, out: Path, name: str) -> dict:
         if result.selection_overrides is not None:
             arrays['selection_overrides'] = result.selection_overrides
         images['actual_changes'] = np.any(result.output.image != result.source.image, axis=2).astype(np.uint8)*255
+    elif result.processing.get('automatic_selection'):
+        images['actual_changes'] = np.any(result.output.image != result.source.image, axis=2).astype(np.uint8)*255
     for field in ("footprint", "text_keepout", "overlay_opacity", "repeat_stroke_support",
-                  "veil_strength", "veil_offset"):
+                  "veil_strength", "veil_offset", "shadow_reconstruction"):
         value = getattr(mask, field)
         if value is not None:
             arrays[field] = value
@@ -58,6 +60,9 @@ def write_selection(result: PageResult, out: Path, name: str) -> dict:
         documents.save_png(out / files[kind], image)
     files["mask_data"] = f"{name}_mask_data.npz"
     np.savez_compressed(out / files["mask_data"], **arrays)
+    if result.comparison_evidence:
+        files['comparison_observations'] = f'{name}_原图评分观测_不是修复选区.npz'
+        np.savez_compressed(out / files['comparison_observations'], **result.comparison_evidence)
     evidence = {
         "files": files,
         "selection": {
@@ -74,6 +79,21 @@ def write_selection(result: PageResult, out: Path, name: str) -> dict:
         },
     }
     evidence['processing_mode'] = 'human_assisted' if result.automatic_result is not None else 'automatic'
+    if mask.shadow_evidence is not None:
+        evidence['selection']['shadow_layers'] = mask.shadow_evidence
+        if mask.repair_mode == 'shadow_layer_inverse':
+            evidence['selection']['alpha_note'] = '二值笔画许可；不是测得的水印透明度'
+    if result.comparison_results:
+        comparisons = []
+        for index, candidate in enumerate(result.comparison_results, 1):
+            candidate_name = f'{name}_方法{index:02d}'
+            item = write_selection(candidate, out, candidate_name)
+            item['files']['clean'] = candidate_name + '_clean.png'
+            documents.save_png(out / item['files']['clean'], candidate.output.image)
+            item['name'] = candidate.processing['candidate_name']
+            item['verdict'] = candidate.verdict.to_dict()
+            comparisons.append(item)
+        evidence['automatic_candidates'] = comparisons
     if mask.selection is not None:
         evidence['selection'].update(
             overlay='uniform red; complete edited selection, not physical alpha',
@@ -112,6 +132,18 @@ def write_index(out: Path, pages: list[dict]) -> None:
             figures.append(f'<figure><figcaption>{label}</figcaption><a href="{url}">'
                            f'<img loading="lazy" src="{url}" alt="{label}"></a></figure>')
         assistance = ''
+        auto = page.get('processing', {}).get('automatic_selection')
+        if auto:
+            assistance += ('<p><b>自动比较试用：'+('未达标' if auto['status'] == 'unmet' else '待复核')
+                           +'</b> '+escape(auto['reason'])
+                           +'。以下仅保留实际算出的结果；未运行的方法见记录，较好候选不等于已验证成功。</p>')
+            for candidate in page.get('automatic_candidates', []):
+                label = '原方法' if candidate['name'] == 'original' else '笔画补全'
+                for kind, suffix in [('clean', '实际结果'), ('mask', '实际选区')]:
+                    url = escape(quote(candidate['files'][kind]), quote=True)
+                    caption = label+' · '+suffix
+                    figures.append(f'<figure><figcaption>{caption}</figcaption><a href="{url}">'
+                                   f'<img loading="lazy" src="{url}" alt="{caption}"></a></figure>')
         if page.get('processing_mode') == 'human_assisted':
             baseline = page['automatic_baseline']['files']
             assistance = '<p><b>人工辅助结果：不计为全自动处理效果。</b> 自动基线与每次确认的笔画已单独保存，仍需检查残留及背景损伤。</p>'

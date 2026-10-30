@@ -55,6 +55,8 @@ def main():
         preview.thumbnail((1000, 1000))
         preview.save(dest / '选区预览.jpg', quality=90)
         np.savez_compressed(dest / '检测数值.npz', alpha=result.mask.alpha)
+        if result.comparison_results:
+            pipeline.write_results([result], dest / '自动比较详情')
         record = dict(key=key, id=item['id'], page=page, mode=task['mode'], status='completed',
                       input_sha256=item['input_sha256'], settings=settings,
                       output_sha256=pixels(result.output.image), mask_sha256=pixels(selected),
@@ -64,7 +66,8 @@ def main():
                       elapsed_ms=result.verdict.elapsed_ms, method=result.mask.method,
                       repair_mode=result.mask.repair_mode, repairs=[str(r) for r in result.verdict.repairs],
                       automatic_verdict=result.verdict.to_dict(),
-                      files={p.name: str(p) for p in dest.iterdir()})
+                      processing=result.processing,
+                      files={p.name: str(p) for p in dest.iterdir() if p.is_file()})
         records.append(record)
         save_json(folder / 'inference.json', records)
         print(key, flush=True)

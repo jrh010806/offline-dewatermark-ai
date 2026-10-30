@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>项目现状与后续开发说明 · 离线去水印</title>
+<style>
+:root{--ink:#172b3a;--muted:#596b79;--line:#dce4e9;--blue:#145c87;--bg:#f4f7f9;--green:#176953;--red:#a33a2d}*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:26px}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.8 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}a{color:var(--blue);text-decoration-thickness:1px;text-underline-offset:3px}a:hover{color:#092f4c}button{font:inherit;cursor:pointer;background:#fff;border:1px solid var(--line);border-radius:7px;padding:7px 13px;color:var(--ink)}button:hover{background:#edf4f8}button:focus-visible,a:focus-visible,summary:focus-visible,textarea:focus-visible{outline:3px solid #54a5dc;outline-offset:3px}.layout{display:grid;grid-template-columns:230px minmax(0,1fr);max-width:1500px;margin:auto}.nav{position:sticky;top:0;align-self:start;height:100vh;padding:34px 22px;border-right:1px solid var(--line);overflow:auto}.brand{font-weight:750;font-size:19px;margin-bottom:4px}.nav small{color:var(--muted);display:block;margin-bottom:25px}.nav a{display:block;padding:8px 0;text-decoration:none;font-size:14px}.nav .nav-actions{border-top:1px solid var(--line);margin-top:25px;padding-top:18px}.content{min-width:0;padding:44px 5vw 70px;max-width:1260px}header{margin-bottom:36px}.eyebrow{font-size:12px;letter-spacing:2px;color:var(--blue);font-weight:700}h1{font-size:34px;line-height:1.3;margin:12px 0 14px;letter-spacing:-.5px}h2{font-size:24px;line-height:1.4;margin:0 0 18px}h3{font-size:18px;margin:26px 0 12px}.lead{font-size:20px;line-height:1.7;max-width:880px}.meta,.muted{color:var(--muted);font-size:14px}.meta{margin:18px 0}.section{border-top:1px solid var(--line);padding-top:32px;margin-top:38px}p{margin:12px 0}ul,ol{padding-left:24px}li{margin:7px 0}.note{border-left:4px solid var(--blue);padding:14px 18px;background:#eaf3f9;margin:20px 0}.warning{border-left-color:#bd6b1b;background:#fff4e8}.danger{border-left-color:var(--red);background:#faece9}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:24px 0}.stat{background:white;padding:20px;border:1px solid var(--line);border-radius:10px}.stat strong{display:block;font-size:30px;line-height:1.3;font-variant-numeric:tabular-nums}.stat span{font-size:14px;color:var(--muted)}.stat.bad strong{color:var(--red)}.table-wrap{width:100%;overflow:auto;margin:16px 0 22px;border:1px solid var(--line);border-radius:8px;background:#fff}table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.65}th,td{text-align:left;vertical-align:top;padding:13px 14px;border-bottom:1px solid var(--line);overflow-wrap:anywhere}th{background:#eaf0f4;font-weight:650;color:#334d60}tr:last-child td{border-bottom:0}tbody tr:nth-child(even){background:#fafcfd}.category{min-width:760px}.category td:nth-child(1){width:20%}.category td:nth-child(2){width:10%}.category td:nth-child(3){width:40%}.files{font-size:12px;color:var(--muted);margin-top:7px}.files a{color:#526c80}code{font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;background:#eaf0f4;padding:2px 5px;border-radius:4px;overflow-wrap:anywhere}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#172b3a;color:#edf6fb;border-radius:8px;padding:18px;font:13px/1.75 ui-monospace,SFMono-Regular,Consolas,monospace}pre code{background:transparent;color:inherit;font:inherit;padding:0}details{background:#fff;border:1px solid var(--line);border-radius:9px;margin:16px 0;padding:0 18px}summary{font-weight:650;cursor:pointer;padding:15px 0}details[open]{padding-bottom:16px}blockquote{margin:18px 0;padding:18px 22px;background:#fff;border-left:4px solid var(--blue);font-size:18px}blockquote footer{font-size:13px;color:var(--muted);margin-top:10px}.steps{counter-reset:step;list-style:none;padding:0}.steps>li{position:relative;padding:3px 0 20px 46px;margin:20px 0;border-bottom:1px solid var(--line)}.steps>li:before{counter-increment:step;content:counter(step);position:absolute;left:0;top:3px;background:#dcecf6;color:var(--blue);width:30px;height:30px;border-radius:50%;text-align:center;font-weight:700;line-height:30px}.steps strong{font-size:17px}.route{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.route>div{padding:16px;border:1px solid var(--line);background:white;border-radius:8px}.route b{display:block;margin-bottom:6px}.route p{font-size:14px;margin:0}textarea{width:100%;min-height:390px;resize:vertical;border:1px solid var(--line);border-radius:8px;padding:18px;background:#f9fbfc;font:14px/1.8 ui-monospace,"PingFang SC",monospace;color:var(--ink)}.actions{display:flex;gap:12px;align-items:center;margin:10px 0}.actions span{font-size:13px;color:var(--muted)}.footer{margin-top:35px;color:var(--muted);font-size:13px}.pill{display:inline-block;padding:2px 8px;border-radius:4px;background:#eaf0f4;font-size:12px}.nowrap{white-space:nowrap}
+@media(max-width:1000px){.layout{grid-template-columns:190px minmax(0,1fr)}.nav{padding:24px 15px}.content{padding:32px 25px}.stats,.route{gap:8px}.stat{padding:14px}h1{font-size:29px}}
+@media(max-width:720px){.layout{display:block}.nav{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);padding:18px}.nav nav{display:flex;gap:5px 17px;flex-wrap:wrap}.nav a{padding:2px 0}.nav small,.nav-actions{display:none}.content{padding:25px 18px}.stats,.route{grid-template-columns:1fr}.stat{display:flex;align-items:center;justify-content:space-between}.stat strong{font-size:26px}h1{font-size:27px}h2{font-size:22px}.lead{font-size:18px}th,td{padding:10px}.table-wrap table{min-width:600px}}
+@media print{body{background:white;font-size:11pt}.layout{display:block}.nav,.actions,.no-print{display:none}.content{padding:0;max-width:none}h1{font-size:24pt}h2{font-size:17pt}.section{margin-top:24px;padding-top:20px}.table-wrap{overflow:visible;border-radius:0}table,.category{min-width:0!important;font-size:9pt}th,td{padding:7px}thead{display:table-header-group}tr{break-inside:avoid}a{color:inherit}textarea{display:none}.print-prompt{display:block!important;white-space:pre-wrap;font-size:10pt}pre{background:#f0f3f5;color:#172b3a}details{break-inside:auto}.stats{grid-template-columns:repeat(3,1fr)}.note,blockquote,.route>div{break-inside:avoid}}
+</style></head><body><div class="layout">
+<aside class="nav"><div class="brand">离线去水印</div><small>项目状态 · 2026-10-27</small><nav aria-label="文档目录"><a href="#state">01 当前做到哪里</a><a href="#types">02 分类与现有算法</a><a href="#route">03 技术路线判断</a><a href="#data">04 数据与测试口径</a><a href="#market">05 市面工具与差距</a><a href="#next">06 下一轮怎么做</a><a href="#run">07 代码与运行入口</a><a href="#ai">08 给 AI 的开工说明</a><a href="#evidence">09 原始证据</a></nav><div class="nav-actions"><button type="button" id="print-btn">打印 / 保存 PDF</button></div></aside>
+<main class="content"><header><div class="eyebrow">OFFLINE DEWATERMARK AI / PROJECT STATUS</div><h1>项目现状与后续开发说明</h1><p class="lead"><strong>PDF 的部分类型已有改善，基础图片去水印仍未达到可用水平。</strong>下一步应保留有效分支，重点验证更适合照片的去水印方法。</p><div class="meta">整理日期：2026-10-27　·　最新质量测试：2026-10-26 20:45　·　范围：图片与 PDF 的可见叠加水印</div><p class="muted">先读前六节了解项目与决策；后面提供代码位置、命令和可复制给 AI 的说明。本文整理现有证据，本次没有重新运行模型、训练或上传竞品样本。</p></header>
+
+<section class="section" id="state"><h2>01　当前做到哪里</h2><div class="stats"><div class="stat bad"><strong>3 / 42</strong><span>带水印图片通过</span></div><div class="stat"><strong>14 / 26</strong><span>带水印 PDF 页通过</span></div><div class="stat"><strong>20 / 20</strong><span>干净样本保持原样</span></div>
+<p>这是同一轮 88 张／页的开发复测：58 张图片、30 页 PDF，包含正例与干净对照。<strong>原先那组 22 张带水印图片仍然是 0/22。</strong>新增的 20 张检查图只有 3 张通过，因此当前不能作为通用去水印产品交付。</p>
+<div class="table-wrap"><table class=""><thead><tr><th scope="col">同一批输入</th><th scope="col">修改前</th><th scope="col">最新保存结果</th></tr></thead><tbody><tr><td>原批次图片正例</td><td>0/22</td><td>0/22</td></tr><tr><td>扩展检查图片正例</td><td>1/20</td><td>3/20</td></tr><tr><td>原批次 PDF 正例页</td><td>6/22</td><td>10/22</td></tr><tr><td>扩展检查 PDF 正例页</td><td>0/4</td><td>4/4</td></tr><tr><td>干净图片／PDF（逐像素不变）</td><td>10/20</td><td>20/20</td></tr></tbody></table></div>
+<p class="muted">其中 42 张图片包括照片与文档背景；原 22 种图片样式来自同一张照片底图。扩展检查包含训练来源，结果反映本批样本的改进，不代表总体成功率。数字来自<a href="../out/foundation_round_20261026/after/all_metrics.json">保存的逐项结果</a>。</p>
+<ul><li><strong>已经具备：</strong>离线运行、桌面界面、单张与批量处理、原图／结果查看、结果和记录导出；若干 PDF 文字、中文及透明图片水印能去掉。</li><li><strong>主要失败：</strong>照片里的居中大字、密集平铺、淡字、Logo、裁边小字，以及 PDF 矢量、嵌套对象、图章、图层与压平页。</li><li><strong>工程检查：</strong>最近保存的 74 项程序检查通过；它们证明部分程序行为正确，不能证明图片去除质量合格。</li></ul>
+<div class="note warning"><strong>不能只把问题归因于样本不足。</strong>现有样本已足够暴露基础问题。给准水印位置后，现有修复方法按原规则也只有 4/22 通过，说明自动定位和后续修复都要改。这个诊断不能代替自动效果，也不能视作 LaMa 或其他方法的理论上限。</div>
+<p><a href="基础功能修复测试报告.html">查看前后对照图</a> · <a href="水印分类样本与最新测试.html">查看全部样本及详细分类</a></p></section>
+
+<section class="section" id="types"><h2>02　分为多少类，每类现在用什么算法</h2><p><strong>12 类验收场景，细分为 22 种图片样式、11 种 PDF 结构，另有干净对照。</strong>场景可以重叠：同一个白色平铺水印也可能存在于扫描 PDF 中。这里的“类别”是测试范围；代码由多个共用分支处理，不能理解成已经完成了 33 套算法。</p>
+<div class="table-wrap"><table class="category"><thead><tr><th scope="col">场景</th><th scope="col">细分数量</th><th scope="col">当前算法，用简单的话解释</th><th scope="col">现状与边界</th></tr></thead><tbody><tr><td><strong>C01</strong><br>局部文字、日期时间戳、网址</td><td>3 种</td><td>白底页用文字识别（OCR）找角落编号，确认后填回纸色；照片用文字位置与透明叠加特征定位，再做局部补画。<div class="files"><a href="../wm/corner_id.py">corner_id.py</a><br><a href="../wm/photo_text.py">photo_text.py</a><br><a href="../wm/lama.py">lama.py</a></div></td><td>角落规则偏向编号；普通网址、日期及复杂照片仍大量漏检。</td></tr><tr><td><strong>C02</strong><br>Logo、模拟签名、手写标记</td><td>3 种</td><td>尚无通用 Logo／签名专用识别器。主要依赖灰度、颜色和大小规则定位，随后反解透明叠加或用 LaMa 补图。<div class="files"><a href="../wm/masks.py">masks.py</a><br><a href="../wm/lama.py">lama.py</a></div></td><td>无法可靠区分水印与正常 Logo、原始签名；任意形状覆盖不足。</td></tr><tr><td><strong>C03</strong><br>居中大字、白色半透明大字</td><td>2 种</td><td>白底文档估计被染色纸面与正文的颜色，反推叠加前内容；照片通过颜色差异和大字位置找水印，再局部修补，少数可估计透明度回填细节。<div class="files"><a href="../wm/document_overlay.py">document_overlay.py</a><br><a href="../wm/chromatic.py">chromatic.py</a><br><a href="../wm/photo_overlay.py">photo_overlay.py</a><br><a href="../wm/photo_text.py">photo_text.py</a><br><a href="../wm/lama.py">lama.py</a></div></td><td>照片分支依赖背景颜色和文字几何；水平居中、浅色区域及复杂纹理容易失败。</td></tr><tr><td><strong>C04</strong><br>斜向平铺、非等距密集文字</td><td>2 种</td><td>OCR 找候选文字，再在同一张图中匹配重复形状；白底页尝试分离叠加色或只清理纸面，照片使用有限区域修补。<div class="files"><a href="../wm/repeated.py">repeated.py</a><br><a href="../wm/paper_repeat.py">paper_repeat.py</a><br><a href="../wm/photo_text.py">photo_text.py</a><br><a href="../wm/lama.py">lama.py</a></div></td><td>重复证据不足、边缘残片及正文交叠仍漏检；非等距不保证适配。</td></tr><tr><td><strong>C05</strong><br>点阵、细线网格</td><td>2 种</td><td>点阵利用重复间距与位置估计点的形状、颜色和透明度，再反解／局部插值。线网没有同等成熟的专用分支。<div class="files"><a href="../wm/paper_grid.py">paper_grid.py</a><br><a href="../wm/periodic.py">periodic.py</a><br><a href="../wm/masks.py">masks.py</a><br><a href="../wm/lama.py">lama.py</a></div></td><td>规则点阵只覆盖部分周期条件；不能把细线网格、表格线都当点阵。</td></tr><tr><td><strong>C06</strong><br>高清小角标、贴边裁切文字</td><td>2 种</td><td>角标走 OCR 与角落规则；裁切的重复字可由已确认的文字模板补找残片，再执行对应修复。<div class="files"><a href="../wm/corner_id.py">corner_id.py</a><br><a href="../wm/repeated.py">repeated.py</a><br><a href="../wm/paper_repeat.py">paper_repeat.py</a><br><a href="../wm/photo_text.py">photo_text.py</a></div></td><td>缩小后的细字易丢失；孤立的裁切文字没有稳定补全方法。</td></tr><tr><td><strong>C07</strong><br>深色大字、完全不透明图案</td><td>2 种</td><td>可测出透明叠加时尝试反解；不能反解的区域由 LaMa 根据周边内容补画。重复深字也会经过重复文字分支。<div class="files"><a href="../wm/repeated.py">repeated.py</a><br><a href="../wm/paper_repeat.py">paper_repeat.py</a><br><a href="../wm/masks.py">masks.py</a><br><a href="../wm/lama.py">lama.py</a></div></td><td>dark_text 专用模块尚不存在；完全挡住的内容不能保证恢复原样，尤其文字和数字。</td></tr><tr><td><strong>C08</strong><br>极淡、渐变、描边、阴影、多重叠加、多色</td><td>6 种</td><td>复用已有颜色、灰度、重复文字和照片文字规则，按命中的分支修复；没有六种样式各自完整的专用模型。<div class="files"><a href="../wm/masks.py">masks.py</a><br><a href="../wm/document_overlay.py">document_overlay.py</a><br><a href="../wm/repeated.py">repeated.py</a><br><a href="../wm/chromatic.py">chromatic.py</a><br><a href="../wm/photo_text.py">photo_text.py</a><br><a href="../wm/lama.py">lama.py</a></div></td><td>全图用一组颜色／透明度难描述渐变与多层混合，边缘残留和细节损伤明显。</td></tr><tr><td><strong>C09</strong><br>PDF 独立文字、中文编码、共用内容流</td><td>3 种</td><td>解析 PDF 绘制指令，依据透明度、字号、方向、重复与邻近关系，省略被确认的文字显示指令；不按整块矩形擦除。<div class="files"><a href="../wm/pdf_text.py">pdf_text.py</a><br><a href="../wm/structure.py">structure.py</a></div></td><td>当前仅处理符合条件的顶层文字块；正文与水印混在同一文字块、特殊透明混合仍保守跳过。</td></tr><tr><td><strong>C10</strong><br>PDF 透明图片、矢量路径、描边文字</td><td>3 种</td><td>透明图片按具体绘制次数删除，保留共享图片资源；矢量与描边没有完整结构删除，仍可能转图片走颜色规则。<div class="files"><a href="../wm/pdf_images.py">pdf_images.py</a><br><a href="../wm/structure.py">structure.py</a><br><a href="../wm/masks.py">masks.py</a></div></td><td>透明图片已改善；矢量图案失败，描边只部分通过；真正文字转曲字形仍缺专项样本。</td></tr><tr><td><strong>C11</strong><br>PDF 嵌套对象、图章批注、可选图层</td><td>3 种</td><td>暂无完整递归、批注与图层专用删除链；结构预检无法处理时，渲染成图片进入现有像素算法。<div class="files"><a href="../wm/structure.py">structure.py</a><br><a href="../wm/masks.py">masks.py</a><br><a href="../wm/pipeline.py">pipeline.py</a></div></td><td>目前这三类各 0/2 页通过；不能宣称已支持对象级删除。</td></tr><tr><td><strong>C12</strong><br>PDF 数字压平、混合页、实扫与翻拍</td><td>2 种数字结构，另有真实采集</td><td>独立对象能识别时先处理对象；已经融进像素的部分走图片定位与修复。实扫还包含纸纹、透视与光照变化。<div class="files"><a href="../wm/pipeline.py">pipeline.py</a><br><a href="../wm/structure.py">structure.py</a><br><a href="../wm/masks.py">masks.py</a><br><a href="../wm/lama.py">lama.py</a></div></td><td>数字压平各页失败，混合页部分通过；真实扫描已可训练检测，尚无精确修复配对成绩。</td></tr></tbody></table></div>
+<details><summary>展开：22 种图片样式的逐类结果与实际算法</summary><p class="muted">下表算法名来自结果记录。非纸面背景返回原图表示这次未处理成功；它不是一种有效去水印算法。部分标签为共用分支的名称，需结合预测区域和输出判断。</p><div class="table-wrap"><table class=""><thead><tr><th scope="col">样式</th><th scope="col">修改前</th><th scope="col">最新结果</th><th scope="col">本轮实际走到的算法</th></tr></thead><tbody><tr><td>C01 · 局部文字<br><code>local_text</code></td><td>0/6</td><td><strong>1/6</strong></td><td>照片文字定位 → 细笔画插值／较大区域 LaMa（1）<br>未找到可信水印，因非纸面背景保留原图（3）<br>通用纸面灰度／颜色分支（也可能未形成有效区域）（2）<div class="files"><code>photo_translucent_text</code><br><code>nonpaper_background</code><br><code>tonal</code></div></td></tr><tr><td>C01 · 日期时间戳<br><code>timestamp</code></td><td>0/1</td><td><strong>0/1</strong></td><td>未找到可信水印，因非纸面背景保留原图（1）<div class="files"><code>nonpaper_background</code></div></td></tr><tr><td>C01 · 网址文字<br><code>website</code></td><td>0/1</td><td><strong>0/1</strong></td><td>未找到可信水印，因非纸面背景保留原图（1）<div class="files"><code>nonpaper_background</code></div></td></tr><tr><td>C02 · 模拟手写签名<br><code>signature</code></td><td>0/1</td><td><strong>0/1</strong></td><td>未找到可信水印，因非纸面背景保留原图（1）<div class="files"><code>nonpaper_background</code></div></td></tr><tr><td>C02 · 透明几何 Logo<br><code>logo_transparent</code></td><td>0/1</td><td><strong>0/1</strong></td><td>未找到可信水印，因非纸面背景保留原图（1）<div class="files"><code>nonpaper_background</code></div></td></tr><tr><td>C02 · 不透明几何 Logo<br><code>logo_opaque</code></td><td>0/1</td><td><strong>0/1</strong></td><td>未找到可信水印，因非纸面背景保留原图（1）<div class="files"><code>nonpaper_background</code></div></td></tr><tr><td>C03 · 居中大字<br><code>center_text</code></td><td>1/6</td><td><strong>1/6</strong></td><td>照片文字定位 → 细笔画插值／较大区域 LaMa（2）<br>未找到可信水印，因非纸面背景保留原图（2）<br>单页彩色文档叠加反解（1）<br>通用纸面灰度／颜色分支（也可能未形成有效区域）（1）<div class="files"><code>photo_translucent_text</code><br><code>nonpaper_background</code><br><code>single_coloured_document_overlay</code><br><code>tonal</code></div></td></tr><tr><td>C03 · 白色半透明大字<br><code>center_white</code></td><td>0/6</td><td><strong>0/6</strong></td><td>未找到可信水印，因非纸面背景保留原图（4）<br>通用纸面灰度／颜色分支（也可能未形成有效区域）（2）<div class="files"><code>nonpaper_background</code><br><code>tonal</code></div></td></tr><tr><td>C04 · 斜向平铺文字<br><code>tiled_diagonal</code></td><td>0/6</td><td><strong>1/6</strong></td><td>照片文字定位 → 细笔画插值／较大区域 LaMa（2）<br>未找到可信水印，因非纸面背景保留原图（2）<br>重复文字定位＋文档叠加反解（2）<div class="files"><code>photo_translucent_text</code><br><code>nonpaper_background</code><br><code>paper_repeat_document_overlay</code></div></td></tr><tr><td>C04 · 非等距密集文字<br><code>tiled_irregular</code></td><td>0/1</td><td><strong>0/1</strong></td><td>照片文字定位 → 细笔画插值／较大区域 LaMa（1）<div class="files"><code>photo_translucent_text</code></div></td></tr><tr><td>C05 · 点阵<br><code>dot_grid</code></td><td>0/1</td><td><strong>0/1</strong></td><td>未找到可信水印，因非纸面背景保留原图（1）<div class="files"><code>nonpaper_background</code></div></td></tr><tr><td>C05 · 细线网格<br><code>line_net</code></td><td>0/1</td><td><strong>0/1</strong></td><td>未找到可信水印，因非纸面背景保留原图（1）<div class="files"><code>nonpaper_background</code></div></td></tr><tr><td>C06 · 高清小角标<br><code>tiny_corner</code></td><td>0/1</td><td><strong>0/1</strong></td><td>未找到可信水印，因非纸面背景保留原图（1）<div class="files"><code>nonpaper_background</code></div></td></tr><tr><td>C06 · 边缘裁切文字<br><code>cropped_edge</code></td><td>0/1</td><td><strong>0/1</strong></td><td>未找到可信水印，因非纸面背景保留原图（1）<div class="files"><code>nonpaper_background</code></div></td></tr><tr><td>C07 · 深色大字<br><code>heavy_dark</code></td><td>0/1</td><td><strong>0/1</strong></td><td>未找到可信水印，因非纸面背景保留原图（1）<div class="files"><code>nonpaper_background</code></div></td></tr><tr><td>C07 · 大面积完全不透明图案<br><code>opaque_block</code></td><td>0/1</td><td><strong>0/1</strong></td><td>未找到可信水印，因非纸面背景保留原图（1）<div class="files"><code>nonpaper_background</code></div></td></tr><tr><td>C08 · 极淡文字<br><code>faint</code></td><td>0/1</td><td><strong>0/1</strong></td><td>未找到可信水印，因非纸面背景保留原图（1）<div class="files"><code>nonpaper_background</code></div></td></tr><tr><td>C08 · 渐变文字<br><code>gradient</code></td><td>0/1</td><td><strong>0/1</strong></td><td>未找到可信水印，因非纸面背景保留原图（1）<div class="files"><code>nonpaper_background</code></div></td></tr><tr><td>C08 · 描边文字<br><code>outlined</code></td><td>0/1</td><td><strong>0/1</strong></td><td>未找到可信水印，因非纸面背景保留原图（1）<div class="files"><code>nonpaper_background</code></div></td></tr><tr><td>C08 · 带阴影文字<br><code>shadow</code></td><td>0/1</td><td><strong>0/1</strong></td><td>未找到可信水印，因非纸面背景保留原图（1）<div class="files"><code>nonpaper_background</code></div></td></tr><tr><td>C08 · 多重叠加<br><code>multiple</code></td><td>0/1</td><td><strong>0/1</strong></td><td>照片文字定位 → 细笔画插值／较大区域 LaMa（1）<div class="files"><code>photo_translucent_text</code></div></td></tr><tr><td>C08 · 多色文字与图案<br><code>mixed_color</code></td><td>0/1</td><td><strong>0/1</strong></td><td>照片文字定位 → 细笔画插值／较大区域 LaMa（1）<div class="files"><code>photo_translucent_text</code></div></td></tr></tbody></table></div></details>
+<details><summary>展开：11 种 PDF 结构的逐类结果与实际算法</summary><p class="muted">全部为本轮测试页的结果；不代表同类所有文件都可处理。描述“描边文字”的样本仍是文字对象，不等于文字已转成路径。</p><div class="table-wrap"><table class=""><thead><tr><th scope="col">样式</th><th scope="col">修改前</th><th scope="col">最新结果</th><th scope="col">本轮实际走到的算法</th></tr></thead><tbody><tr><td>C09 · PDF 独立文字<br><code>independent_text</code></td><td>2/2</td><td><strong>2/2</strong></td><td>删除 PDF 文字显示指令（2）<div class="files"><code>transparent_pdf_text</code></div></td></tr><tr><td>C09 · PDF 中文编码文字<br><code>unicode_text</code></td><td>0/4</td><td><strong>4/4</strong></td><td>删除 PDF 文字显示指令（4）<div class="files"><code>transparent_pdf_text</code></div></td></tr><tr><td>C09 · PDF 水印正文共用内容流<br><code>shared_content_stream</code></td><td>2/2</td><td><strong>2/2</strong></td><td>删除 PDF 文字显示指令（2）<div class="files"><code>transparent_pdf_text</code></div></td></tr><tr><td>C10 · PDF 独立透明图片<br><code>independent_image</code></td><td>0/4</td><td><strong>4/4</strong></td><td>删除 PDF 透明图片的一次绘制（4）<div class="files"><code>transparent_pdf_image</code></div></td></tr><tr><td>C10 · PDF 矢量路径<br><code>vector_paths</code></td><td>0/2</td><td><strong>0/2</strong></td><td>通用纸面灰度／颜色分支（也可能未形成有效区域）（2）<div class="files"><code>tonal</code></div></td></tr><tr><td>C10 · PDF 描边文字<br><code>outlined_text</code></td><td>1/2</td><td><strong>1/2</strong></td><td>单页彩色文档叠加反解（2）<div class="files"><code>single_coloured_document_overlay</code></div></td></tr><tr><td>C11 · PDF 嵌套 Form XObject<br><code>nested_form</code></td><td>0/2</td><td><strong>0/2</strong></td><td>通用纸面灰度／颜色分支（也可能未形成有效区域）（2）<div class="files"><code>tonal</code></div></td></tr><tr><td>C11 · PDF 图章批注<br><code>stamp_annotation</code></td><td>0/2</td><td><strong>0/2</strong></td><td>通用纸面灰度／颜色分支（也可能未形成有效区域）（2）<div class="files"><code>tonal</code></div></td></tr><tr><td>C11 · PDF 可选图层 OCG<br><code>optional_content</code></td><td>0/2</td><td><strong>0/2</strong></td><td>通用纸面灰度／颜色分支（也可能未形成有效区域）（2）<div class="files"><code>tonal</code></div></td></tr><tr><td>C12 · PDF 数字栅格化压平<br><code>raster_flattened</code></td><td>0/2</td><td><strong>0/2</strong></td><td>通用纸面灰度／颜色分支（也可能未形成有效区域）（2）<div class="files"><code>tonal</code></div></td></tr><tr><td>C12 · PDF 文字与图像混合存储<br><code>mixed_storage</code></td><td>1/2</td><td><strong>1/2</strong></td><td>删除 PDF 文字显示指令（1）<br>通用纸面灰度／颜色分支（也可能未形成有效区域）（1）<div class="files"><code>transparent_pdf_text</code><br><code>tonal</code></div></td></tr></tbody></table></div></details>
+<div class="note"><strong>“有样本”“有代码分支”“处理得干净”是三件事。</strong>其中不少类型目前只有样本和回退处理，效果仍失败，后续 AI 必须按实际输出判断。</div></section>
+
+<section class="section" id="route"><h2>03　技术路线是否合适</h2><div class="route"><div><b>PDF 独立对象：保留</b><p>能确认水印是独立文字或图片绘制时，直接省略该绘制，优先保留底层内容。</p></div><div><b>白底文档：继续完善</b><p>纸色、文字色与重复结构有用；可测出透明叠加时优先还原，保护正文、数字和表格线。</p></div><div><b>照片：调整主力方法</b><p>改为验证专门针对可见水印的模型；现有 OCR 和局部补图作为对照或局部辅助。</p></div></div>
+<h3>为什么当前照片路线效果差</h3><ol><li><strong>很多位置根本找不到。</strong>本轮 42 张正例中，26 张走到 <code>nonpaper_background</code>。现有规则偏向白底页、特定方向的大字或重复图案。</li><li><strong>找到了也不一定还原得好。</strong>LaMa 根据周围内容补画，容易抹平细纹理；透明水印下面仍有的信息，未被充分利用。LaMa 的官方定位是图像补全，见 <a href="https://github.com/advimman/lama" target="_blank" rel="noopener noreferrer">官方项目</a>。</li><li><strong>放宽规则会误删正常内容。</strong>此前出现表格标签、页脚线和图表误改；这一轮已补保护，不能通过扩大擦除范围换取表面干净。</li><li><strong>评分也需要完善。</strong><code>wm/verdict.py</code> 的文字指标是二值笔画近似判断，并非真正读出文字；照片应额外检查纹理、主体和真实水印外区域。</li></ol>
+<h3>候选模型先比较，再确定</h3>
+<div class="table-wrap"><table class=""><thead><tr><th scope="col">方法</th><th scope="col">为什么比较</th><th scope="col">当前结论</th></tr></thead><tbody><tr><td><a href="https://github.com/MRUIL/WDNet" target="_blank" rel="noopener noreferrer">WDNet ↗</a></td><td>预测水印颜色、透明度和位置，尝试分离底图；与透明水印保留细节的目标相关。</td><td>候选，尚无当前固定集实测，不能预先判为有效。</td></tr><tr><td><a href="https://github.com/bcmi/SLBR-Visible-Watermark-Removal" target="_blank" rel="noopener noreferrer">SLBR ↗</a></td><td>联合水印定位与背景恢复；已有本地权重，可作为研究对照。</td><td>旧 57 例实验中 52 例区域误差下降，但 56 份干净对照发生像素改动；不是可直接上线的方案。官方训练尺度为 256×256，高清适配需验证。</td></tr><tr><td><a href="https://github.com/Aitchson-Hwang/MNet" target="_blank" rel="noopener noreferrer">MNet ↗</a></td><td>2025 年多尺度可见水印模型，官方提供代码和权重入口，可作为另一种专用方法。</td><td>候选，下载可用性、运行兼容与本地效果仍需实测。</td></tr><tr><td><a href="https://github.com/advimman/lama" target="_blank" rel="noopener noreferrer">LaMa（当前） ↗</a></td><td>保留为限定范围的补图基线，比较细节与边缘表现。</td><td>现有定位和修复组合不足以完成基础照片任务。</td></tr></tbody></table></div>
+<p>透明水印优先尝试把叠加的颜色与底图分开；大面积不透明遮挡只能补出合理内容，不能保证原始细节，尤其不能凭补图结果认定被遮数字或文字已真实恢复。能否达到当前业务要求，必须由我们的样本和原尺寸输出确认。</p>
+<details><summary>实现层面必须知道的几个缺口</summary><ul><li><code>wm/masks.py</code> 尝试导入 <code>dark_text</code>，但当前没有 <code>wm/dark_text.py</code>；导入失败会跳过。不能把这个入口算作已完成的深色文字算法。</li><li><code>wm/directional.py</code> 是实验方向滤波代码，目前未接入主检测流程。</li><li>PDF 结构修改后的字节暂存在内存，<code>PageResult</code> 返回的是渲染页图；常规 <code>write_results</code> 导出 PNG 与 JSON。<strong>目前没有完整的原生 PDF 保结构导出链。</strong>“页图变干净”不能宣称文字可搜索、链接与批注均保留。</li><li><code>wm/structure.py</code> 的旧 <code>strip_pdf</code> 仍有按资源删除图片的实现，当前主流程改走 <code>process_text_page</code> 与具体绘制删除；后续不要误接回旧全局删除路径。</li><li>同页只要结构分支返回结果，主流程就直接使用它；复杂混合页尚未形成完整的“结构删除后再识别剩余像素水印”流程。</li><li>新增照片文字分支只在限定条件下进入；<code>photo_overlay.py</code> 仅对可拟合的颜色关系细化，不是通用照片还原模型。</li></ul></details></section>
+
+<section class="section" id="data"><h2>04　现在有哪些数据，哪些成绩能使用</h2><p><strong>当前工作数据只保留三套。</strong>固定回归集从前两套中抽取，不另算新增来源。</p>
+<div class="table-wrap"><table class=""><thead><tr><th scope="col">数据目录</th><th scope="col">数量与用途</th><th scope="col">边界</th></tr></thead><tbody><tr><td><a href="../data/watermark_training_v1/README.txt">data/watermark_training_v1</a></td><td>基础集 2,432 条：2,240 张图片、192 份 PDF（384 页）。</td><td>96 个底稿来源；其中 32 张照片、64 张程序底图；PDF 为部分文档的结构变体。</td></tr><tr><td><a href="../data/watermark_training_increment_v1_1/training_tasks.jsonl">data/watermark_training_increment_v1_1</a></td><td>统一任务清单 129 条：121 严格配对＋3 近似配对＋5 检测专用。</td><td>全部用于训练／开发；数据已可读，产品模型尚未因此完成新训练。</td></tr><tr><td><a href="../data/watermark_regression_min_v1/README.txt">data/watermark_regression_min_v1</a></td><td>核心 36 个输入／48 张或页；真实扩展 10 个输入／14 张或页。</td><td>核心图片分布在 9 个既有验证底稿，PDF 来自 2 个验证文档；真实扩展是训练来源，不能冒充最终独立测试。</td></tr></tbody></table></div>
+<h3>图片与页面数量</h3><p>严格配对部分合计 <strong>2,355 张图片</strong>（2,222 张带水印＋133 张干净对照）和 <strong>390 页 PDF</strong>（358 页带水印＋32 页干净对照）。再加 8 个真实任务样本，当前样本页面共有 <strong>2,753 张／页卡片</strong>。这些不是 2,753 张独立原始照片。</p>
+<p>22 种图片水印各有 101 张，共用同一批 101 张底图：<strong>32 张下载的 CC0 照片＋64 张程序底图＋5 张用户提供的照片</strong>。64 张程序底图包括 32 张虚构文档、16 张图表、16 张纹理；2,222 张正例的水印层都是程序叠加。5 张用户照片为猫、菜品、汤品、室内标牌、户外建筑。</p>
+<details><summary>展开：129 条人工增量怎样使用</summary><ul><li><strong>121 条严格配对：</strong>110 张合成水印图、5 张干净对照、6 页真实软件 PDF 配对。6 页 PDF 只有 1 份底稿的 2 个变体，不能算 6 个独立文档。</li><li><strong>3 组近似修复配对：</strong>2 组黑笔手写、1 组醒图导出；有有效学习区域，权重 0.25，不能当精确像素评测真值。</li><li><strong>5 张检测专用：</strong>4 张实际纸张采集图只提供检测框，1 张红笔单图提供笔迹与忽略区域；没有同条件干净原图，不用于精确配对修复。</li><li>修复任务可读 124 条，检测任务可读 126 条；共享 121 条，二者不能相加。最新 <code>qa/training_tasks_validation.json</code> 已通过读取和临时梯度检查，明确记录<strong>没有训练产品模型或保存新模型权重</strong>。</li></ul><p>增量的旧 <code>build_summary.json</code> 与 <code>qa/validation.json</code> 仍有“扫描待标注”的历史字段；以 <code>training_tasks.jsonl</code> 和最新任务校验为准。</p></details>
+<div class="note warning"><strong>新回归集尚无推理成绩。</strong>本次核对只验证了 269 个文件，46 个输入共 62 张／页，校验通过；<code>out/min_regression/</code> 尚无结果。新集合换了选图，不能直接套用历史 88 项成绩。</div>
+<p>数据足够启动算法筛选，但独立底图数量仍有限。同一底图生成 22 种水印不会变成 22 个独立来源；先遵守已有来源分组，最终验收使用没有参与调参的来源。旧 <code>real_samples</code>、<code>syn</code> 与公开 40 对样本入口已退役，不应按旧文档重建为第四套工作数据。</p></section>
+
+<section class="section" id="market"><h2>05　市面工具与当前差距</h2><blockquote>“我们这边基本水印去除不掉，这些去除不掉的我随便拿一个在 WatermarkRemover.io 上测试，都能去除很干净。”<footer>用户在本次项目讨论中的实际体验反馈，记录于 2026-10-27。</footer></blockquote>
+<p><strong>这说明当前项目与用户可获得的工具之间存在明确的体验差距，应该以这个差距推动算法改进。</strong>不要继续用“已经接入 AI”“支持很多类别”来替代效果。</p>
+<p>当前尚未归档这次网站试用的具体输入、完整输出、设置与逐项评分，因此没有正式的竞品通过率，也不能据此猜测网站内部使用了 LaMa、SLBR 或某个大模型。下一轮应把用户认为去得干净的结果留作直观对照。</p>
+
+<h3>7 款竞品的处理方式与免费边界</h3>
+<p class="muted">官方功能与收费核对日期：2026-10-27。本节是公开资料核对，尚未完成同一组样本的效果实测；免费额度、价格和套餐可能调整，正式测试时保存当时的界面与版本。</p>
+<div class="route"><div><b>自动识别＋图片修补</b><p>WatermarkRemover.io、DeWatermark、佐糖：比较无需手动指定位置的一次处理结果。</p></div><div><b>手动选区＋图片修补</b><p>Cleanup、各工具的画笔／消除笔：比较修补质量，并计入人工操作时间。</p></div><div><b>PDF 独立对象删除</b><p>WPS、Acrobat、万兴：比较水印对象删除、正文保留及批量处理。</p></div></div>
+<div class="table-wrap"><table class="competitors"><colgroup><col style="width:17%"><col style="width:27%"><col style="width:29%"><col style="width:27%"></colgroup><thead><tr><th scope="col">工具与官方来源</th><th scope="col">怎样处理水印</th><th scope="col">是否免费／收费边界</th><th scope="col">本项目的参照方式与注意事项</th></tr></thead><tbody>
+<tr><td><strong>WatermarkRemover.io</strong><div class="files"><a href="https://www.watermarkremover.io/" target="_blank" rel="noopener noreferrer">功能 ↗</a><br><a href="https://www.watermarkremover.io/pricing" target="_blank" rel="noopener noreferrer">价格与额度 ↗</a></div></td><td>自动识别图片中的文字、Logo 等水印并处理，无需手动标出位置；另有 PDF、视频入口。具体底层模型未公开。</td><td><strong>限额免费。</strong>价格页写每月 3 积分、3 次免费下载，FAQ 另写未登录每天可试 2 张，两种口径不能直接相加。普通图片 1 积分／张，PDF 1 积分／2 页；一次性积分包从 8.99 美元／30 积分起。</td><td>首要<strong>全自动一次处理</strong>参照。用户反馈本项目失败的样本在该站处理很干净，正式同样本输出仍未归档。记录实际试用额度、导出尺寸和 PDF 结构保留情况。</td></tr>
+<tr><td><strong>DeWatermark.ai</strong><div class="files"><a href="https://dewatermark.ai/" target="_blank" rel="noopener noreferrer">功能与模型 ↗</a><br><a href="https://dewatermark.ai/pricing" target="_blank" rel="noopener noreferrer">价格与额度 ↗</a></div></td><td>自动模型处理，再用 AI 画笔对涂抹区域做局部修补。当前入口有 Auto Remove 3.0、4.0、PRO；官网提到图像修复（inpainting）与 GAN，但未公开具体架构或权重。</td><td><strong>限额免费。</strong>价格卡写每天 3 积分，高质量输出和批量处理列为 Pro 权益；一次性积分包从 7 美元／100 积分起。FAQ 仍写每天 2 积分，PRO 单张消耗在不同页面写 3 或 6 积分，须以实际处理界面核实。</td><td>对比<strong>自动处理＋手动补擦</strong>完整流程。自动结果与补擦后结果分别保存；记录模型名称、设置、费用和导出尺寸。下方旧说明仍列 2.0，不能仅凭版本号推断实际效果。</td></tr>
+<tr><td><strong>佐糖 PicWish</strong><div class="files"><a href="https://picwish.cn/remove-image-logo" target="_blank" rel="noopener noreferrer">处理方式 ↗</a><br><a href="https://picwish.cn/faq/frequently-asked-questions.html" target="_blank" rel="noopener noreferrer">免费与会员说明 ↗</a></div></td><td>AI 自动检测 Logo／水印并补全背景，也支持手动涂抹，以及文字指令指定要移除的内容。</td><td><strong>提供免费体验，不是已确认的无限免费。</strong>功能页宣传免费下载高清图片；总 FAQ 明确说明体验次数随功能和运营策略调整，之后可开会员或购买算粒。具体次数以功能页面为准。</td><td>国内图片工具参照。网页、Windows、Mac 和手机端的功能与权益不同；自动去水印、手动消除笔和文字指令模式分别记录。</td></tr>
+<tr><td><strong>Cleanup.pictures</strong><div class="files"><a href="https://cleanup.pictures/" target="_blank" rel="noopener noreferrer">功能、导出限制与价格 ↗</a></div></td><td><strong>用户先涂抹区域</strong>，AI 根据周围内容推测并补出背景，处理文字、Logo、物体等，属于图像修复工具。</td><td><strong>低分辨率可免费使用。</strong>官网写不限图片数量，免费导出限 720px；Pro 为 5 美元／月或 36 美元／年，支持高分辨率，并提供高清试用。</td><td>用于<strong>手动修补</strong>对照，不与全自动一次处理混算。计入涂抹与返工时间；免费缩小输出不得当作原尺寸结果评分。</td></tr>
+<tr><td><strong>WPS PDF／图片工具</strong><div class="files"><a href="https://www.wps.cn/learning/course/detail/id/1025.html" target="_blank" rel="noopener noreferrer">PDF 操作与会员 ↗</a><br><a href="https://vip.wps.cn/privilege_page/privilege_detail?id=img_rm_watermark" target="_blank" rel="noopener noreferrer">图片去水印权益 ↗</a><br><a href="https://www.wps.cn/learning/room/d/335172" target="_blank" rel="noopener noreferrer">图片工具介绍 ↗</a></div></td><td><strong>两条路径：</strong>PDF 中删除标准水印，或进入编辑模式选中独立图片对象删除；图片工具支持涂抹消除，官方另有智能识别水印并填补背景的介绍。</td><td><strong>相关功能属于会员权益。</strong>PDF 水印及图片去水印均有会员说明；具体套餐、试用及支持平台以客户端为准，不套用 WPS 基础办公功能的免费政策。</td><td>拆成“PDF 对象删除”和“图片修补”两项记录。标明版本、平台和功能入口；PDF 的删除水印按钮不能代表扫描图片的修补效果。</td></tr>
+<tr><td><strong>Adobe Acrobat</strong><div class="files"><a href="https://helpx.adobe.com/acrobat/desktop/edit-documents/add-backgrounds-and-watermarks/delete-watermarks.html" target="_blank" rel="noopener noreferrer">删除操作 ↗</a><br><a href="https://www.adobe.com/acrobat/free-trial-download.html" target="_blank" rel="noopener noreferrer">试用与续费 ↗</a></div></td><td>通过 PDF 编辑功能中的“水印 → 删除”移除水印，支持多个 PDF 文件。此处核验的是 PDF 水印对象删除流程。</td><td><strong>付费软件，有限期试用。</strong>Acrobat Pro 提供 7 天免费试用，未取消会转为付费订阅；具体价格取决于地区和套餐。</td><td>用于<strong>原生 PDF 的结构保留与批量处理</strong>参照。这一功能入口不能证明能修复已经融入扫描图像的水印，也不能当作免费 Reader 的能力。</td></tr>
+<tr><td><strong>万兴 PDFelement</strong><div class="files"><a href="https://pdf.wondershare.cn/zhishi/255372.html" target="_blank" rel="noopener noreferrer">标准与非标准水印 ↗</a><br><a href="https://pdf.wondershare.cn/guide/add-watermark-to-pdf.html" target="_blank" rel="noopener noreferrer">批量处理 ↗</a><br><a href="https://pdf.wondershare.cn/guide/register-pdfelement.html" target="_blank" rel="noopener noreferrer">试用限制 ↗</a></div></td><td>识别并删除标准 PDF 水印；非标准水印可能检测不到，可尝试进入编辑模式选中独立对象删除；支持批量水印处理。</td><td><strong>可试用，干净导出通常需付费。</strong>官方说明试用版编辑保存会添加自身试用水印；国内外版本及不同系统的试用期限和限制不同，按实际版本核实。</td><td>按 PDF 文件结构分别测试。区分“删除原文件水印”和“付费移除万兴自身试用水印”；无法单独选中的扫描像素不能直接当作独立对象删除。</td></tr>
+</tbody></table></div>
+<p class="muted">上述 7 款来自项目原有竞品方案，代表常见图片与办公处理路线。没有同口径使用量证据，本文不排列“使用量前七”；历史流量估计也不等于独立用户数。厂商说明证明功能入口与商业规则，不能替代实际效果测试。</p>
+<h3>Auto Remove 是产品模式名称，不能据此判断底层模型</h3>
+<p>截图里的 Auto Remove 2.0、3.0 和 PRO Remove 属于 <strong>DeWatermark.ai</strong>，与 WatermarkRemover.io 是两个产品。按 DeWatermark 的文字说明，2.0 针对表情贴纸和简单覆盖物，3.0 面向多数场景，PRO 针对多层或很淡的水印；当前页面顶部还出现 4.0，但下方旧说明未完全同步。</p>
+<p>官网称其团队持续更新和微调模型，准确表述是<strong>该团队提供和维护的模型服务</strong>。公开页面不足以证明其从零自研，也未给出可下载的架构与权重；不能推断具体使用 LaMa、Stable Diffusion 或其他模型。<a href="https://dewatermark.ai/" target="_blank" rel="noopener noreferrer">模型说明 ↗</a></p>
+<h3>对本项目最重要的四个判断</h3>
+<ol><li><strong>先判断水印是不是独立对象。</strong>PDF 内独立放置的文字或 Logo 可尝试结构删除；压平、扫描或翻拍后已融入图像的水印需要像素修补。不要把同一个“删除水印”按钮理解为覆盖所有情况。</li>
+<li><strong>干净不等于准确恢复。</strong>图像修补可能推测被遮挡内容，照片看来自然也可能改错文字、数字、细线或纹理。<a href="https://cleanup.pictures/" target="_blank" rel="noopener noreferrer">Cleanup 对图像修复的说明 ↗</a>明确描述了根据上下文推测背景；验收必须单独检查内容保真。</li>
+<li><strong>自动和补擦分开评分，原尺寸和缩小导出分开记录。</strong>每个样本保存模型／模式、自动结果、补擦结果、补擦次数、总耗时、导出尺寸、费用及正文误删／细节损坏。PDF 还需检查文字可选可搜、矢量内容与排版是否保留。</li>
+<li><strong>API 或桌面客户端不等于离线推理。</strong>本项目仍要求本地离线运行，在线工具作为质量参照。佐糖官方提供<a href="https://picwish.cn/image-watermark-removal-api" target="_blank" rel="noopener noreferrer">私有化部署洽谈 ↗</a>，可作商业方案调研，但不代表免费开放权重；部署费用、授权、硬件和断网运行能力需另行核实。</li></ol>
+<div class="note"><strong>建议的竞品分组：</strong>WatermarkRemover.io、DeWatermark、佐糖比较自动效果；Cleanup 比较手动修补；WPS、Acrobat、万兴比较 PDF 对象删除与文档保真。WPS 图片工具单独加入图片修补组，支持画笔的自动工具也另存补擦成绩。</div>
+<p>对比时使用相同输入并保存完整导出。WatermarkRemover.io 当前官网列出 PDF 上限 25 页、图片上限 5,000×5,000 像素，执行时再核对；不支持原尺寸的免费结果标注为受限结果，不替代原尺寸验收。</p></section>
+
+<section class="section" id="next"><h2>06　下一轮应该怎么改</h2><p><strong>先做一轮能决定技术路线的对比，选出有效方法后再接入产品。</strong>当前优先级是基础照片去水印，继续扩大类别和制作边缘样本不是前置条件。</p>
+<ol class="steps"><li><strong>保存当前基线，固定输入和规则。</strong><p>运行新固定集的 core 与 real，分别保存结果；同时保留历史 88 项回归。记录原尺寸输出、耗时、预测位置、代码与输入哈希。真实来源扩展只作为开发检查。</p></li>
+<li><strong>比较专门去水印模型与现有方法。</strong><p>在可复现环境中先试 WDNet 与 SLBR，再视可用权重加入 MNet；核实来源、代码／权重使用条件、离线运行和原尺寸处理方式。候选名单不是最终选型。</p><p>做两类实验：一类给准位置，判断修复能否保留细节；另一类只输入带水印图片，检查自动找位置和完整效果。部分模型本身联合检测与修复，应按官方输入方式运行，不能随意改接口后把失败归给模型。</p></li>
+<li><strong>优先解决四种基础照片问题。</strong><p>局部文字、居中深字、居中白字、平铺文字。透明水印优先保留底下仍可见的信息；补画范围需受可信水印位置约束。若现成模型未达标，再用已有严格配对与干净负例做小规模适配训练，3 组近似配对按有效区域和低权重使用。</p></li>
+<li><strong>将“去干净”与“不损坏”一起验收。</strong><p>逐张检查水印残留、主体／纹理损伤、正常文字与 Logo 误删；文档核对关键数字和表格线。保留旧评分以观察回归，补充真实 OCR 字符检查与基于真值的区域外变化；不能通过放宽阈值制造提升。</p><p>20 份历史干净对照继续保持原样，新负例单独报告；结果需在多个底图来源上改善。未达到质量条件的模型继续作为实验，不能直接替换默认处理。</p></li>
+<li><strong>保留有效 PDF 分支，补对象处理与导出。</strong><p>中文、独立文字与透明图片的已有改善不能回退。按绘制实例处理共享资源，再逐步补嵌套对象、路径、图章与图层；为混合页建立删除后复查；增加原生 PDF 保存并检查可搜索文字、链接、批注和页数。</p></li>
+<li><strong>输出易读报告，再决定是否扩大训练。</strong><p>固定输入前后对照、按类别通过情况、失败图、干净样本损伤、端到端耗时；竞品输出有证据才计入比较。确认候选在质量和误删上可用后，再优化速度并在目标 NVIDIA 工作站验证；当前 A6000 尚无可采信实测结果。</p></li></ol>
+<div class="note"><strong>本轮应得到的决策：</strong>保留哪个候选、哪些样式已改善、哪些需要训练、哪些方法应停止投入。没有效果证据时，不承诺“换模型就能达到网站水平”。</div></section>
+
+<section class="section" id="run"><h2>07　代码与运行入口</h2><p>项目目录：<code>/Users/kevinli/Desktop/挑战赛需求/offline-dewatermark-ai</code></p><p>环境：Python 3.14.5 / macOS arm64；核心使用 NumPy、OpenCV、PyMuPDF、pypdf、ONNX Runtime、RapidOCR，桌面界面为 PySide6。当前正式推理不依赖 PyTorch；研究与训练环境已安装 PyTorch。新机器的库版本和可用算力须重新核对。</p>
+<div class="table-wrap"><table class=""><thead><tr><th scope="col">文件</th><th scope="col">后续 AI 应从这里了解什么</th></tr></thead><tbody><tr><td><a href="../README.md">README.md</a></td><td>启动方式与目录入口；后半部分保留历史成绩，阅读时检查日期。</td></tr><tr><td><a href="../start.sh">start.sh</a></td><td>setup、check-data、eval、test、gui、report 命令。</td></tr><tr><td><a href="../wm/pipeline.py">wm/pipeline.py</a></td><td>主流程、PDF 预检、图片分流、批处理、结果导出。</td></tr><tr><td><a href="../wm/masks.py">wm/masks.py</a></td><td>实际检测顺序、纸面保护、表格保护和跨页辅助判断。</td></tr><tr><td><a href="../wm/styles.py">wm/styles.py</a></td><td>目前只有 5 个可指定的样式入口；22 种样本标签不等于 22 个算法。</td></tr><tr><td><a href="../wm/lama.py">wm/lama.py</a></td><td>不同修复方式的调度、LaMa 模型查找、分块补图与线程设置。</td></tr><tr><td><a href="../wm/pdf_text.py">wm/pdf_text.py</a></td><td>PDF 透明文字指令删除，包括符合条件的中文伴随行。</td></tr><tr><td><a href="../wm/pdf_images.py">wm/pdf_images.py</a></td><td>删除特定透明图片绘制，保护共享资源与背景插图。</td></tr><tr><td><a href="../wm/structure.py">wm/structure.py</a></td><td>当前结构预检；旧 probe_pdf/strip_pdf 仍在文件里，主流程不使用旧全局删除路径。</td></tr><tr><td><a href="../wm/verdict.py">wm/verdict.py</a></td><td>现有评分规则；ink_iou 是二值笔画近似量，不是真实 OCR 字符准确率。</td></tr><tr><td><a href="../wm/app.py">wm/app.py</a></td><td>桌面 UI，查看原图、结果与水印区域，按批次运行和导出。</td></tr><tr><td><a href="../tools/run_min_regression.py">tools/run_min_regression.py</a></td><td>固定最小回归执行器；先推理再读参考图评分。</td></tr><tr><td><a href="../tools/load_manual_increment.py">tools/load_manual_increment.py</a></td><td>129 条统一任务清单的读取与两类训练数据接口。</td></tr><tr><td><a href="../tools/foundation_round.py">tools/foundation_round.py</a></td><td>历史 88 张／页前后复测脚本；带源码哈希，重跑需保留已有结果。</td></tr></tbody></table></div>
+<details><summary>实际处理顺序与样式入口</summary><pre>PDF 页面先尝试：透明文字绘制删除 → 透明图片绘制删除
+命中结构结果：返回清理后的页图
+未命中 / 普通图片：
+  paper_grid → periodic → corner_id → dark_text（模块缺失，跳过）
+  → photo_text → repeated → paper_repeat → document_overlay → chromatic
+  → 通用纸面灰度／颜色规则
+  → 按 repair_mode 选择反解、纸面清理、局部插值或 LaMa
+  → 评分与结果导出</pre><p>这是有条件的依次尝试，不是每张图都运行每个分支；前面确认后即可返回。多页同尺寸且允许跨页时，可加入共同水印证据；没有单页证据时不会仅因跨页重复就擦除。</p><p><code>wm/styles.py</code> 只有 <code>dot_grid</code>、<code>tiled_text</code>、<code>big_center</code>、<code>heavy_dark</code>、<code>corner_id</code> 五种手动样式。锁定样式会跳过其他通道；正式自动对比不应偷偷传入正确类别。</p></details>
+<h3>已有环境下的常用命令</h3><pre><code>cd '/Users/kevinli/Desktop/挑战赛需求/offline-dewatermark-ai'
+
+# 只核对固定数据，不运行模型
+./start.sh check-data
+
+# 核心：36 个输入 / 48 张或页
+./start.sh eval
+
+# 核心 + 真实扩展：46 个输入 / 62 张或页
+./start.sh test
+
+# 查看最近一轮固定回归报告路径
+./start.sh report
+
+# 打开界面
+./start.sh gui
+
+# 程序检查，与效果评测分开
+QT_QPA_PLATFORM=offscreen HF_HUB_OFFLINE=1 .venv/bin/python -m unittest discover -s tests -v
+
+# 单个样本；结果写入独立时间目录
+HF_HUB_OFFLINE=1 .venv/bin/python -m wm.cli run \
+  data/watermark_regression_min_v1/inputs/core/core_001.png \
+  --out out/manual_probe --dpi 96</code></pre>
+<p><code>./start.sh</code> 不带参数会运行完整固定回归。<code>./start.sh setup</code> 是首次安装入口，可能安装依赖或下载模型；离线机器应预先准备环境和文件。回归默认按 96 DPI 处理 PDF，普通处理默认 200 DPI，质量和耗时比较必须统一。</p>
+<h3>模型与文件必须一并保留</h3><p>当前 LaMa 文件名为 <code>inpainting_lama_2025jan.onnx</code>，查找顺序：<code>WM_LAMA_ONNX</code> → 项目 <code>models/</code> → Hugging Face 缓存。本机 <code>models/</code> 为空，实际依赖下面的缓存文件：</p><pre>/Users/kevinli/.cache/huggingface/hub/models--opencv--inpainting_lama/snapshots/aee6d22f0a13e5e35af1c9a1c3afd62841fc6f3f/inpainting_lama_2025jan.onnx</pre><p>新机器应复制真实模型文件到 <code>models/</code> 或设置 <code>WM_LAMA_ONNX</code>；上述缓存路径是符号链接，单独复制链接不能保证模型可用。模型缺失会报错。<code>WM_LAMA_CUDA=1</code> 仅请求 GPU，仍要核对实际运行后端；默认 CPU 使用 4 个 ONNX 线程。</p>
+<div class="note warning"><strong>仅克隆 Git 仓库不能恢复当前完整状态。</strong>当前有未提交与未跟踪的实现；<code>docs/</code> 被 Git 忽略，训练数据、输出证据及模型也需单独确认已复制。先看 <code>git status</code>，不要重置或覆盖现有工作。当前 HEAD：<code>e8b3ffe1bf967bd7300cd7b57a250b613473f14e</code>。</div>
+<p>旧 <code>下一步优化任务.md</code> 与 README 历史段落有旧样本、旧结论和早期“不引入学习式方法”的阶段决策；当前讨论已转为先验证照片专用方法。以本说明列出的当前证据和用户最新目标为准。</p></section>
+
+<section class="section" id="ai"><h2>08　可直接给 AI 的开工说明</h2><p>将下面内容连同整个项目目录提供给后续 AI。它先核对状态，再开展实现；不应重复询问已经明确的项目目标。</p><div class="actions"><button type="button" id="copy-btn">复制开工说明</button><span id="copy-status" role="status" aria-live="polite"></span></div><textarea id="ai-prompt" readonly aria-label="给 AI 的开工说明">请先阅读当前项目 docs/项目现状与后续开发说明.html，以及 README.md、wm/pipeline.py、wm/masks.py、wm/lama.py、wm/verdict.py 和 tools/run_min_regression.py，再继续开发。
+
+项目是离线图片/PDF可见水印去除原型。当前有12类场景、22种图片样式、11种PDF结构。最新保存的开发复测为2026-10-26：图片3/42通过、PDF14/26页通过、20份干净样本保持原样；原22张图片仍0/22。不是通用可用产品，也没有达到竞品效果。
+
+用户反馈：本工具去不掉的基础样本，在WatermarkRemover.io上能去得很干净。把这个差距作为效果目标；网站内部模型未知，不得编造其算法。当前没有归档的正式同样本竞品成绩。
+
+保留PDF对象删除与已验证的白底文档分支；重点验证照片专用去水印方法，不能继续只调OCR阈值或扩大补画范围。WDNet、SLBR、MNet只是候选，先做可复现对比再定模型。旧SLBR实验已暴露干净图误改，不能直接启用。给准水印位置的4/22只是诊断，不是自动产品成绩，也不是模型理论上限。
+
+先检查git status，保留现有未提交工作。使用.venv；检查离线模型文件。固定回归集data/watermark_regression_min_v1含46个输入、62张/页，建立时只做了完整性验证；请先查out/min_regression是否已有更新，再保存本次基线。不要把历史88项成绩套给新集合。真实扩展来自训练来源，只是开发检查。
+
+数据只用当前三套：watermark_training_v1、watermark_training_increment_v1_1、watermark_regression_min_v1。增量training_tasks.jsonl有129个样本，其中121严格配对、3近似修复配对、5检测专用图；不要给扫描或红笔单图虚构干净目标。训练分组遵守已有来源分区，测试真值不能进入产品推理。
+
+保留旧评分供回归，同时补上照片区域误差、真实文字/数字识别、真值水印外改动和干净负例检查。做新模型试验时保存权重来源、版本、代码与输入哈希、参数、原尺寸输出、失败图和耗时。使用过的开发图不能再声称是独立最终测试。离线、原尺寸和内容保护均须验证。
+
+每一轮结束生成易读HTML报告，明确改了什么、哪些变好、哪些仍失败。不要把程序测试通过、模型已接入、数据已可读取当成去水印质量达标。</textarea><div class="print-prompt" style="display:none">请先阅读当前项目 docs/项目现状与后续开发说明.html，以及 README.md、wm/pipeline.py、wm/masks.py、wm/lama.py、wm/verdict.py 和 tools/run_min_regression.py，再继续开发。
+
+项目是离线图片/PDF可见水印去除原型。当前有12类场景、22种图片样式、11种PDF结构。最新保存的开发复测为2026-10-26：图片3/42通过、PDF14/26页通过、20份干净样本保持原样；原22张图片仍0/22。不是通用可用产品，也没有达到竞品效果。
+
+用户反馈：本工具去不掉的基础样本，在WatermarkRemover.io上能去得很干净。把这个差距作为效果目标；网站内部模型未知，不得编造其算法。当前没有归档的正式同样本竞品成绩。
+
+保留PDF对象删除与已验证的白底文档分支；重点验证照片专用去水印方法，不能继续只调OCR阈值或扩大补画范围。WDNet、SLBR、MNet只是候选，先做可复现对比再定模型。旧SLBR实验已暴露干净图误改，不能直接启用。给准水印位置的4/22只是诊断，不是自动产品成绩，也不是模型理论上限。
+
+先检查git status，保留现有未提交工作。使用.venv；检查离线模型文件。固定回归集data/watermark_regression_min_v1含46个输入、62张/页，建立时只做了完整性验证；请先查out/min_regression是否已有更新，再保存本次基线。不要把历史88项成绩套给新集合。真实扩展来自训练来源，只是开发检查。
+
+数据只用当前三套：watermark_training_v1、watermark_training_increment_v1_1、watermark_regression_min_v1。增量training_tasks.jsonl有129个样本，其中121严格配对、3近似修复配对、5检测专用图；不要给扫描或红笔单图虚构干净目标。训练分组遵守已有来源分区，测试真值不能进入产品推理。
+
+保留旧评分供回归，同时补上照片区域误差、真实文字/数字识别、真值水印外改动和干净负例检查。做新模型试验时保存权重来源、版本、代码与输入哈希、参数、原尺寸输出、失败图和耗时。使用过的开发图不能再声称是独立最终测试。离线、原尺寸和内容保护均须验证。
+
+每一轮结束生成易读HTML报告，明确改了什么、哪些变好、哪些仍失败。不要把程序测试通过、模型已接入、数据已可读取当成去水印质量达标。</div></section>
+
+<section class="section" id="evidence"><h2>09　原始证据与阅读顺序</h2><p>质量数字以保存的逐项结果为准，数据现状以正式清单和最新任务校验为准。原有文档保留历史记录，遇到冲突应核对记录时间与文件内容。</p><ol><li><a href="../docs/水印分类样本与最新测试.html">全部样本与最新测试（2026-10-27 更新，推理记录为 10-26）</a></li><li><a href="../docs/基础功能修复测试报告.html">基础功能修复报告，含前后对照图</a></li><li><a href="../docs/水印覆盖与竞品评测.html">12 类场景与 7 款竞品的既有评测方案（含历史信息）</a></li><li><a href="../out/foundation_round_20261026/after/all_metrics.json">88 项最新保存结果与源码哈希</a></li><li><a href="../out/foundation_round_20261026/before/all_metrics.json">相同输入的修改前结果</a></li><li><a href="../out/foundation_round_20261026/selection.json">历史复测输入选择清单</a></li><li><a href="../out/foundation_round_20261026/diagnostics/known_positions.json">给准位置的修复诊断：4/22</a></li><li><a href="../out/foundation_round_20261026/tests_after.log">74 项程序检查通过的历史日志</a></li><li><a href="../data/watermark_training_v1/manifest.jsonl">基础训练集正式清单</a></li><li><a href="../data/watermark_training_increment_v1_1/training_tasks.jsonl">增量统一训练任务清单（129 条）</a></li><li><a href="../data/watermark_training_increment_v1_1/qa/training_tasks_validation.json">最新增量读取与标签检查</a></li><li><a href="../data/watermark_regression_min_v1/README.txt">新固定回归集用途与数量说明</a></li><li><a href="../data/watermark_regression_min_v1/coverage.json">新固定回归集覆盖及明确缺口</a></li><li><a href="../out/new_samples/slbr_validation/metrics.json">旧 SLBR 研究结果；不与本轮成绩合并</a></li><li><a href="../out/new_samples/slbr_validation/provenance.json">旧 SLBR 权重、设备与未接入产品的记录</a></li></ol>
+<p class="muted">本次核验：88 项质量记录完整；当前 <code>wm/*.py</code> 与该轮保存的源码哈希一致；固定回归集 269 个文件检查通过。74 项程序检查引用已保存日志，本次文档整理未重跑。外部页面仅查阅公开功能说明，没有上传素材或获取新的竞品结果。</p>
+<details><summary>机器可读的版本与证据摘要</summary><pre id="metadata-view">{
+  &quot;document_date&quot;: &quot;2026-10-27&quot;,
+  &quot;test_record_date&quot;: &quot;2026-10-26T20:45:50+0800&quot;,
+  &quot;repo_root&quot;: &quot;/Users/kevinli/Desktop/挑战赛需求/offline-dewatermark-ai&quot;,
+  &quot;git_head&quot;: &quot;e8b3ffe1bf967bd7300cd7b57a250b613473f14e&quot;,
+  &quot;working_tree_has_uncommitted_changes&quot;: true,
+  &quot;artifact_kind&quot;: &quot;local_project_status_html&quot;,
+  &quot;test_summary&quot;: {
+    &quot;image_original&quot;: {
+      &quot;before&quot;: 0,
+      &quot;after&quot;: 0,
+      &quot;total&quot;: 22
+    },
+    &quot;image_extra&quot;: {
+      &quot;before&quot;: 1,
+      &quot;after&quot;: 3,
+      &quot;total&quot;: 20
+    },
+    &quot;pdf_original&quot;: {
+      &quot;before&quot;: 6,
+      &quot;after&quot;: 10,
+      &quot;total&quot;: 22
+    },
+    &quot;pdf_extra&quot;: {
+      &quot;before&quot;: 0,
+      &quot;after&quot;: 4,
+      &quot;total&quot;: 4
+    },
+    &quot;clean&quot;: {
+      &quot;before&quot;: 10,
+      &quot;after&quot;: 20,
+      &quot;total&quot;: 20
+    },
+    &quot;unit_tests&quot;: 74
+  },
+  &quot;primary_test_pages&quot;: 88,
+  &quot;new_regression_inputs&quot;: 46,
+  &quot;new_regression_pages&quot;: 62,
+  &quot;new_regression_inference_runs_at_authoring&quot;: 0,
+  &quot;code_matches_saved_test&quot;: true,
+  &quot;external_product_pages_checked&quot;: &quot;2026-10-27&quot;,
+  &quot;competitor_quality_claim_source&quot;: &quot;User report in current conversation; no archived controlled competitor outputs reviewed&quot;
+}</pre></details></section>
+<footer class="footer">项目现状与后续开发说明 · 2026-10-27<br>单文件 HTML，可离线阅读正文。代码、数据和测试链接相对于项目目录；外部官方资料需联网。</footer>
+</main></div>
+<script type="application/json" id="project-evidence">{
+  "document_date": "2026-10-27",
+  "test_record_date": "2026-10-26T20:45:50+0800",
+  "repo_root": "/Users/kevinli/Desktop/挑战赛需求/offline-dewatermark-ai",
+  "git_head": "e8b3ffe1bf967bd7300cd7b57a250b613473f14e",
+  "working_tree_has_uncommitted_changes": true,
+  "artifact_kind": "local_project_status_html",
+  "test_summary": {
+    "image_original": {
+      "before": 0,
+      "after": 0,
+      "total": 22
+    },
+    "image_extra": {
+      "before": 1,
+      "after": 3,
+      "total": 20
+    },
+    "pdf_original": {
+      "before": 6,
+      "after": 10,
+      "total": 22
+    },
+    "pdf_extra": {
+      "before": 0,
+      "after": 4,
+      "total": 4
+    },
+    "clean": {
+      "before": 10,
+      "after": 20,
+      "total": 20
+    },
+    "unit_tests": 74
+  },
+  "primary_test_pages": 88,
+  "new_regression_inputs": 46,
+  "new_regression_pages": 62,
+  "new_regression_inference_runs_at_authoring": 0,
+  "code_matches_saved_test": true,
+  "code_sha256": {
+    "wm/repair.py": "ae4f69befce1439f2d2adabdbe188ba7d818066a026c2345b87cda018482bfa4",
+    "wm/e2e_test.py": "ebfad06f3294d0bc4aee2ed715595f661956211fba10aca577e702860c461dfe",
+    "wm/corner_id.py": "4638b295d697ac647e17afa967c69be8f39217ac2c84233d9a798a7497ad5bc0",
+    "wm/synth.py": "4bb1f6bbe750dde757637a8998fe343bfa7355f8751b70c7e5b0db89c550a563",
+    "wm/pdf_images.py": "b64d6f1df53480f7deffd35ebd3c1af260bfd01503edfe6095a8560c4b71e8f5",
+    "wm/document_overlay.py": "fce05c97691e49872d0ee1a65f1f60ed65dd498bd322c82e228ae0f764af1b91",
+    "wm/pdf_text.py": "79ae9b8c7b1719b985268563324da005f08380c25f85d5f006151ee9a5796cd5",
+    "wm/periodic.py": "aeed57f2f781f310c499d74bfc026eb423cdce7935669d0fc8d5e7cb43c1eb87",
+    "wm/photo_overlay.py": "37d482d938b43f2ff21f3ddcf3d6d3a632f0072badb5305d0b44584722cdca15",
+    "wm/documents.py": "b681f5ae4ff5cee84ff86976e0204157a764eb950eeed51123c60a2efcc7f857",
+    "wm/__init__.py": "25c806973e458cb3abcc0de1d3a928ecab5ba314ff328a82191d38ec880ac48d",
+    "wm/paper_repeat.py": "8a9994a9c63e0f3cedf6bea21c1b44aa63559dcde72cfd33fe3b027e5c37adcb",
+    "wm/paper_grid.py": "13efce3c7c930af20d658ebd9d899f40f94d85719caa94ab842a4f985655de8b",
+    "wm/ocr.py": "f461be82874b566eef3b5ca0613dd615cc4624689e5e18314506839f1ef0b87f",
+    "wm/directional.py": "f42c928ff1ccb351e582cb3bbb538c8672dd4167d1928fb93f39ef8a2ec03dcc",
+    "wm/cli.py": "d914c3ba159b26964735747249f047abee33db5c5b69658befad5ee762aaca82",
+    "wm/repeated.py": "add7eaa93f8fb8e95978538645ed5b70b88129ba10e578efbad847e9b71d6687",
+    "wm/chromatic.py": "1969a278079bca70165c8611d1a60f1193ed25609616fa0201d17b3a4c2c478c",
+    "wm/pipeline.py": "9722c381d6d2f8ded1d743a80600b705e36b6af1a46b7cf350c65d97f838ab84",
+    "wm/masks.py": "f774b939634cbfd975fcbc3d8af552d4de704097bba0165dcfbb466acf2aa415",
+    "wm/styles.py": "44fb7de23009b1ea76a44f65eaf945e82420e030591913ba34e25f0fec6c5755",
+    "wm/structure.py": "b7e3cddc5126042139fc84aeda0b7da6a78693833ec9f28fb4d2351e433cf4b8",
+    "wm/app.py": "860512eedd73727473ed283eef7e890422afed93f954b4304404a3aaad202787",
+    "wm/lama.py": "15d2b6107f45c366c0c07d0e8909f378a69127a981a70b40d56e010ed637ca8f",
+    "wm/batches.py": "440027e684ca6865fc3b4c907a093bb960f7d7a06bbccb005b00a87cb1c30226",
+    "wm/contract.py": "4b4ff99b2568f25c2ddd590841563f43d50c368200ecd902c3bd7f4b9a874265",
+    "wm/photo_text.py": "a95c5f0fe0598b2f949ec3b2f437a64d9b0804e03029b50f43a3bd437e5c614c",
+    "wm/fixtures.py": "8290a5b2e88092f3db7f3289b1b024ed9c46b3e4600d90a672424569a4f08789",
+    "wm/verdict.py": "31decef9ef69e3e64726b603329bf580452524a0f74fa24fb339cb057027a3e8"
+  },
+  "source_sha256": {
+    "docs/水印分类样本与最新测试.html": "53d9fda8674d99dc573611a6000173ed4f20a9b277f6814175b9d3ad7492e819",
+    "docs/基础功能修复测试报告.html": "3c3b4df67bc5d6ea3a048c586b336fd2df35b0c1d05078849c403aab556274ea",
+    "docs/水印覆盖与竞品评测.html": "7de6aeadacd09747afc186e1b3151cd8d7f29fcb088d9160d09e43410cc89827",
+    "out/foundation_round_20261026/after/all_metrics.json": "0c440db3ae048d545d5423b083602f872d9fcfb64c4d2ef7ae87926447702cf8",
+    "out/foundation_round_20261026/before/all_metrics.json": "c7ab516ef2b8d53c702cc8c492d38e57a30de5f6b3dc6c4aff68abe85dfbf90e",
+    "out/foundation_round_20261026/selection.json": "2e833872b519c97230f44a0a850cf811d97b80ecd038eae0f4896aba493e722d",
+    "out/foundation_round_20261026/diagnostics/known_positions.json": "dfb3d63ebde711d7db55ae049b47435172405edebf4867f12f7216fd3a16f90d",
+    "out/foundation_round_20261026/tests_after.log": "785585c3a039554314d38adc3427daaf0938894ce280fcef122bcb0a6c4580ba",
+    "data/watermark_training_v1/manifest.jsonl": "e65e9fb34eb0b6a787eeebc8a24c95250071bb7750d664352c2ae13bcec21a6e",
+    "data/watermark_training_increment_v1_1/training_tasks.jsonl": "44e4561fea43ee45805ad31cfa6ee0d304fa1e0600b3bdd5b003e64134179e8d",
+    "data/watermark_training_increment_v1_1/qa/training_tasks_validation.json": "3c3c6a20b63787d97bc36b48bd48bda28c50e06d671f548ebc141e8e219ceeb9",
+    "data/watermark_regression_min_v1/README.txt": "908c3d8297dd506443a8912d0fe90ac077232f102eea7111fc31d944a21376fc",
+    "data/watermark_regression_min_v1/coverage.json": "51bf0998044a8e07f94f7b2fc78611d5d1244b3a20ec8ebd7d77feb9b41d8a4a",
+    "out/new_samples/slbr_validation/metrics.json": "96a1319407f0c0672704ed2eb3d79a9895a168c593294658980247eaf8b8f0b8",
+    "out/new_samples/slbr_validation/provenance.json": "92744652b11f2617a236cfc8b41551c249b0a5559552d0f4ff447ec892d2bca4"
+  },
+  "external_product_pages_checked": "2026-10-27",
+  "competitor_quality_claim_source": "User report in current conversation; no archived controlled competitor outputs reviewed"
+}</script>
+<script>
+const printButton=document.getElementById('print-btn');
+printButton.addEventListener('click',()=>{document.querySelectorAll('details').forEach(d=>d.open=true);window.print()});
+document.getElementById('copy-btn').addEventListener('click',async()=>{
+ const field=document.getElementById('ai-prompt'),status=document.getElementById('copy-status');
+ try{if(!navigator.clipboard)throw new Error('Clipboard unavailable');await navigator.clipboard.writeText(field.value);status.textContent='已复制';}
+ catch(e){field.focus();field.select();status.textContent='已选中全部内容，请按 ⌘C 或 Ctrl+C 复制。';}
+});
+</script></body></html>

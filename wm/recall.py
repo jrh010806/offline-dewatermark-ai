@@ -105,6 +105,11 @@ def _pixel_strokes(image, domain, seed_region, height, *, preserve_seeds=False,
 def expand(image, mask, thr, *, use_ocr=True, style=None):
     if not use_ocr or style in ('dot_grid', 'corner_id'):
         return mask
+    if mask.repair_mode == 'shadow_layer_inverse':
+        # This route already carries source-supported strokes and its own fit.
+        # Generic stroke completion must not discard the reconstruction or turn
+        # its binary permission into an invented alpha/inpainting model.
+        return mask
     # Keep validated numerical alpha and the corresponding inverse. A search
     # pass must never replace a measured background model with a box inpainter.
     if mask.repair_mode in ('texture_overlay', 'photo_repeat_inverse',

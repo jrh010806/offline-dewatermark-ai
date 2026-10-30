@@ -114,7 +114,8 @@ def cmd_run(args: argparse.Namespace) -> None:
                                                   experimental_seed_preservation=preserve,
                                                   experimental_oblique_detection=oblique),
                                    dpi=args.dpi, skip_structure=args.force_raster,
-                                    style=style)
+                                    style=style,
+                                    automatic_selection=getattr(args, 'experimental_auto_selection', False))
     out = pipeline.write_results(results, args.out, source_path=args.input)
     for r in results:
         print(json.dumps(r.to_dict(), ensure_ascii=False))
@@ -151,6 +152,8 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--force-raster", action="store_true")
     p.add_argument("--recall-priority", action="store_true",
                    help="按颜色与重复字形补全水印笔画，允许处理与正文交叠的水印")
+    p.add_argument("--experimental-auto-selection", action="store_true",
+                   help="试用自动比较原方法与笔画补全；保留候选供复核，尚未完成默认放行")
     p.add_argument("--experimental-colour-refinement", action="store_true",
                    help="实验：细化明亮文档上的彩色笔画；未完成独立泛化验证，默认关闭")
     p.add_argument("--experimental-seed-preservation", action="store_true",

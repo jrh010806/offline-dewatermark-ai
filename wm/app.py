@@ -14,7 +14,7 @@ from datetime import datetime
 from pathlib import Path
 
 import numpy as np
-from PySide6.QtCore import Qt, QLocale, QTranslator, QLibraryInfo
+from PySide6.QtCore import Qt, QLocale, QTranslator, QLibraryInfo, QTimer
 from PySide6.QtGui import QFont, QColor
 from PySide6.QtWidgets import (
     QApplication, QCheckBox, QComboBox, QFileDialog, QGridLayout, QGroupBox,
@@ -26,6 +26,7 @@ from PySide6.QtWidgets import (
 
 from . import documents, pipeline
 from .batches import Batch, BatchWorker
+from .batch_timing import format_duration
 from .contract import PageImage, PageResult, Thresholds
 from .viewer import ImageViewer
 from .export_review import overlay_mask
@@ -140,8 +141,9 @@ def make_app() -> QApplication:
 
 
 class MainWindow(QMainWindow):
-    def __init__(self) -> None:
+    def __init__(self, *, automatic_selection: bool = False) -> None:
         super().__init__()
+        self.automatic_selection = automatic_selection
         self.setWindowTitle("离线智能去水印工作台")
         self.resize(1600, 960)
         self.setMinimumSize(1180, 740)
@@ -252,9 +254,9 @@ class MainWindow(QMainWindow):
         self.append_btn = QPushButton("＋ 添加图片到当前批次")
         self.append_btn.clicked.connect(self.append_files)
         left_layout.addWidget(self.append_btn)
-        self.group_hint = label("按图片尺寸自动分组，支持单图识别", "muted")
-        self.group_hint.setWordWrap(True)
-        left_layout.addWidget(self.group_hint)
+        self.batch_time_hint = label("已处理：—\n批次总用时：—\n平均每张：—", "muted")
+        self.batch_time_hint.setWordWrap(True)
+        left_layout.addWidget(self.batch_time_hint)
         left_layout.addWidget(label("图片列表"))
         left_layout.addWidget(self.page_list, 2)
 
@@ -401,6 +403,9 @@ class MainWindow(QMainWindow):
         root_layout.addWidget(self.status)
         self.setCentralWidget(root)
         self.worker: BatchWorker | None = None
+        self._batch_time_timer = QTimer(self)
+        self._batch_time_timer.setInterval(500)
+        self._batch_time_timer.timeout.connect(self.refresh_batch_timing)
         for slider in self._sliders.values():
             slider.valueChanged.connect(self.save_params)
         self.ocr_box.toggled.connect(self.save_params)
@@ -445,6 +450,9 @@ class MainWindow(QMainWindow):
         self.recall_box.setChecked(True)
         self.recall_box.setToolTip("通过颜色和重复字形补全笔画；文字框和重复行只用于搜索，不作为修复选区。外扩由上方参数控制。")
         grid.addWidget(self.recall_box, row, 0, 1, 3)
+        if self.automatic_selection:
+            self.recall_box.hide()
+            grid.addWidget(QLabel("自动比较处理方法 · 试用版，结果需复核"), row, 0, 1, 3)
         row += 1
         grid.addWidget(QLabel("水印样式"), row, 0)
         self.style_box = QComboBox()
@@ -525,14 +533,9 @@ class MainWindow(QMainWindow):
         self._loading_params = False
         self.page_list.clear()
         if self.batch:
-            sizes = {}
-            for page in self.pages:
-                sizes[page.image.shape] = sizes.get(page.image.shape, 0) + 1
-            self.group_hint.setText("尺寸分组：" + "；".join(
-                f"{shape[1]}×{shape[0]} · {count} 张" + ("（单图识别）" if count == 1 else "（跨页先验）")
-                for shape, count in sizes.items()))
             for i, page in enumerate(self.pages):
                 self.page_list.addItem(self._page_item(i))
+        self.refresh_batch_timing()
         self.page_list.setCurrentRow(0)
         self.show_page(0 if self.pages else -1)
         self.set_busy(bool(self.worker and self.worker.isRunning()))
@@ -544,6 +547,29 @@ class MainWindow(QMainWindow):
         if ok and name.strip():
             self.batch.name = name.strip()
             self.refresh_batches()
+
+    def refresh_batch_timing(self) -> None:
+        timing = self.batch.timing if self.batch else None
+        if timing is None:
+            progress = f"0 / {len(self.batch.pages)} 张" if self.batch else "—"
+            self.batch_time_hint.setText(f"已处理：{progress}\n批次总用时：—\n平均每张：—")
+            self.batch_time_hint.setToolTip("尚无整批处理计时；单张重处理不更新批次统计。")
+            return
+        snapshot = timing.snapshot()
+        suffix = f"（{snapshot.state}）" if snapshot.state != "已完成" else ""
+        average = (format_duration(snapshot.average_seconds)
+                   if snapshot.average_seconds is not None else "—")
+        failures = f"（失败 {snapshot.failed} 张）" if snapshot.failed else ""
+        self.batch_time_hint.setText(
+            f"已处理：{snapshot.completed} / {snapshot.total} 张{failures}\n"
+            f"批次总用时：{format_duration(snapshot.elapsed_seconds)}{suffix}\n"
+            f"平均每张：{average}")
+        self.batch_time_hint.setToolTip(
+            f"最近一轮整批处理：{snapshot.state}，已处理 {snapshot.completed}/{snapshot.total} 张。\n"
+            "总用时包含识别、批次共用分析及修复，排除暂停、排队和查看结果时间。\n"
+            "平均值按已处理张数计算，包含运行失败；正在处理的图片完成后才计入平均值。\n"
+            "失败数量仅统计本轮运行失败；已处理不代表质量通过或水印已去净。\n"
+            "单张重处理保留本轮统计；文档按页计数。")
 
     def delete_batch(self) -> None:
         if not self.batch or (self.worker and self.worker.isRunning()):
@@ -922,10 +948,11 @@ class MainWindow(QMainWindow):
                              lama_tile_overlap=vals["lama_tile_overlap"],
                              lama_mask_dilate=vals["lama_mask_dilate"],
                              watermark_recall_priority=batch.recall_priority)
-            jobs.append((batch, indices, thr, vals["close_px"], batch.use_ocr, batch.style))
+            job = (batch, indices, thr, vals["close_px"], batch.use_ocr, batch.style)
+            jobs.append(job + (True,) if self.automatic_selection else job)
         if not jobs:
             return
-        self.worker = BatchWorker(jobs, self)
+        self.worker = BatchWorker(jobs, self, record_batch_timing=only_page is None)
         self.worker.update.connect(self.queue_update)
         self.worker.finished.connect(self.on_finished)
         self.progress.setRange(0, self.worker.total)
@@ -934,6 +961,7 @@ class MainWindow(QMainWindow):
         self.set_busy(True)
         self.status.setText(f"开始处理，共 {self.worker.total} 张；已有结果将在各张重跑后更新")
         self.worker.start()
+        self._batch_time_timer.start()
 
     def pause_queue(self, paused: bool) -> None:
         if self.worker and self.worker.isRunning():
@@ -950,9 +978,12 @@ class MainWindow(QMainWindow):
 
     def queue_update(self, payload: dict) -> None:
         if payload["kind"] == "paused":
+            self.refresh_batch_timing()
             self.status.setText(f"已暂停 · {payload['done']}/{payload['total']} 张")
             return
         batch = next(b for b in self.batches if b.uid == payload["batch"])
+        if batch is self.batch:
+            self.refresh_batch_timing()
         index = payload["index"]
         if payload["kind"] == "stage":
             message = payload["message"].replace("PDF", "文档")
@@ -990,6 +1021,8 @@ class MainWindow(QMainWindow):
 
     def on_finished(self) -> None:
         worker = self.worker
+        self._batch_time_timer.stop()
+        self.refresh_batch_timing()
         self.set_busy(False)
         self.pause_btn.blockSignals(True)
         self.pause_btn.setChecked(False)
@@ -1057,6 +1090,8 @@ class MainWindow(QMainWindow):
                               "single_chromatic_oblique": "单图色彩残差与大字定位",
                               "single_periodic_texture_text": "周期纹理与透明文字定位",
                               "single_coloured_document_overlay": "单图文档色差与透明度估计",
+                              "single_observed_shadow_layers": "阴影文字：颜色与阴影分层",
+                              "single_observed_shadow": "阴影文字：原纸面清理",
                               "contrast_dark_oblique": "深色斜向文字定位",
                               "contrast_bright_repeated": "浅色重复文字定位",
                               "contrast_faint_chromatic": "淡色文字定位",
@@ -1069,12 +1104,18 @@ class MainWindow(QMainWindow):
                               "crosspage": "跨页统计"}.get(result.mask.method, "灰度与颜色")),
                 ("总耗时", f"{report.elapsed_ms / 1000:.2f} 秒")]
         stages = {"mask_ms": "水印定位耗时", "repair_ms": "图像修复耗时",
+                  "auto_detection_ms": "候选定位与原图核对", "auto_repair_and_comparison_ms": "候选处理与比较",
                   "assist_mask_ms": "辅助笔画识别耗时", "assist_repair_ms": "辅助修复耗时",
                   "manual_repair_ms": "按选区重新修复耗时"}
         rows += [(stages.get(k, "其他阶段耗时"), f"{v / 1000:.2f} 秒") for k, v in report.stage_ms.items()]
         if result.automatic_result is not None:
             rows.append(("处理模式", "人工辅助 · 自动结果另行保留"))
             rows.append(("已确认辅助次数", str(len(result.assistance_masks))))
+        auto = result.processing.get('automatic_selection')
+        if auto:
+            rows.append(("自动比较", "原方法" if auto['chosen'] == 'original' else "笔画补全"))
+            rows.append(("选择原因", auto['reason']))
+            rows.append(("结果状态", "未达标" if auto['status'] == 'unmet' else "待复核"))
         names = {"coverage": "修复选区占比", "fidelity_mean_delta": "选区外平均变化",
                  "fidelity_p99_delta": "选区外变化高位值", "ink_iou": "文字重合度",
                  "residual_basis": "残留评估依据", "residual_coverage": "水印残留率",
@@ -1098,6 +1139,7 @@ class MainWindow(QMainWindow):
             self.metrics.setItem(i, 0, QTableWidgetItem(str(k)))
             self.metrics.setItem(i, 1, QTableWidgetItem(str(v)))
         conditions = {"fidelity": "选区外保真", "residual": "水印残留",
+                      "automatic_selection_verified": "自动比较尚待复核",
                       "recognition": "文字识别", "time_budget": "处理时限"}
         flags = "  ".join("水印残留待复核" if name == "residual" and ok
                           and report.metrics.get("residual_basis") == 0.0 else
@@ -1108,7 +1150,8 @@ class MainWindow(QMainWindow):
         failures = {"no_watermark_detected": "未检测到水印", "residual_watermark": "仍有水印残留",
                     "fidelity_breach": "原始内容变化超出阈值", "recognition_regression": "文字识别质量下降",
                     "repair_failed": "图像修复失败", "structure_not_applicable": "不适用文档结构处理",
-                    "out_of_time_budget": "处理超过预定时限", "needs_manual_mask": "需要人工标记水印区域"}
+                    "out_of_time_budget": "处理超过预定时限", "needs_manual_mask": "需要人工标记水印区域",
+                    "auto_selection_unresolved": "自动比较仍有残留或内容损伤疑点"}
         review = "\n待人工复核：自动检查可能漏掉水印。" if report.review_needed else ""
         errors = "；".join(failures.get(str(f), "其他处理异常") for f in report.failures) or "无"
         self.conditions.setText(f"自动检查：{flags or '暂无'}{review}\n异常：{errors}")
@@ -1185,9 +1228,9 @@ class MainWindow(QMainWindow):
             self.canvas.set_selection_overlay()
 
 
-def smoke(path: str | None) -> int:
+def smoke(path: str | None, *, automatic_selection: bool = False) -> int:
     app = make_app()
-    win = MainWindow()
+    win = MainWindow(automatic_selection=automatic_selection)
     win.show()
     win.open_file(path or str(Path(__file__).resolve().parents[1] / "data/watermark_regression_min_v1/inputs/core/core_001.png"))
     win.start_run()
@@ -1201,10 +1244,10 @@ def smoke(path: str | None) -> int:
     return 0
 
 
-def shot(path: str | None, out_dir: str) -> int:
+def shot(path: str | None, out_dir: str, *, automatic_selection: bool = False) -> int:
     """Headless render of the workbench, one PNG per view mode, for demos and reports."""
     app = make_app()
-    win = MainWindow()
+    win = MainWindow(automatic_selection=automatic_selection)
     win.show()
     win.open_file(path or str(Path(__file__).resolve().parents[1] / "data/watermark_regression_min_v1/inputs/core/core_025.pdf"))
     win.start_run()
@@ -1227,13 +1270,15 @@ def main() -> None:
     parser.add_argument("file", nargs="?", default=None)
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--shot", default=None, help="无头渲染工作台并输出每个视图的 PNG")
+    parser.add_argument("--experimental-auto-selection", action="store_true",
+                        help="试用自动比较处理方法；未完成默认放行，结果需复核")
     args = parser.parse_args()
     if args.smoke:
-        sys.exit(smoke(args.file))
+        sys.exit(smoke(args.file, automatic_selection=args.experimental_auto_selection))
     if args.shot:
-        sys.exit(shot(args.file, args.shot))
+        sys.exit(shot(args.file, args.shot, automatic_selection=args.experimental_auto_selection))
     app = make_app()
-    win = MainWindow()
+    win = MainWindow(automatic_selection=args.experimental_auto_selection)
     win.show()
     if args.file:
         win.open_file(args.file)

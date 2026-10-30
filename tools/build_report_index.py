@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'out'
 INDEX = OUT / '水印验证报告总目录.html'
 CATEGORIES = {
-    'baseline': ('观察基线', '完整保存的当前版本表现，用于后续逐张比较；记录完成不代表去水印质量合格。'),
+    'baseline': ('观察基线', '保存当时版本的表现，用于后续逐张比较；记录完成不代表当前代码全量通过或去水印质量合格。'),
     'control': ('项目管控', '版本冻结、防退化规则、工具自检和工程记录。工具自检只证明控制链路可运行。'),
     'diagnosis': ('失败与诊断', '已记录的失败案例、定位分析与瓶颈判断；保留未修复和待验证事项。'),
     'experiment': ('算法实验', '定位、笔画补全及修复方法的实验对照。每轮的适用条件和验收结论以原报告为准。'),
@@ -77,12 +77,47 @@ def clean_document_links(body):
     return re.sub(r'''href=(["'])(.*?)\1''', replace, body)
 
 
+def available_local_links(body, base=None):
+    """Keep missing files visible without publishing a broken clickable link.
+
+    Retain the original target so a later rebuild can restore the same link
+    when that exact file returns. Never edit or substitute historical assets.
+    """
+    base = OUT if base is None else Path(base)
+    note = '<small data-missing-note="true">（本地文件缺失）</small>'
+
+    def replace(match):
+        attrs, inner = match.group(1), match.group(2)
+        active = re.search(r'''(?<![\w-])href\s*=\s*(["'])(.*?)\1''', attrs)
+        dormant = re.search(r'''data-missing-href\s*=\s*(["'])(.*?)\1''', attrs)
+        original = active or dormant
+        if original is None:
+            return match.group(0)
+        value = unescape(original.group(2))
+        parts = urlsplit(value)
+        if parts.scheme or not parts.path:
+            return match.group(0)
+        exists = (base / unquote(parts.path)).exists()
+        if active is not None and exists:
+            return match.group(0)
+        if dormant is not None and not exists:
+            return match.group(0) if note in inner else f'<a{attrs}>{inner}{note}</a>'
+        attrs = attrs[:original.start()] + attrs[original.end():]
+        attrs = re.sub(r'''\s+aria-disabled\s*=\s*(["'])true\1''', '', attrs)
+        if exists:
+            return f'<a{attrs} href="{escape(value, quote=True)}">{inner.replace(note, "")}</a>'
+        return (f'<a{attrs} data-missing-href="{escape(value, quote=True)}" '
+                f'aria-disabled="true">{inner}{note}</a>')
+
+    return re.sub(r'<a\b([^>]*)>(.*?)</a>', replace, body, flags=re.S)
+
+
 def category(value):
     if '完整基线效果总览' in value or '效果分档总览' in value:
         return 'baseline'
     if any(k in value for k in ('tender-', '方案材料｜', '答辩材料｜', 'proposal/output')):
         return 'material'
-    if any(k in value for k in ('项目防退化控制', '分层防退化检查', '样本移除记录', 'project-control', '空间清理审计')):
+    if any(k in value for k in ('项目防退化控制', '分层防退化检查', '项目整理', '样本移除记录', 'project-control', '空间清理审计')):
         return 'control'
     if any(k in value for k in ('失败案例', 'bottleneck', 'failure-cases', '瓶颈判断', '漏检原因分析',
                                 'batch_diagnosis', 'report_before.html', 'export_selection_diagnosis')):
@@ -148,7 +183,7 @@ def baseline_card():
             body += '<p>按用户要求移除3张手写样本后，当前效果页与后续回归为395个输入／423页／三模式1,269页次；下列1,278页次是原始封存范围。样本变更不代表算法效果提升。</p>'
     body += (f'<p>398个输入场景、426张／页，三种模式共 <strong>{len(rows):,}／{len(run["expected_keys"]):,} 页次</strong>。'
              f'运行或评分异常 {failures}；桌面默认 {modes["desktop"]}、关闭补全 {modes["desktop_protected"]}、CLI默认 {modes["cli"]} 页次。</p>'
-             '<p><strong>观察基线记录当前表现，包括既有缺陷；不是全部图片效果合格，也不是独立泛化验证。</strong></p>')
+             '<p><strong>观察基线记录当时表现，包括既有缺陷；不是当前工作版本全量通过、全部图片效果合格或独立泛化验证。</strong></p>')
     links = [('逐图报告', '项目防退化控制报告.html'), ('运行记录与指标', '运行记录.json'),
              ('完整样本清单', '原始清单.json'), ('冻结验收规则', '验收规则.json'), ('封存校验', '封存校验.json')]
     body += '<p class="links">' + ' · '.join(f'<a href="{href(directory / filename)}">{label}</a>' for label, filename in links) + '</p>'
@@ -168,7 +203,7 @@ def discover(cards, baseline):
         if path.resolve() in linked or path == INDEX:
             continue
         name = path.name
-        if any(k in str(path) for k in ('/代码快照/', '/基线代码/', '/暂存代码快照/', '/可维护源文件/', '/原生编辑工作区/', '/样本移除留档/')):
+        if any(k in str(path) for k in ('/代码快照/', '/基线代码/', '/暂存代码快照/', '/可维护源文件/', '/原生编辑工作区/', '/样本移除留档/', '/整理前备份/', '/更新前备份/')):
             continue
         if any(k in name for k in ('入口片段', '备份', '留档', '修改前', '更新前', '添加方案入口前', '分类前')):
             continue
@@ -210,6 +245,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #5ba8
 .cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{min-width:0;background:white;padding:24px;border:1px solid var(--line);border-radius:12px}
 .card[data-category=baseline]{grid-column:1/-1;border-top:3px solid var(--green);padding:28px}.card h2{font-size:18px;line-height:1.55;margin:0 0 9px}.card p{margin:9px 0;font-size:14px}.card a{color:var(--green);text-underline-offset:3px;text-decoration-thickness:1px}.card h2 a{text-decoration:none}.card h2 a:hover{text-decoration:underline}
 .card .path{font-size:11px;color:var(--muted);overflow-wrap:anywhere}.state{font-weight:650;color:var(--green)}.tag{display:inline-block;border:1px solid var(--line);border-radius:4px;padding:1px 7px;font-size:11px;color:var(--muted);margin-bottom:12px}
+.card a[aria-disabled=true]{color:var(--muted);text-decoration:none;cursor:default}.card small[data-missing-note]{color:#885c24}
 [hidden]{display:none!important}.empty{padding:40px;background:white;border:1px dashed var(--line);border-radius:10px;text-align:center;color:var(--muted)}footer{border-top:1px solid var(--line);margin-top:32px;padding-top:16px;font-size:12px;color:var(--muted)}
 @media(max-width:760px){.shell{padding:24px 16px 40px}h1{font-size:27px}.cards{grid-template-columns:1fr}.toolbar{flex-direction:column;align-items:stretch}.search{width:100%}.search input{width:100%}.search label{flex:1}.tabs button{padding:10px}.card{padding:19px}}
 @media print{.tabs,.search{display:none}.card[hidden]{display:block!important}.cards{display:block}.card{break-inside:avoid;margin:12px 0}.shell{padding:0}}
@@ -304,6 +340,12 @@ def main():
         if '当前默认基线｜两批14张' in item['body']:
             item['body'] = item['body'].replace('当前默认基线｜两批14张', '历史开发基线｜两批14张')
     cards = [baseline] + [item for item in curated if item['id'] != baseline['id']]
+    current_id = 'current-project-organization-20261029'
+    current_body = ('<h2>' + '<a href="' + href(ROOT / 'docs/项目文档总览.html') + '">当前说明｜项目状态、数据与工具入口（2026-10-29）</a></h2>'
+                    '<p>先看当前状态，再选择观察基线、实验或历史记录。数据数量从实际清单生成；本轮只整理入口和管理，不形成新的算法效果成绩。</p>'
+                    '<p>' + '<a href="' + href(ROOT / 'docs/项目现状与后续开发说明.html') + '">当前状态与待处理事项</a> · '
+                    '<a href="' + href(ROOT / 'docs/代码与工具用途说明.html') + '">代码、工具与备份</a></p>')
+    cards = [item for item in cards if item['id'] != current_id] + [card(current_id, 'control', current_body)]
     failure_record = ROOT / 'docs/去水印失败案例记录.html'
     if failure_record.is_file() and 'id="baseline-review-20261029"' in failure_record.read_text():
         identifier = 'failure-baseline-review-20261029'
@@ -312,11 +354,13 @@ def main():
                 '<p>保留原有11个历史案例，补充空选区、重建差异、内容损伤、模式双向影响和修复范围问题；'
                 '区分已确认现象、实现风险与待验证原因。仅分析保存结果，未修改算法或重跑推理。</p>')
         cards = [item for item in cards if item['id'] != identifier] + [card(identifier, 'diagnosis', body)]
+    for item in cards:
+        item['body'] = available_local_links(clean_document_links(item['body']))
     cards += discover(cards, directory)
     unique = {item['id']: item for item in cards}
     cards = list(unique.values())
     for item in cards:
-        item['body'] = clean_document_links(item['body'])
+        item['body'] = available_local_links(clean_document_links(item['body']))
     counts = Counter(item['category'] for item in cards)
     tabs = ''.join(f'<button id="tab-{key}" type="button" role="tab" aria-controls="report-panel" aria-selected="{str(key == "baseline").lower()}" tabindex="{0 if key == "baseline" else -1}" data-category="{key}" data-title="{label}" data-description="{escape(description, quote=True)}">{label}<span class="count">{len(cards) if key == "all" else counts[key]}</span></button>' for key, (label, description) in CATEGORIES.items())
     body = []
@@ -329,7 +373,7 @@ def main():
 <!-- report-timestamp:start -->
 <p class="timestamp" data-report-timestamp="updated">目录更新时间：<time datetime="{now.isoformat(timespec='seconds')}">{now.strftime('%Y-%m-%d %H:%M:%S')}</time> · 北京时间</p>
 <!-- report-timestamp:end -->
-<div class="summary"><span>{len(cards)} 个报告与材料入口</span><span>完整观察基线：1,278 页次已记录</span><span>记录完成 ≠ 效果全部合格</span></div></header>
+<div class="summary"><span>{len(cards)} 个报告与材料入口</span><span>历史完整观察基线：1,278 页次已记录</span><span>记录完成 ≠ 当前代码验收通过</span></div><p><a href="{href(ROOT / 'docs/项目现状与后续开发说明.html')}">查看当前状态与清单问题</a> · <a href="{href(ROOT / 'docs/项目文档总览.html')}">查看文档用途</a></p></header>
 <nav class="tabs" role="tablist" aria-label="报告分类">{tabs}</nav>
 <section id="report-panel" data-catalog-panel="true" role="tabpanel" aria-labelledby="tab-baseline"><div class="toolbar"><div><h2 id="category-heading">全部报告</h2><p id="category-description">按上方标签切换分类。</p><p id="result-count" role="status" aria-live="polite">共 {len(cards)} 个入口</p></div><div class="search"><label><span class="sr-label" hidden>搜索当前分类的报告</span><input id="report-search" type="search" aria-label="搜索当前分类的报告" placeholder="在当前分类搜索报告…"></label><button id="clear-search" type="button">清空</button></div></div>
 <div class="cards">{''.join(body)}</div><p id="empty-state" class="empty" hidden>当前分类没有匹配的报告。可清空搜索或切换“全部报告”。</p></section>

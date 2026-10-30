@@ -11,6 +11,7 @@ from PySide6.QtCore import QThread, Signal
 
 from . import masks, pipeline, structure
 from .contract import MaskLayer, PageImage, PageResult, Thresholds
+from .batch_timing import BatchTiming
 
 
 @dataclass
@@ -27,6 +28,7 @@ class Batch:
     states: dict[int, str] = field(default_factory=dict)
     priors: dict[tuple, MaskLayer] = field(default_factory=dict)
     dirty: set[int] = field(default_factory=set)
+    timing: BatchTiming | None = None
 
     def invalidate(self) -> None:
         self.priors.clear()
@@ -35,7 +37,7 @@ class Batch:
 class BatchWorker(QThread):
     update = Signal(object)
 
-    def __init__(self, jobs, parent=None):
+    def __init__(self, jobs, parent=None, *, record_batch_timing: bool = False):
         super().__init__(parent)
         self.jobs = jobs  # (batch, selected indices, frozen thresholds, close_px, OCR, style)
         self.total = sum(len(indices) for _, indices, *_ in jobs)
@@ -44,6 +46,8 @@ class BatchWorker(QThread):
         self.stopped = False
         self._paused = False
         self._condition = Condition()
+        self._record_batch_timing = record_batch_timing
+        self._active_timing: BatchTiming | None = None
 
     def pause(self, paused: bool) -> None:
         with self._condition:
@@ -58,18 +62,35 @@ class BatchWorker(QThread):
     def _checkpoint(self) -> bool:
         with self._condition:
             while self._paused and not self.stopped:
+                if self._active_timing is not None:
+                    self._active_timing.pause()
                 self.update.emit(dict(kind="paused", done=self.done, total=self.total))
                 self._condition.wait()
+            if self._active_timing is not None and not self.stopped:
+                self._active_timing.resume()
             return not self.stopped
 
     def run(self) -> None:
+        try:
+            self._run_jobs()
+        finally:
+            if self._active_timing is not None:
+                self._active_timing.finish(stopped=True)
+                self._active_timing = None
+
+    def _run_jobs(self) -> None:
         for job in self.jobs:
+            if self.stopped:
+                return
             batch, indices, thr, close_px, use_ocr = job[:5]
             style = job[5] if len(job) > 5 else None
+            automatic_selection = bool(job[6]) if len(job) > 6 else False
             groups = {}
             unavailable_priors = set()
             for page in batch.pages:
                 groups.setdefault(page.image.shape, []).append(page)
+            if self._record_batch_timing:
+                batch.timing = self._active_timing = BatchTiming(len(indices))
             for index in indices:
                 if not self._checkpoint():
                     return
@@ -95,18 +116,27 @@ class BatchWorker(QThread):
                                     logging.getLogger(__name__).warning(
                                         "Cross-page prior unavailable; using single-image detection: %s", exc)
                                     unavailable_priors.add(key)
-                            single = masks.estimate_single_page(
-                                page.image, thr, close_px=close_px,
-                                use_ocr=use_ocr, style=style)
-                            mask = masks.with_prior(single, mask, thr)
+                            if not automatic_selection:
+                                single = masks.estimate_single_page(
+                                    page.image, thr, close_px=close_px,
+                                    use_ocr=use_ocr, style=style)
+                                mask = masks.with_prior(single, mask, thr)
                         else:
-                            mask = masks.estimate_single_page(page.image, thr, close_px=close_px,
-                                                              use_ocr=use_ocr, style=style)
+                            mask = (None if automatic_selection else masks.estimate_single_page(
+                                page.image, thr, close_px=close_px, use_ocr=use_ocr, style=style))
                         mask_ms = int((perf_counter() - started) * 1000)
                         # Pause/stop requests made during prior estimation take effect before repair.
                         if not self._checkpoint():
                             return
-                        result = pipeline._process_one(page, mask, thr, mask_ms=mask_ms)
+                        if automatic_selection:
+                            from .auto_selection import process
+                            self.update.emit(dict(kind="stage", batch=batch.uid, index=index,
+                                                  message="自动比较处理结果并核对原图内容"))
+                            result = process(page, thr, prior=mask, close_px=close_px,
+                                             use_ocr=use_ocr, style=style, mask_ms=mask_ms,
+                                             checkpoint=self._checkpoint)
+                        else:
+                            result = pipeline._process_one(page, mask, thr, mask_ms=mask_ms)
                     elif not self._checkpoint():
                         return
                     if isinstance(result, PageResult):
@@ -115,11 +145,18 @@ class BatchWorker(QThread):
                                                  thresholds=asdict(thr))
                     payload = dict(result=result, error=None)
                 except Exception as exc:
+                    if self.stopped and isinstance(exc, InterruptedError):
+                        return
                     payload = dict(result=None, error=str(exc))
                 result = payload["result"]
                 self.outcomes.append("运行失败" if result is None else
                                      "质量未通过" if not result.verdict.passed else
                                      "待复核" if result.verdict.review_needed else "通过")
                 self.done += 1
+                if self._active_timing is not None:
+                    self._active_timing.complete_page(failed=result is None)
                 self.update.emit(dict(kind="page", batch=batch.uid, index=index,
                                       done=self.done, total=self.total, **payload))
+            if self._active_timing is not None:
+                self._active_timing.finish(stopped=False)
+                self._active_timing = None

@@ -55,6 +55,7 @@ class FailureCode(StrEnum):
     STRUCTURE_NOT_APPLICABLE = "structure_not_applicable"
     OUT_OF_TIME_BUDGET = "out_of_time_budget"
     NEEDS_MANUAL_MASK = "needs_manual_mask"
+    AUTO_SELECTION_UNRESOLVED = "auto_selection_unresolved"
 
 
 class JobState(StrEnum):
@@ -152,6 +153,10 @@ class MaskLayer:
     # Source-only glyph core registered across verified repeats, before any
     # footprint padding. Evidence for the opt-in seed-preservation candidate.
     repeat_stroke_support: np.ndarray | None = None
+    # Source-only shadow fit, independent of the current edit permission.
+    # Binary alpha selects strokes here; it is not measured physical opacity.
+    shadow_reconstruction: np.ndarray | None = None
+    shadow_evidence: dict[str, Any] | None = None
 
     def binary(self, threshold: float = Thresholds.mask_alpha_min) -> np.ndarray:
         if self.selection is not None:
@@ -195,7 +200,8 @@ class VerdictReport:
     @property
     def review_needed(self) -> bool:
         """Unmeasured recognition or residual quality cannot count as success."""
-        return "recognition" not in self.conditions or "residual" not in self.conditions
+        return ("recognition" not in self.conditions or "residual" not in self.conditions
+                or self.conditions.get("automatic_selection_verified") is False)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -229,6 +235,10 @@ class PageResult:
     # -1 = automatic decision; 0 = manually excluded; 1 = manually included.
     # Only committed edits belong in a PageResult; pending edits stay in the UI.
     selection_overrides: np.ndarray | None = None
+    # Successful candidate runs retained for inspection; none contain a parent
+    # or themselves. Selection never uses their optional evaluation references.
+    comparison_results: list[PageResult] = field(default_factory=list)
+    comparison_evidence: dict[str, np.ndarray] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {

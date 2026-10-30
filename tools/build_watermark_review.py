@@ -25,7 +25,7 @@ V1 = ROOT / 'data/watermark_training_v1'
 INC = ROOT / 'data/watermark_training_increment_v1_1'
 OUT = ROOT / 'out/baseline_20261026'
 LATEST = ROOT / 'out/foundation_round_20261026'
-UPDATED_ON = '2026-10-27'
+UPDATED_ON = '2026-10-29'
 REPORT = DOCS / '水印分类样本与最新测试.html'
 IMAGE_STYLES = json.loads((V1 / 'build_summary.json').read_text())['image_styles']
 PDF_STYLES = json.loads((V1 / 'build_summary.json').read_text())['pdf_styles']
@@ -379,8 +379,8 @@ def build():
     snapshot='与本次报告读取的源码一致' if run['code_snapshot_matches'] else '与当前源码存在差异；结果仅代表保存的测试版本'
     source_links=' · '.join(source_link(p,label) for p,label in [(run['metrics_path'],'本次完整指标'),(run['before_metrics_path'],'同输入修改前指标'),(LATEST/'selection.json','88 张／页选样清单')] if p)
     warning='本轮包含 train 和 validation 来源的开发检查样本；不是全部来自独立留出集。图片样式仍集中于少数底图，不能把此处比例当作总体成功率。新增 8 个真实训练样本尚未加入这轮推理结果。'
-    content=f'''<section id="overview"><p class="eyebrow">图片 / PDF · 文档更新 {UPDATED_ON} · 测试记录保留原时间</p><h1>水印种类、全部样本与最新测试</h1>
-<p class="lead">按类型核对覆盖范围，查看全部原始样本与可用参考，检查最新一轮的完整处理结果。</p>
+    content=f'''<div class="notice" id="current-project-entry"><strong>样本目录与历史开发测试：</strong>文件名保留兼容，页内“最新”指下方注明日期的保存结果，不代表当前代码全量验收。<a href="项目现状与后续开发说明.html">查看当前状态</a> · <a href="../out/水印验证报告总目录.html">查看基线、实验和全部报告</a></div><section id="overview"><p class="eyebrow">图片 / PDF · 文档更新 {UPDATED_ON} · 测试记录保留原时间</p><h1>水印分类样本与历史测试</h1>
+<p class="lead">按类型查看样本与参考；本页保存的开发测试对应历史版本。当前状态和全量观察基线请从上方入口查看。</p>
 <div class="stats"><div><b>12 类</b><span>可见水印验收场景</span></div><div><b>{len(entries):,}</b><span>全部图片／页面卡片</span></div><div><b>{len(tasks)}</b><span>人工增量可训练记录</span></div><div><b>{len(tests)}</b><span>最新测试完整对比</span></div></div>
 <div class="notice">人工增量已包含 121 条严格配对、3 组近似修复配对和 5 张检测专用图。最新已保存复测为 {esc(run['created_at'])}，共 58 张图片、30 页 PDF。此次只更新报告，没有重跑推理或训练模型。</div></section>
 <section id="training"><h2>当前训练数据状态</h2><p>当前只保留基础训练集、人工训练增量、固定最小回归集三套工作数据。原 v1 的 2,432 条按图片／PDF 文档计；增量 129 条按图片／页计，不能直接相加成独立来源数。固定回归集是派生测试输入，也不另算训练来源。</p>

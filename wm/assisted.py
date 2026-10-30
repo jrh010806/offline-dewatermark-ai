@@ -78,7 +78,8 @@ def find_strokes(result: PageResult, rectangle, thr: Thresholds,
     layer = replace(local, alpha=alpha, footprint=selected,
                     paper=expand(local.paper, background=paper_fill),
                     text_keepout=expand(local.text_keepout),
-                    overlay_opacity=expand(local.overlay_opacity), instances=[])
+                    overlay_opacity=expand(local.overlay_opacity),
+                    shadow_reconstruction=expand(local.shadow_reconstruction), instances=[])
     # A non-invertible generic layer has no validated numerical veil model.
     if layer.repair_mode == 'hybrid':
         layer = replace(layer, repair_mode='inpaint',

@@ -317,6 +317,10 @@ def repair_with_lama(img: np.ndarray, mask, thr) -> tuple[np.ndarray, list[Repai
         from .observed_text import restore_shadow
         return restore_shadow(img, mask), [RepairName.PAPER_CLEANUP]
 
+    if mask.repair_mode == 'shadow_layer_inverse':
+        from .shadow_layers import restore
+        return restore(img, mask, thr.mask_alpha_min), [RepairName.ALPHA_UNMIX]
+
     if mask.repair_mode == 'thin_photo_text':
         region = mask.footprint
         distance = cv2.distanceTransform(region.astype(np.uint8), cv2.DIST_L2, 3)
